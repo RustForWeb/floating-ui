@@ -1,0 +1,13 @@
+[package]
+name = "floating-ui-leptos"
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+floating-ui-core = { path = "../core" }
+floating-ui-utils = { path = "../utils" }
+leptos = { version = "0.6.9", features = ["nightly"] }

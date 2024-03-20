@@ -1,0 +1,12 @@
+[workspace]
+members = ["packages/*"]
+resolver = "2"
+
+[workspace.package]
+authors = ["Nixy <info@nixy.software>"]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/NixySoftware/floating-ui"
+version = "0.1.0"
+
+[workspace.dependencies]

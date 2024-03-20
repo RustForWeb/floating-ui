@@ -1,0 +1,15 @@
+{
+    "name": "@nixysoftware/floating-ui",
+    "description": "Rust port of Floating UI.",
+    "author": "Nixy <info@nixy.software>",
+    "repository": "github:NixySoftware/floating-ui",
+    "license": "MIT",
+    "private": true,
+    "scripts": {},
+    "devDependencies": {
+        "prettier": "^3.2.5"
+    },
+    "engines": {
+        "node": ">=18"
+    }
+}

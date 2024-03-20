@@ -1,0 +1,11 @@
+[package]
+name = "floating-ui-core"
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+floating-ui-utils = { path = "../utils" }
