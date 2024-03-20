@@ -52,10 +52,26 @@ pub enum Axis {
     Y,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Coords {
     pub x: isize,
     pub y: isize,
+}
+
+impl Coords {
+    pub fn update_axis<F>(&mut self, axis: Axis, update: F)
+    where
+        F: Fn(isize) -> isize,
+    {
+        match axis {
+            Axis::X => {
+                self.x = update(self.x);
+            }
+            Axis::Y => {
+                self.y = update(self.y);
+            }
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -64,13 +80,13 @@ pub enum Length {
     Height,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Dimensions {
     pub width: isize,
     pub height: isize,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct SideObject {
     pub top: isize,
     pub right: isize,
@@ -78,7 +94,7 @@ pub struct SideObject {
     pub left: isize,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct PartialSideObject {
     pub top: Option<isize>,
     pub right: Option<isize>,
@@ -86,7 +102,7 @@ pub struct PartialSideObject {
     pub left: Option<isize>,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Rect {
     pub x: isize,
     pub y: isize,
@@ -95,7 +111,7 @@ pub struct Rect {
 }
 
 impl Rect {
-    pub fn get_length(&self, length: &Length) -> isize {
+    pub fn get_length(&self, length: Length) -> isize {
         match length {
             Length::Width => self.width,
             Length::Height => self.height,
@@ -103,13 +119,13 @@ impl Rect {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub enum Padding {
     All(isize),
     PerSide(PartialSideObject),
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct ClientRectObject {
     pub x: isize,
     pub y: isize,
@@ -121,13 +137,13 @@ pub struct ClientRectObject {
     pub left: isize,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct ElementRects {
     pub reference: Rect,
     pub floating: Rect,
 }
 
-pub fn get_side(placement: &Placement) -> Side {
+pub fn get_side(placement: Placement) -> Side {
     match placement {
         Placement::Top => Side::Top,
         Placement::TopStart => Side::Top,
@@ -144,7 +160,7 @@ pub fn get_side(placement: &Placement) -> Side {
     }
 }
 
-pub fn get_alignment(placement: &Placement) -> Option<Alignment> {
+pub fn get_alignment(placement: Placement) -> Option<Alignment> {
     match placement {
         Placement::Top => None,
         Placement::TopStart => Some(Alignment::Start),
@@ -161,7 +177,7 @@ pub fn get_alignment(placement: &Placement) -> Option<Alignment> {
     }
 }
 
-pub fn get_placement(side: &Side, alignment: &Option<Alignment>) -> Placement {
+pub fn get_placement(side: Side, alignment: Option<Alignment>) -> Placement {
     match (side, alignment) {
         (Side::Top, None) => Placement::Top,
         (Side::Top, Some(Alignment::Start)) => Placement::TopStart,
@@ -178,21 +194,21 @@ pub fn get_placement(side: &Side, alignment: &Option<Alignment>) -> Placement {
     }
 }
 
-pub fn get_opposite_axis(axis: &Axis) -> Axis {
+pub fn get_opposite_axis(axis: Axis) -> Axis {
     match axis {
         Axis::X => Axis::Y,
         Axis::Y => Axis::X,
     }
 }
 
-pub fn get_axis_length(axis: &Axis) -> Length {
+pub fn get_axis_length(axis: Axis) -> Length {
     match axis {
         Axis::X => Length::Width,
         Axis::Y => Length::Height,
     }
 }
 
-pub fn get_side_axis(placement: &Placement) -> Axis {
+pub fn get_side_axis(placement: Placement) -> Axis {
     match get_side(placement) {
         Side::Top => Axis::Y,
         Side::Right => Axis::X,
@@ -201,18 +217,18 @@ pub fn get_side_axis(placement: &Placement) -> Axis {
     }
 }
 
-pub fn get_alignment_axis(placement: &Placement) -> Axis {
-    get_opposite_axis(&get_side_axis(placement))
+pub fn get_alignment_axis(placement: Placement) -> Axis {
+    get_opposite_axis(get_side_axis(placement))
 }
 
 pub fn get_alignment_sides(
-    placement: &Placement,
-    rects: &ElementRects,
+    placement: Placement,
+    rects: ElementRects,
     rtl: Option<bool>,
 ) -> (Side, Side) {
     let alignment = get_alignment(placement);
     let alignment_axis = get_alignment_axis(placement);
-    let length = get_axis_length(&alignment_axis);
+    let length = get_axis_length(alignment_axis);
 
     let mut main_alignment_side = match (alignment_axis, alignment) {
         (Axis::X, Some(Alignment::Start)) => match rtl {
@@ -227,24 +243,24 @@ pub fn get_alignment_sides(
         (Axis::Y, _) => Side::Top,
     };
 
-    if rects.reference.get_length(&length) > rects.floating.get_length(&length) {
-        main_alignment_side = get_opposite_side(&main_alignment_side);
+    if rects.reference.get_length(length) > rects.floating.get_length(length) {
+        main_alignment_side = get_opposite_side(main_alignment_side);
     }
 
-    (main_alignment_side, get_opposite_side(&main_alignment_side))
+    (main_alignment_side, get_opposite_side(main_alignment_side))
 }
 
-pub fn get_expanded_placements(placement: &Placement) -> (Placement, Placement, Placement) {
+pub fn get_expanded_placements(placement: Placement) -> (Placement, Placement, Placement) {
     let opposite_placement = get_opposite_placement(placement);
 
     (
         get_opposite_alignment_placement(placement),
         opposite_placement,
-        get_opposite_alignment_placement(&opposite_placement),
+        get_opposite_alignment_placement(opposite_placement),
     )
 }
 
-pub fn get_opposite_alignment_placement(placement: &Placement) -> Placement {
+pub fn get_opposite_alignment_placement(placement: Placement) -> Placement {
     match placement {
         Placement::Top => Placement::Top,
         Placement::TopStart => Placement::TopEnd,
@@ -280,7 +296,7 @@ pub fn get_side_list(side: Side, is_start: bool, rtl: Option<bool>) -> Vec<Side>
     }
 }
 
-pub fn get_opposite_side(side: &Side) -> Side {
+pub fn get_opposite_side(side: Side) -> Side {
     match side {
         Side::Top => Side::Bottom,
         Side::Right => Side::Left,
@@ -290,7 +306,7 @@ pub fn get_opposite_side(side: &Side) -> Side {
 }
 
 pub fn get_opposite_axis_placements(
-    placement: &Placement,
+    placement: Placement,
     flip_alignment: bool,
     direction: Option<Alignment>,
     rtl: Option<bool>,
@@ -303,18 +319,24 @@ pub fn get_opposite_axis_placements(
     );
 
     let mut list: Vec<Placement> = side_list
-        .iter()
-        .map(|side| get_placement(side, &alignment))
+        .into_iter()
+        .map(|side| get_placement(side, alignment))
         .collect();
 
     if flip_alignment {
-        list.append(&mut list.iter().map(get_opposite_alignment_placement).collect());
+        let mut opposite_list: Vec<Placement> = list
+            .clone()
+            .into_iter()
+            .map(get_opposite_alignment_placement)
+            .collect();
+
+        list.append(&mut opposite_list);
     }
 
     list
 }
 
-pub fn get_opposite_placement(placement: &Placement) -> Placement {
+pub fn get_opposite_placement(placement: Placement) -> Placement {
     match placement {
         Placement::Top => Placement::Bottom,
         Placement::TopStart => Placement::BottomStart,
@@ -331,7 +353,7 @@ pub fn get_opposite_placement(placement: &Placement) -> Placement {
     }
 }
 
-pub fn expand_padding_object(padding: &PartialSideObject) -> SideObject {
+pub fn expand_padding_object(padding: PartialSideObject) -> SideObject {
     SideObject {
         top: padding.top.unwrap_or(0),
         right: padding.right.unwrap_or(0),
@@ -340,19 +362,19 @@ pub fn expand_padding_object(padding: &PartialSideObject) -> SideObject {
     }
 }
 
-pub fn get_padding_object(padding: &Padding) -> SideObject {
+pub fn get_padding_object(padding: Padding) -> SideObject {
     match padding {
         Padding::All(padding) => SideObject {
-            top: *padding,
-            right: *padding,
-            bottom: *padding,
-            left: *padding,
+            top: padding,
+            right: padding,
+            bottom: padding,
+            left: padding,
         },
         Padding::PerSide(padding) => expand_padding_object(padding),
     }
 }
 
-pub fn rect_to_client_rect(rect: &Rect) -> ClientRectObject {
+pub fn rect_to_client_rect(rect: Rect) -> ClientRectObject {
     ClientRectObject {
         x: rect.x,
         y: rect.y,

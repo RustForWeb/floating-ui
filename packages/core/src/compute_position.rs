@@ -20,7 +20,7 @@ pub fn compute_position(
         floating,
         strategy,
     });
-    let Coords { x, y } = compute_coords_from_placement();
+    // let Coords { x, y } = compute_coords_from_placement(rects, placement, rtl);
 }
 
 #[cfg(test)]
