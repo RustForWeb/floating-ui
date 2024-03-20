@@ -1,4 +1,6 @@
-use floating_ui_utils::{Dimensions, ElementRects, Placement, Rect, Strategy};
+use floating_ui_utils::{
+    ClientRectObject, Coords, Dimensions, ElementRects, Placement, Rect, Strategy,
+};
 
 // TODO
 type Element = bool;
@@ -18,26 +20,55 @@ pub enum RootBoundary {
 // }
 
 pub struct GetElementRectsArgs {
-    reference: ReferenceElement,
-    floating: FloatingElement,
-    strategy: Strategy,
+    pub reference: ReferenceElement,
+    pub floating: FloatingElement,
+    pub strategy: Strategy,
 }
 
 pub struct GetClippingRectArgs {
-    element: Element,
-    boundary: Boundary,
-    root_boundary: RootBoundary,
-    strategy: Strategy,
+    pub element: Element,
+    pub boundary: Boundary,
+    pub root_boundary: RootBoundary,
+    pub strategy: Strategy,
 }
 
 pub trait Platform {
+    // TODO: check arg type, currently all anys are replaced by Element
+
     fn get_element_rects(&self, args: GetElementRectsArgs) -> ElementRects;
 
     fn get_clipping_rect(&self, args: GetClippingRectArgs) -> Rect;
 
     fn get_dimensions(&self, element: Element) -> Dimensions;
 
-    // TODO: optional funcs
+    // TODO: args
+    fn convert_offset_parent_relative_react_to_viewport_relative_rect(&self) -> Option<Rect> {
+        None
+    }
+
+    fn get_offset_parent(&self, element: Element) -> Option<Element> {
+        None
+    }
+
+    fn is_element(&self, value: Element) -> Option<bool> {
+        None
+    }
+
+    fn get_document_element(&self, element: Element) -> Option<Element> {
+        None
+    }
+
+    fn get_client_rects(&self, element: Element) -> Option<Vec<ClientRectObject>> {
+        None
+    }
+
+    fn is_rtl(&self, element: Element) -> Option<bool> {
+        None
+    }
+
+    fn get_scale(&self, element: Element) -> Option<Coords> {
+        None
+    }
 }
 
 pub trait Middleware {
@@ -54,10 +85,10 @@ pub struct MiddlewareData {
 }
 
 pub struct ComputePositionConfig {
-    platform: Box<dyn Platform>,
-    placement: Option<Placement>,
-    strategy: Option<Strategy>,
-    middleware: Option<Vec<Box<dyn Middleware>>>,
+    pub platform: Box<dyn Platform>,
+    pub placement: Option<Placement>,
+    pub strategy: Option<Strategy>,
+    pub middleware: Option<Vec<Box<dyn Middleware>>>,
 }
 
 pub struct ComputePositionReturn {
