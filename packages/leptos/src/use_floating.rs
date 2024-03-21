@@ -7,7 +7,7 @@ pub struct UseFloatingOptions {
     // TODO: check these types and implement the rest
     strategy: Strategy,
     placement: Placement,
-    middleware: Vec<Box<dyn Middleware>>,
+    middleware: Vec<Box<dyn Middleware<Element>>>,
 }
 
 pub struct UseFloatingData {

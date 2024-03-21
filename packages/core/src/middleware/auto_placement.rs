@@ -59,13 +59,25 @@ pub fn get_placement_list(
         .collect()
 }
 
-#[derive(Clone, Debug, Default)]
-pub struct AutoPlacementOptions {
-    detect_overflow: Option<DetectOverflowOptions>,
+#[derive(Clone, Debug)]
+pub struct AutoPlacementOptions<'a, Element> {
+    detect_overflow: Option<DetectOverflowOptions<'a, Element>>,
     cross_axis: Option<bool>,
     alignment: Option<Alignment>,
     auto_alignment: Option<bool>,
     allowed_placements: Option<Vec<Placement>>,
+}
+
+impl<'a, Element> Default for AutoPlacementOptions<'a, Element> {
+    fn default() -> Self {
+        Self {
+            detect_overflow: Default::default(),
+            cross_axis: Default::default(),
+            alignment: Default::default(),
+            auto_alignment: Default::default(),
+            allowed_placements: Default::default(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -80,22 +92,22 @@ struct AutoPlacementData {
     overflows: Vec<AutoPlacementDataOverflow>,
 }
 
-pub struct AutoPlacement {
-    options: AutoPlacementOptions,
+pub struct AutoPlacement<'a, Element> {
+    options: AutoPlacementOptions<'a, Element>,
 }
 
-impl AutoPlacement {
-    pub fn new(options: AutoPlacementOptions) -> Self {
+impl<'a, Element> AutoPlacement<'a, Element> {
+    pub fn new(options: AutoPlacementOptions<'a, Element>) -> Self {
         AutoPlacement { options }
     }
 }
 
-impl Middleware for AutoPlacement {
+impl<'a, Element> Middleware<Element> for AutoPlacement<'a, Element> {
     fn name(&self) -> &'static str {
         "autoPlacement"
     }
 
-    fn compute(&self, state: MiddlewareState) -> MiddlewareReturn {
+    fn compute(&self, state: MiddlewareState<Element>) -> MiddlewareReturn {
         let MiddlewareState {
             rects,
             middleware_data,
@@ -123,7 +135,10 @@ impl Middleware for AutoPlacement {
 
         let overflow = detect_overflow(
             state,
-            self.options.detect_overflow.clone().unwrap_or_default(),
+            self.options
+                .detect_overflow
+                .clone()
+                .unwrap_or(DetectOverflowOptions::default()),
         );
 
         let data: AutoPlacementData =
@@ -140,8 +155,11 @@ impl Middleware for AutoPlacement {
         if let Some(current_placement) = current_placement {
             let current_placement = *current_placement;
 
-            let alignment_sides =
-                get_alignment_sides(current_placement, rects, platform.is_rtl(elements.floating));
+            let alignment_sides = get_alignment_sides(
+                current_placement,
+                rects,
+                platform.is_rtl(&elements.floating),
+            );
 
             // Make `compute_coords` start from the right place.
             if placement != current_placement {
@@ -257,8 +275,10 @@ impl Middleware for AutoPlacement {
     }
 }
 
-impl MiddlewareWithOptions<AutoPlacementOptions> for AutoPlacement {
-    fn options(&self) -> &AutoPlacementOptions {
+impl<'a, Element> MiddlewareWithOptions<AutoPlacementOptions<'a, Element>>
+    for AutoPlacement<'a, Element>
+{
+    fn options(&self) -> &AutoPlacementOptions<'a, Element> {
         &self.options
     }
 }
@@ -397,8 +417,8 @@ mod tests {
             strategy,
             middleware_data,
         } = compute_position(
-            REFERENCE,
-            FLOATING,
+            &REFERENCE,
+            &FLOATING,
             ComputePositionConfig {
                 platform: &PLATFORM,
                 placement: None,

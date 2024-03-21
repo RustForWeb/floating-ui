@@ -1,10 +1,12 @@
 use floating_ui_utils::{Dimensions, ElementRects, Rect};
 
-use crate::types::{Element, GetClippingRectArgs, GetElementRectsArgs, Platform};
+use crate::types::{GetClippingRectArgs, GetElementRectsArgs, Platform};
 
-// TODO
-pub const REFERENCE: Element = false;
-pub const FLOATING: Element = false;
+#[derive(Clone, Debug)]
+pub struct Element {}
+
+pub const REFERENCE: Element = Element {};
+pub const FLOATING: Element = Element {};
 pub const REFERENCE_RECT: Rect = Rect {
     x: 0,
     y: 0,
@@ -20,15 +22,15 @@ pub const FLOATING_RECT: Rect = Rect {
 
 pub struct TestPlatform {}
 
-impl Platform for TestPlatform {
-    fn get_element_rects(&self, _args: GetElementRectsArgs) -> ElementRects {
+impl Platform<Element> for TestPlatform {
+    fn get_element_rects(&self, _args: GetElementRectsArgs<Element>) -> ElementRects {
         ElementRects {
             reference: REFERENCE_RECT,
             floating: FLOATING_RECT,
         }
     }
 
-    fn get_clipping_rect(&self, _args: GetClippingRectArgs) -> Rect {
+    fn get_clipping_rect(&self, _args: GetClippingRectArgs<Element>) -> Rect {
         Rect {
             x: 0,
             y: 0,
@@ -37,7 +39,7 @@ impl Platform for TestPlatform {
         }
     }
 
-    fn get_dimensions(&self, _element: Element) -> Dimensions {
+    fn get_dimensions(&self, _element: &Element) -> Dimensions {
         Dimensions {
             width: 10,
             height: 10,

@@ -2,21 +2,51 @@ use floating_ui_utils::{
     get_padding_object, rect_to_client_rect, Coords, Padding, Rect, SideObject,
 };
 
-use crate::types::{
-    Boundary, ConvertOffsetParentRelativeRectToViewportRelativeRectArgs, ElementContext,
-    MiddlewareState, RootBoundary,
+use crate::{
+    types::{
+        Boundary, ConvertOffsetParentRelativeRectToViewportRelativeRectArgs, ElementContext,
+        MiddlewareState, RootBoundary,
+    },
+    Elements, GetClippingRectArgs,
 };
 
-#[derive(Clone, Debug, Default)]
-pub struct DetectOverflowOptions {
-    boundary: Option<Boundary>,
-    root_boundary: Option<RootBoundary>,
-    element_context: Option<ElementContext>,
-    alt_boundary: Option<bool>,
-    padding: Option<Padding>,
+#[derive(Debug)]
+pub struct DetectOverflowOptions<'a, Element> {
+    pub boundary: Option<Boundary<'a, Element>>,
+    pub root_boundary: Option<RootBoundary>,
+    pub element_context: Option<ElementContext>,
+    pub alt_boundary: Option<bool>,
+    pub padding: Option<Padding>,
 }
 
-pub fn detect_overflow(state: MiddlewareState, options: DetectOverflowOptions) -> SideObject {
+impl<'a, Element> Clone for DetectOverflowOptions<'a, Element> {
+    fn clone(&self) -> Self {
+        Self {
+            boundary: self.boundary.clone(),
+            root_boundary: self.root_boundary.clone(),
+            element_context: self.element_context.clone(),
+            alt_boundary: self.alt_boundary.clone(),
+            padding: self.padding.clone(),
+        }
+    }
+}
+
+impl<'a, Element> Default for DetectOverflowOptions<'a, Element> {
+    fn default() -> Self {
+        Self {
+            boundary: Default::default(),
+            root_boundary: Default::default(),
+            element_context: Default::default(),
+            alt_boundary: Default::default(),
+            padding: Default::default(),
+        }
+    }
+}
+
+pub fn detect_overflow<Element>(
+    state: MiddlewareState<Element>,
+    options: DetectOverflowOptions<Element>,
+) -> SideObject {
     let MiddlewareState {
         x,
         y,
@@ -44,7 +74,7 @@ pub fn detect_overflow(state: MiddlewareState, options: DetectOverflowOptions) -
     };
 
     let clipping_client_rect =
-        rect_to_client_rect(platform.get_clipping_rect(crate::GetClippingRectArgs {
+        rect_to_client_rect(platform.get_clipping_rect(GetClippingRectArgs {
             element: match platform.is_element(element).unwrap_or(false) {
                 true => Some(&element),
                 false => None, // TODO
@@ -64,7 +94,7 @@ pub fn detect_overflow(state: MiddlewareState, options: DetectOverflowOptions) -
         },
     };
 
-    let offset_parent = platform.get_offset_parent(elements.floating);
+    let offset_parent = platform.get_offset_parent(&elements.floating);
     let offset_scale = match offset_parent {
         Some(offset_parent) => match platform.is_element(offset_parent).unwrap_or(false) {
             true => platform
@@ -79,7 +109,10 @@ pub fn detect_overflow(state: MiddlewareState, options: DetectOverflowOptions) -
         platform
             .convert_offset_parent_relative_rect_to_viewport_relative_rect(
                 ConvertOffsetParentRelativeRectToViewportRelativeRectArgs {
-                    elements: Some(elements),
+                    elements: Some(Elements {
+                        reference: &elements.reference,
+                        floating: &elements.floating,
+                    }),
                     rect: rect.clone(),
                     offset_parent,
                     strategy,

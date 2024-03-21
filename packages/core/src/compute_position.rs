@@ -2,15 +2,14 @@ use floating_ui_utils::{Coords, Placement, Strategy};
 
 use crate::compute_coords_from_placement::compute_coords_from_placement;
 use crate::types::{
-    ComputePositionConfig, Elements, FloatingElement, GetElementRectsArgs, MiddlewareData,
-    MiddlewareReturn, MiddlewareState, ReferenceElement, Reset,
+    ComputePositionConfig, ComputePositionReturn, Elements, GetElementRectsArgs, MiddlewareData,
+    MiddlewareReturn, MiddlewareState, Reset, ResetRects,
 };
-use crate::{ComputePositionReturn, ResetRects};
 
-pub fn compute_position(
-    reference: ReferenceElement,
-    floating: FloatingElement,
-    config: ComputePositionConfig,
+pub fn compute_position<Element>(
+    reference: &Element,
+    floating: &Element,
+    config: ComputePositionConfig<Element>,
 ) -> ComputePositionReturn {
     let placement = config.placement.unwrap_or(Placement::Bottom);
     let strategy = config.strategy.unwrap_or(Strategy::Absolute);
@@ -48,8 +47,8 @@ pub fn compute_position(
             rects: &rects,
             platform,
             elements: &Elements {
-                reference,
-                floating,
+                reference: &reference,
+                floating: &floating,
             },
         });
 
@@ -123,12 +122,12 @@ mod tests {
     fn test_returned_data() {
         struct CustomMiddleware {}
 
-        impl Middleware for CustomMiddleware {
+        impl<Element> Middleware<Element> for CustomMiddleware {
             fn name(&self) -> &'static str {
                 "custom"
             }
 
-            fn compute(&self, _state: MiddlewareState) -> MiddlewareReturn {
+            fn compute(&self, _state: MiddlewareState<Element>) -> MiddlewareReturn {
                 MiddlewareReturn {
                     x: None,
                     y: None,
@@ -145,8 +144,8 @@ mod tests {
             strategy,
             middleware_data,
         } = compute_position(
-            REFERENCE,
-            FLOATING,
+            &REFERENCE,
+            &FLOATING,
             ComputePositionConfig {
                 platform: &PLATFORM,
                 placement: Some(Placement::Top),
@@ -169,12 +168,15 @@ mod tests {
     fn test_middleware() {
         struct TestMiddleware {}
 
-        impl Middleware for TestMiddleware {
+        impl<Element> Middleware<Element> for TestMiddleware {
             fn name(&self) -> &'static str {
                 "test"
             }
 
-            fn compute(&self, MiddlewareState { x, y, .. }: MiddlewareState) -> MiddlewareReturn {
+            fn compute(
+                &self,
+                MiddlewareState { x, y, .. }: MiddlewareState<Element>,
+            ) -> MiddlewareReturn {
                 MiddlewareReturn {
                     x: Some(x + 1),
                     y: Some(y + 1),
@@ -185,8 +187,8 @@ mod tests {
         }
 
         let ComputePositionReturn { x, y, .. } = compute_position(
-            REFERENCE,
-            FLOATING,
+            &REFERENCE,
+            &FLOATING,
             ComputePositionConfig {
                 platform: &PLATFORM,
                 placement: None,
@@ -196,8 +198,8 @@ mod tests {
         );
 
         let ComputePositionReturn { x: x2, y: y2, .. } = compute_position(
-            REFERENCE,
-            FLOATING,
+            &REFERENCE,
+            &FLOATING,
             ComputePositionConfig {
                 platform: &PLATFORM,
                 placement: None,
@@ -213,12 +215,12 @@ mod tests {
     fn test_middleware_data() {
         struct TestMiddleware {}
 
-        impl Middleware for TestMiddleware {
+        impl<Element> Middleware<Element> for TestMiddleware {
             fn name(&self) -> &'static str {
                 "test"
             }
 
-            fn compute(&self, _state: MiddlewareState) -> MiddlewareReturn {
+            fn compute(&self, _state: MiddlewareState<Element>) -> MiddlewareReturn {
                 MiddlewareReturn {
                     x: None,
                     y: None,
@@ -231,8 +233,8 @@ mod tests {
         let ComputePositionReturn {
             middleware_data, ..
         } = compute_position(
-            REFERENCE,
-            FLOATING,
+            &REFERENCE,
+            &FLOATING,
             ComputePositionConfig {
                 platform: &PLATFORM,
                 placement: None,
