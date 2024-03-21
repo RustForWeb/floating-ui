@@ -1,5 +1,6 @@
 [package]
 name = "floating-ui-utils"
+description = "Utilities for Floating UI."
 
 authors.workspace = true
 edition.workspace = true

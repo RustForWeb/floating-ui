@@ -1,5 +1,6 @@
 [package]
 name = "floating-ui-leptos"
+description = "Floating UI for Leptos."
 
 authors.workspace = true
 edition.workspace = true

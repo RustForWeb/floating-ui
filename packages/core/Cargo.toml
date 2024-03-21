@@ -1,5 +1,6 @@
 [package]
 name = "floating-ui-core"
+description = "Positioning library for floating elements: tooltips, popovers, dropdowns, and more."
 
 authors.workspace = true
 edition.workspace = true

@@ -111,10 +111,7 @@ pub fn compute_position(
 mod tests {
     use floating_ui_utils::{Dimensions, ElementRects, Rect};
 
-    use crate::{
-        types::{Element, Middleware, Platform},
-        MiddlewareWithOptions,
-    };
+    use crate::types::{Element, Middleware, Platform};
 
     use super::*;
 
