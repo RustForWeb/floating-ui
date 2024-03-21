@@ -10,3 +10,7 @@ version.workspace = true
 
 [dependencies]
 floating-ui-core = { path = "../core" }
+
+[dependencies.web-sys]
+version = "0.3.69"
+features = ["Element"]
