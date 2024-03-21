@@ -135,10 +135,7 @@ impl<'a, Element> Middleware<Element> for AutoPlacement<'a, Element> {
 
         let overflow = detect_overflow(
             state,
-            self.options
-                .detect_overflow
-                .clone()
-                .unwrap_or(DetectOverflowOptions::default()),
+            self.options.detect_overflow.clone().unwrap_or_default(),
         );
 
         let data: AutoPlacementData =
@@ -155,11 +152,8 @@ impl<'a, Element> Middleware<Element> for AutoPlacement<'a, Element> {
         if let Some(current_placement) = current_placement {
             let current_placement = *current_placement;
 
-            let alignment_sides = get_alignment_sides(
-                current_placement,
-                rects,
-                platform.is_rtl(&elements.floating),
-            );
+            let alignment_sides =
+                get_alignment_sides(current_placement, rects, platform.is_rtl(elements.floating));
 
             // Make `compute_coords` start from the right place.
             if placement != current_placement {

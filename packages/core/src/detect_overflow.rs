@@ -24,8 +24,8 @@ impl<'a, Element> Clone for DetectOverflowOptions<'a, Element> {
         Self {
             boundary: self.boundary.clone(),
             root_boundary: self.root_boundary.clone(),
-            element_context: self.element_context.clone(),
-            alt_boundary: self.alt_boundary.clone(),
+            element_context: self.element_context,
+            alt_boundary: self.alt_boundary,
             padding: self.padding.clone(),
         }
     }
@@ -76,7 +76,7 @@ pub fn detect_overflow<Element>(
     let clipping_client_rect =
         rect_to_client_rect(platform.get_clipping_rect(GetClippingRectArgs {
             element: match platform.is_element(element).unwrap_or(false) {
-                true => Some(&element),
+                true => Some(element),
                 false => None, // TODO
             },
             boundary,
@@ -94,7 +94,7 @@ pub fn detect_overflow<Element>(
         },
     };
 
-    let offset_parent = platform.get_offset_parent(&elements.floating);
+    let offset_parent = platform.get_offset_parent(elements.floating);
     let offset_scale = match offset_parent {
         Some(offset_parent) => match platform.is_element(offset_parent).unwrap_or(false) {
             true => platform
@@ -110,8 +110,8 @@ pub fn detect_overflow<Element>(
             .convert_offset_parent_relative_rect_to_viewport_relative_rect(
                 ConvertOffsetParentRelativeRectToViewportRelativeRectArgs {
                     elements: Some(Elements {
-                        reference: &elements.reference,
-                        floating: &elements.floating,
+                        reference: elements.reference,
+                        floating: elements.floating,
                     }),
                     rect: rect.clone(),
                     offset_parent,

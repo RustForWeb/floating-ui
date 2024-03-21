@@ -1,6 +1,6 @@
 [package]
-name = "floating-ui-utils"
-description = "Utilities for Floating UI."
+name = "floating-ui-dom"
+description = "Floating UI for the web."
 
 authors.workspace = true
 edition.workspace = true
@@ -9,4 +9,4 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-serde.workspace = true
+floating-ui-core = { path = "../core" }

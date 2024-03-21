@@ -37,32 +37,32 @@ pub trait Platform<Element> {
 
     fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
         &self,
-        args: ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<&Element>,
+        _args: ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<&Element>,
     ) -> Option<Rect> {
         None
     }
 
-    fn get_offset_parent(&self, element: &Element) -> Option<&Element> {
+    fn get_offset_parent(&self, _element: &Element) -> Option<&Element> {
         None
     }
 
-    fn is_element(&self, value: &Element) -> Option<bool> {
+    fn is_element(&self, _value: &Element) -> Option<bool> {
         None
     }
 
-    fn get_document_element(&self, element: &Element) -> Option<&Element> {
+    fn get_document_element(&self, _element: &Element) -> Option<&Element> {
         None
     }
 
-    fn get_client_rects(&self, element: &Element) -> Option<Vec<ClientRectObject>> {
+    fn get_client_rects(&self, _element: &Element) -> Option<Vec<ClientRectObject>> {
         None
     }
 
-    fn is_rtl(&self, element: &Element) -> Option<bool> {
+    fn is_rtl(&self, _element: &Element) -> Option<bool> {
         None
     }
 
-    fn get_scale(&self, element: &Element) -> Option<Coords> {
+    fn get_scale(&self, _element: &Element) -> Option<Coords> {
         None
     }
 }
@@ -155,8 +155,8 @@ pub struct Elements<'a, Element> {
 impl<'a, Element> Elements<'a, Element> {
     pub fn get_element_context(&self, element_context: ElementContext) -> &Element {
         match element_context {
-            ElementContext::Reference => &self.reference,
-            ElementContext::Floating => &self.floating,
+            ElementContext::Reference => self.reference,
+            ElementContext::Floating => self.floating,
         }
     }
 }
@@ -186,9 +186,9 @@ impl<'a, Element> Clone for Boundary<'a, Element> {
     fn clone(&self) -> Self {
         match self {
             Self::ClippingAncestors => Self::ClippingAncestors,
-            Self::Element(arg0) => Self::Element(arg0.clone()),
-            Self::Elements(arg0) => Self::Elements(arg0.clone()),
-            Self::Rect(arg0) => Self::Rect(arg0.clone()),
+            Self::Element(e) => Self::Element(e),
+            Self::Elements(e) => Self::Elements(e.clone()),
+            Self::Rect(r) => Self::Rect(r.clone()),
         }
     }
 }
