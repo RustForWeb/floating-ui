@@ -1,3 +1,7 @@
+use std::collections::HashMap;
+
+use serde::{de::DeserializeOwned, Serialize};
+
 use floating_ui_utils::{
     ClientRectObject, Coords, Dimensions, ElementRects, Placement, Rect, Strategy,
 };
@@ -12,7 +16,7 @@ pub struct GetElementRectsArgs {
 }
 
 pub struct GetClippingRectArgs<'a> {
-    pub element: &'a Element,
+    pub element: Option<&'a Element>,
     pub boundary: Boundary,
     pub root_boundary: RootBoundary,
     pub strategy: Strategy,
@@ -34,7 +38,7 @@ pub trait Platform {
 
     fn get_dimensions(&self, element: Element) -> Dimensions;
 
-    fn convert_offset_parent_relative_react_to_viewport_relative_rect(
+    fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
         &self,
         args: ConvertOffsetParentRelativeRectToViewportRelativeRectArgs,
     ) -> Option<Rect> {
@@ -66,9 +70,30 @@ pub trait Platform {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct MiddlewareData {
-    // TODO
+    values: HashMap<String, serde_json::Value>,
+}
+
+impl MiddlewareData {
+    pub fn get(&self, key: &str) -> Option<&serde_json::Value> {
+        self.values.get(key)
+    }
+
+    pub fn get_as<D: DeserializeOwned>(&self, key: &str) -> Option<D> {
+        self.values
+            .get(key)
+            .map(|value| serde_json::from_value::<D>(value.clone()).unwrap())
+    }
+
+    pub fn set(&mut self, key: &str, value: serde_json::Value) {
+        self.values.insert(key.into(), value);
+    }
+
+    pub fn set_as<S: Serialize>(&mut self, key: &str, value: S) {
+        self.values
+            .insert(key.into(), serde_json::to_value(value).unwrap());
+    }
 }
 
 #[derive(Clone)]
@@ -110,12 +135,12 @@ pub enum Reset {
 pub struct MiddlewareReturn {
     pub x: Option<isize>,
     pub y: Option<isize>,
-    pub data: Option<bool>, // TODO
+    pub data: Option<serde_json::Value>,
     pub reset: Option<Reset>,
 }
 
 pub trait Middleware {
-    fn name(&self) -> String;
+    fn name(&self) -> &'static str;
 
     fn compute(&self, state: MiddlewareState) -> MiddlewareReturn;
 }

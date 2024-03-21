@@ -46,8 +46,8 @@ pub fn detect_overflow(state: MiddlewareState, options: DetectOverflowOptions) -
     let clipping_client_rect =
         rect_to_client_rect(platform.get_clipping_rect(crate::GetClippingRectArgs {
             element: match platform.is_element(element).unwrap_or(false) {
-                true => &element,
-                false => todo!(),
+                true => Some(&element),
+                false => None, // TODO
             },
             boundary,
             root_boundary,
@@ -77,7 +77,7 @@ pub fn detect_overflow(state: MiddlewareState, options: DetectOverflowOptions) -
 
     let element_client_rect = rect_to_client_rect(
         platform
-            .convert_offset_parent_relative_react_to_viewport_relative_rect(
+            .convert_offset_parent_relative_rect_to_viewport_relative_rect(
                 ConvertOffsetParentRelativeRectToViewportRelativeRectArgs {
                     elements: Some(elements),
                     rect: rect.clone(),

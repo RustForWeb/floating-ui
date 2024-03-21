@@ -15,7 +15,7 @@ pub fn compute_position(
     let placement = config.placement.unwrap_or(Placement::Bottom);
     let strategy = config.strategy.unwrap_or(Strategy::Absolute);
     let platform = config.platform;
-    let middlewares = config.middleware.unwrap_or(vec![]);
+    let middlewares = config.middleware.unwrap_or_default();
 
     let rtl = platform.is_rtl(floating);
 
@@ -26,7 +26,7 @@ pub fn compute_position(
     });
     let Coords { mut x, mut y } = compute_coords_from_placement(&rects, placement, rtl);
     let mut stateful_placement = placement;
-    let mut middleware_data = MiddlewareData {};
+    let mut middleware_data = MiddlewareData::default();
     let mut reset_count = 0;
 
     let mut i = 0;
@@ -56,7 +56,9 @@ pub fn compute_position(
         x = next_x.unwrap_or(x);
         y = next_y.unwrap_or(y);
 
-        // TODO: modify middleware data
+        if let Some(data) = data {
+            middleware_data.set(middleware.name(), data);
+        }
 
         if let Some(reset) = reset {
             if reset_count <= 50 {
@@ -91,7 +93,8 @@ pub fn compute_position(
                     }
                 }
 
-                i -= 1;
+                i = 0;
+                continue;
             }
         }
 
@@ -109,54 +112,32 @@ pub fn compute_position(
 
 #[cfg(test)]
 mod tests {
-    use floating_ui_utils::{Dimensions, ElementRects, Rect};
+    use serde_json::json;
 
-    use crate::types::{Element, Middleware, Platform};
+    use crate::test_utils::{FLOATING, PLATFORM, REFERENCE};
+    use crate::types::Middleware;
 
     use super::*;
 
-    // TODO
-    const REFERENCE: Element = false;
-    const FLOATING: Element = false;
-    const REFERENCE_RECT: Rect = Rect {
-        x: 0,
-        y: 0,
-        width: 100,
-        height: 100,
-    };
-    const FLOATING_RECT: Rect = Rect {
-        x: 0,
-        y: 0,
-        width: 50,
-        height: 50,
-    };
-
-    struct TestPlatform {}
-
-    impl Platform for TestPlatform {
-        fn get_element_rects(&self, _args: GetElementRectsArgs) -> ElementRects {
-            ElementRects {
-                reference: REFERENCE_RECT,
-                floating: FLOATING_RECT,
-            }
-        }
-
-        fn get_clipping_rect(&self, _args: crate::GetClippingRectArgs) -> Rect {
-            todo!()
-        }
-
-        fn get_dimensions(&self, _element: Element) -> Dimensions {
-            Dimensions {
-                width: 10,
-                height: 10,
-            }
-        }
-    }
-
-    const PLATFORM: TestPlatform = TestPlatform {};
-
     #[test]
     fn test_returned_data() {
+        struct CustomMiddleware {}
+
+        impl Middleware for CustomMiddleware {
+            fn name(&self) -> &'static str {
+                "custom"
+            }
+
+            fn compute(&self, _state: MiddlewareState) -> MiddlewareReturn {
+                MiddlewareReturn {
+                    x: None,
+                    y: None,
+                    data: Some(json!({"property": true})),
+                    reset: None,
+                }
+            }
+        }
+
         let ComputePositionReturn {
             x,
             y,
@@ -170,7 +151,7 @@ mod tests {
                 platform: &PLATFORM,
                 placement: Some(Placement::Top),
                 strategy: None,
-                middleware: Some(vec![]),
+                middleware: Some(vec![&CustomMiddleware {}]),
             },
         );
 
@@ -178,7 +159,10 @@ mod tests {
         assert_eq!(y, -50);
         assert_eq!(placement, Placement::Top);
         assert_eq!(strategy, Strategy::Absolute);
-        // assert_eq!(middleware_data, MiddlewareData {});
+        assert_eq!(
+            middleware_data.get("custom"),
+            Some(&json!({"property": true}))
+        );
     }
 
     #[test]
@@ -186,8 +170,8 @@ mod tests {
         struct TestMiddleware {}
 
         impl Middleware for TestMiddleware {
-            fn name(&self) -> String {
-                "test".into()
+            fn name(&self) -> &'static str {
+                "test"
             }
 
             fn compute(&self, MiddlewareState { x, y, .. }: MiddlewareState) -> MiddlewareReturn {
@@ -226,5 +210,37 @@ mod tests {
     }
 
     #[test]
-    fn test_middleware_data() {}
+    fn test_middleware_data() {
+        struct TestMiddleware {}
+
+        impl Middleware for TestMiddleware {
+            fn name(&self) -> &'static str {
+                "test"
+            }
+
+            fn compute(&self, _state: MiddlewareState) -> MiddlewareReturn {
+                MiddlewareReturn {
+                    x: None,
+                    y: None,
+                    data: Some(json!({"hello": true})),
+                    reset: None,
+                }
+            }
+        }
+
+        let ComputePositionReturn {
+            middleware_data, ..
+        } = compute_position(
+            REFERENCE,
+            FLOATING,
+            ComputePositionConfig {
+                platform: &PLATFORM,
+                placement: None,
+                strategy: None,
+                middleware: Some(vec![&TestMiddleware {}]),
+            },
+        );
+
+        assert_eq!(middleware_data.get("test"), Some(&json!({"hello": true})));
+    }
 }

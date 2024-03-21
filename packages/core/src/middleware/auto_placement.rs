@@ -2,6 +2,7 @@ use floating_ui_utils::{
     get_alignment, get_alignment_sides, get_opposite_alignment_placement, get_side, Alignment,
     Placement, ALL_PLACEMENTS,
 };
+use serde::{Deserialize, Serialize};
 
 use crate::{
     detect_overflow::{detect_overflow, DetectOverflowOptions},
@@ -67,6 +68,18 @@ pub struct AutoPlacementOptions {
     allowed_placements: Option<Vec<Placement>>,
 }
 
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct AutoPlacementDataOverflow {
+    placement: Placement,
+    overflows: Vec<isize>,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct AutoPlacementData {
+    index: usize,
+    overflows: Vec<AutoPlacementDataOverflow>,
+}
+
 pub struct AutoPlacement {
     options: AutoPlacementOptions,
 }
@@ -78,8 +91,8 @@ impl AutoPlacement {
 }
 
 impl Middleware for AutoPlacement {
-    fn name(&self) -> String {
-        "autoPlacement".into()
+    fn name(&self) -> &'static str {
+        "autoPlacement"
     }
 
     fn compute(&self, state: MiddlewareState) -> MiddlewareReturn {
@@ -113,54 +126,127 @@ impl Middleware for AutoPlacement {
             self.options.detect_overflow.clone().unwrap_or_default(),
         );
 
-        // TODO
-        // let current_index = middleware_data
-        let current_index = 0;
-        let current_placement = placements[current_index];
+        let data: AutoPlacementData =
+            middleware_data
+                .get_as(self.name())
+                .unwrap_or(AutoPlacementData {
+                    index: 0,
+                    overflows: vec![],
+                });
 
-        // if current_placement == null { return {} }
+        let current_index = data.index;
+        let current_placement = placements.get(current_index);
 
-        let alignment_sides =
-            get_alignment_sides(current_placement, rects, platform.is_rtl(elements.floating));
+        if let Some(current_placement) = current_placement {
+            let current_placement = *current_placement;
 
-        // Make `compute_coords` start from the right place.
-        if placement != current_placement {
-            return MiddlewareReturn {
-                x: None,
-                y: None,
-                data: None,
-                reset: Some(Reset::Value(ResetValue {
-                    placement: Some(placements[0]),
-                    rects: None,
-                })),
-            };
+            let alignment_sides =
+                get_alignment_sides(current_placement, rects, platform.is_rtl(elements.floating));
+
+            // Make `compute_coords` start from the right place.
+            if placement != current_placement {
+                return MiddlewareReturn {
+                    x: None,
+                    y: None,
+                    data: None,
+                    reset: Some(Reset::Value(ResetValue {
+                        placement: Some(placements[0]),
+                        rects: None,
+                    })),
+                };
+            }
+
+            let current_overflows = vec![
+                overflow.get_side(get_side(current_placement)),
+                overflow.get_side(alignment_sides.0),
+                overflow.get_side(alignment_sides.1),
+            ];
+
+            let mut all_overflows = data.overflows.clone();
+            all_overflows.push(AutoPlacementDataOverflow {
+                placement,
+                overflows: current_overflows,
+            });
+
+            let next_placement = placements.get(current_index + 1);
+
+            // There are more placements to check.
+            if let Some(next_placement) = next_placement {
+                return MiddlewareReturn {
+                    x: None,
+                    y: None,
+                    data: Some(
+                        serde_json::to_value(AutoPlacementData {
+                            index: current_index + 1,
+                            overflows: all_overflows.clone(),
+                        })
+                        .unwrap(),
+                    ),
+                    reset: Some(Reset::Value(ResetValue {
+                        placement: Some(*next_placement),
+                        rects: None,
+                    })),
+                };
+            }
+
+            let mut placements_sorted_by_most_space: Vec<_> = all_overflows
+                .clone()
+                .into_iter()
+                .map(|overflow| {
+                    let alignment = get_alignment(overflow.placement);
+
+                    (
+                        overflow.placement,
+                        match alignment.is_some() && cross_axis {
+                            // Check along the main axis and main cross axis side.
+                            true => overflow.overflows[0..2].iter().sum(),
+                            // Check only the main axis.
+                            false => overflow.overflows[0],
+                        },
+                        overflow.overflows,
+                    )
+                })
+                .collect();
+
+            placements_sorted_by_most_space.sort_by_key(|v| v.1);
+
+            let placements_that_fit_on_each_side: Vec<_> = placements_sorted_by_most_space
+                .clone()
+                .into_iter()
+                .filter(|overflow| {
+                    // Aligned placements should not check their opposite cross axis side.
+                    overflow.2[0..match get_alignment(overflow.0) {
+                        Some(_) => 2,
+                        None => 3,
+                    }]
+                        .iter()
+                        .all(|v| *v <= 0)
+                })
+                .collect();
+
+            let reset_placement = placements_that_fit_on_each_side
+                .first()
+                .map(|v| v.0)
+                .unwrap_or(placements_sorted_by_most_space[0].0);
+
+            if reset_placement != placement {
+                return MiddlewareReturn {
+                    x: None,
+                    y: None,
+                    data: Some(
+                        serde_json::to_value(AutoPlacementData {
+                            index: current_index + 1,
+                            overflows: all_overflows,
+                        })
+                        .unwrap(),
+                    ),
+                    reset: Some(Reset::Value(ResetValue {
+                        placement: Some(reset_placement),
+                        rects: None,
+                    })),
+                };
+            }
         }
-
-        let current_overflows = vec![
-            overflow.get_side(get_side(current_placement)),
-            overflow.get_side(alignment_sides.0),
-            overflow.get_side(alignment_sides.1),
-        ];
-
-        // let all_overflows =
-
-        let next_placement = placements.get(current_index + 1);
-
-        // There are more placements to check.
-        if let Some(next_placement) = next_placement {
-            return MiddlewareReturn {
-                x: None,
-                y: None,
-                data: None, // TODO
-                reset: Some(Reset::Value(ResetValue {
-                    placement: Some(*next_placement),
-                    rects: None,
-                })),
-            };
-        }
-
-        // let placements_sorted_by_most_space = all_overflows
-        // TODO
 
         MiddlewareReturn {
             x: None,
@@ -179,6 +265,15 @@ impl MiddlewareWithOptions<AutoPlacementOptions> for AutoPlacement {
 
 #[cfg(test)]
 mod tests {
+    use floating_ui_utils::Strategy;
+
+    use crate::{
+        compute_position::compute_position,
+        test_utils::{FLOATING, PLATFORM, REFERENCE},
+        types::ComputePositionConfig,
+        ComputePositionReturn,
+    };
+
     use super::*;
 
     #[test]
@@ -290,6 +385,55 @@ mod tests {
                 Placement::TopStart,
                 Placement::LeftStart
             ]
+        )
+    }
+
+    #[test]
+    fn test_middleware() {
+        let ComputePositionReturn {
+            x,
+            y,
+            placement,
+            strategy,
+            middleware_data,
+        } = compute_position(
+            REFERENCE,
+            FLOATING,
+            ComputePositionConfig {
+                platform: &PLATFORM,
+                placement: None,
+                strategy: None,
+                middleware: Some(vec![&AutoPlacement::new(AutoPlacementOptions::default())]),
+            },
+        );
+
+        assert_eq!(x, 100);
+        assert_eq!(y, 25);
+        assert_eq!(placement, Placement::Right);
+        assert_eq!(strategy, Strategy::Absolute);
+        assert_eq!(
+            middleware_data.get_as::<AutoPlacementData>("autoPlacement"),
+            Some(AutoPlacementData {
+                index: 4,
+                overflows: vec![
+                    AutoPlacementDataOverflow {
+                        placement: Placement::Top,
+                        overflows: vec![50, -925, -25]
+                    },
+                    AutoPlacementDataOverflow {
+                        placement: Placement::Right,
+                        overflows: vec![-850, -925, -25]
+                    },
+                    AutoPlacementDataOverflow {
+                        placement: Placement::Bottom,
+                        overflows: vec![-850, -925, -25]
+                    },
+                    AutoPlacementDataOverflow {
+                        placement: Placement::Left,
+                        overflows: vec![50, -925, -25]
+                    }
+                ]
+            })
         )
     }
 }

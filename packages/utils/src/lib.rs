@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Alignment {
     Start,
@@ -24,7 +26,7 @@ pub enum AlignedPlacement {
     LeftEnd,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Placement {
     Top,
     TopStart,
