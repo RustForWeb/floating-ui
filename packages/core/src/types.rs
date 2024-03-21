@@ -3,21 +3,7 @@ use floating_ui_utils::{
 };
 
 // TODO
-type Element = bool;
-pub type ReferenceElement = Element;
-pub type FloatingElement = Element;
-pub type Boundary = Element;
-
-pub enum RootBoundary {
-    Viewport,
-    Document,
-    Rect(Rect),
-}
-
-// pub enum ElementContext {
-//     Reference,
-//     Floating
-// }
+pub type Element = bool;
 
 pub struct GetElementRectsArgs {
     pub reference: ReferenceElement,
@@ -71,15 +57,6 @@ pub trait Platform {
     }
 }
 
-pub trait Middleware {
-    fn name(&self) -> String;
-
-    // TODO: return type
-    fn options(&self) -> bool;
-
-    // fn run(&self, state: MiddlewareState) -> MiddlewareReturn;
-}
-
 pub struct MiddlewareData {
     // TODO
 }
@@ -92,7 +69,73 @@ pub struct ComputePositionConfig {
 }
 
 pub struct ComputePositionReturn {
-    placement: Placement,
-    strategy: Strategy,
-    middleware_data: MiddlewareData,
+    pub x: isize,
+    pub y: isize,
+    pub placement: Placement,
+    pub strategy: Strategy,
+    pub middleware_data: MiddlewareData,
 }
+
+pub enum ResetRects {
+    True,
+    Value(ElementRects),
+}
+
+pub struct ResetValue {
+    pub placement: Option<Placement>,
+    pub rects: Option<ResetRects>,
+}
+
+pub enum Reset {
+    True,
+    Value(ResetValue),
+}
+
+pub struct MiddlewareReturn {
+    pub x: Option<isize>,
+    pub y: Option<isize>,
+    pub data: Option<bool>, // TODO
+    pub reset: Option<Reset>,
+}
+
+pub trait Middleware {
+    fn name(&self) -> String;
+
+    // TODO: return type
+    fn options(&self) -> bool;
+
+    fn compute(&self, state: MiddlewareState) -> MiddlewareReturn;
+}
+
+pub type ReferenceElement = Element;
+pub type FloatingElement = Element;
+
+pub struct Elements {
+    pub reference: ReferenceElement,
+    pub floating: FloatingElement,
+}
+
+pub struct MiddlewareState<'a> {
+    pub x: isize,
+    pub y: isize,
+    pub initial_placement: Placement,
+    pub placement: Placement,
+    pub strategy: Strategy,
+    pub middleware_data: &'a MiddlewareData,
+    pub elements: &'a Elements,
+    pub rects: &'a ElementRects,
+    pub platform: &'a Box<dyn Platform>,
+}
+
+pub type Boundary = Element;
+
+pub enum RootBoundary {
+    Viewport,
+    Document,
+    Rect(Rect),
+}
+
+// pub enum ElementContext {
+//     Reference,
+//     Floating
+// }

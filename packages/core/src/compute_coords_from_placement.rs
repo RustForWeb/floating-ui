@@ -7,7 +7,7 @@ pub fn compute_coords_from_placement(
     ElementRects {
         reference,
         floating,
-    }: ElementRects,
+    }: &ElementRects,
     placement: Placement,
     rtl: Option<bool>,
 ) -> Coords {
@@ -83,7 +83,7 @@ mod tests {
     #[test]
     fn test_top() {
         assert_eq!(
-            compute_coords_from_placement(ELEMENT_RECTS, Placement::Top, None),
+            compute_coords_from_placement(&ELEMENT_RECTS, Placement::Top, None),
             Coords { x: 25, y: -50 }
         )
     }
@@ -91,7 +91,7 @@ mod tests {
     #[test]
     fn test_top_start() {
         assert_eq!(
-            compute_coords_from_placement(ELEMENT_RECTS, Placement::TopStart, None),
+            compute_coords_from_placement(&ELEMENT_RECTS, Placement::TopStart, None),
             Coords { x: 0, y: -50 }
         )
     }
@@ -99,7 +99,7 @@ mod tests {
     #[test]
     fn test_top_end() {
         assert_eq!(
-            compute_coords_from_placement(ELEMENT_RECTS, Placement::TopEnd, None),
+            compute_coords_from_placement(&ELEMENT_RECTS, Placement::TopEnd, None),
             Coords { x: 50, y: -50 }
         )
     }
@@ -107,7 +107,7 @@ mod tests {
     #[test]
     fn test_right() {
         assert_eq!(
-            compute_coords_from_placement(ELEMENT_RECTS, Placement::Right, None),
+            compute_coords_from_placement(&ELEMENT_RECTS, Placement::Right, None),
             Coords { x: 100, y: 25 }
         )
     }
@@ -115,7 +115,7 @@ mod tests {
     #[test]
     fn test_right_start() {
         assert_eq!(
-            compute_coords_from_placement(ELEMENT_RECTS, Placement::RightStart, None),
+            compute_coords_from_placement(&ELEMENT_RECTS, Placement::RightStart, None),
             Coords { x: 100, y: 0 }
         )
     }
@@ -123,7 +123,7 @@ mod tests {
     #[test]
     fn test_right_end() {
         assert_eq!(
-            compute_coords_from_placement(ELEMENT_RECTS, Placement::RightEnd, None),
+            compute_coords_from_placement(&ELEMENT_RECTS, Placement::RightEnd, None),
             Coords { x: 100, y: 50 }
         )
     }
@@ -131,7 +131,7 @@ mod tests {
     #[test]
     fn test_bottom() {
         assert_eq!(
-            compute_coords_from_placement(ELEMENT_RECTS, Placement::Bottom, None),
+            compute_coords_from_placement(&ELEMENT_RECTS, Placement::Bottom, None),
             Coords { x: 25, y: 100 }
         )
     }
@@ -139,7 +139,7 @@ mod tests {
     #[test]
     fn test_bottom_start() {
         assert_eq!(
-            compute_coords_from_placement(ELEMENT_RECTS, Placement::BottomStart, None),
+            compute_coords_from_placement(&ELEMENT_RECTS, Placement::BottomStart, None),
             Coords { x: 0, y: 100 }
         )
     }
@@ -147,7 +147,7 @@ mod tests {
     #[test]
     fn test_bottom_end() {
         assert_eq!(
-            compute_coords_from_placement(ELEMENT_RECTS, Placement::BottomEnd, None),
+            compute_coords_from_placement(&ELEMENT_RECTS, Placement::BottomEnd, None),
             Coords { x: 50, y: 100 }
         )
     }
@@ -155,7 +155,7 @@ mod tests {
     #[test]
     fn test_left() {
         assert_eq!(
-            compute_coords_from_placement(ELEMENT_RECTS, Placement::Left, None),
+            compute_coords_from_placement(&ELEMENT_RECTS, Placement::Left, None),
             Coords { x: -50, y: 25 }
         )
     }
@@ -163,7 +163,7 @@ mod tests {
     #[test]
     fn test_left_start() {
         assert_eq!(
-            compute_coords_from_placement(ELEMENT_RECTS, Placement::LeftStart, None),
+            compute_coords_from_placement(&ELEMENT_RECTS, Placement::LeftStart, None),
             Coords { x: -50, y: 0 }
         )
     }
@@ -171,7 +171,7 @@ mod tests {
     #[test]
     fn test_left_end() {
         assert_eq!(
-            compute_coords_from_placement(ELEMENT_RECTS, Placement::LeftEnd, None),
+            compute_coords_from_placement(&ELEMENT_RECTS, Placement::LeftEnd, None),
             Coords { x: -50, y: 50 }
         )
     }
