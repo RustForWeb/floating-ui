@@ -46,7 +46,7 @@ pub fn compute_position(
             strategy,
             middleware_data: &middleware_data,
             rects: &rects,
-            platform: &platform,
+            platform,
             elements: &Elements {
                 reference,
                 floating,
@@ -112,8 +112,8 @@ mod tests {
     use floating_ui_utils::{Dimensions, ElementRects, Rect};
 
     use crate::{
-        types::{Element, Platform},
-        Middleware,
+        types::{Element, Middleware, Platform},
+        MiddlewareWithOptions,
     };
 
     use super::*;
@@ -170,7 +170,7 @@ mod tests {
             REFERENCE,
             FLOATING,
             ComputePositionConfig {
-                platform: Box::new(PLATFORM),
+                platform: &PLATFORM,
                 placement: Some(Placement::Top),
                 strategy: None,
                 middleware: Some(vec![]),
@@ -193,10 +193,6 @@ mod tests {
                 "test".into()
             }
 
-            fn options(&self) -> bool {
-                false
-            }
-
             fn compute(&self, MiddlewareState { x, y, .. }: MiddlewareState) -> MiddlewareReturn {
                 MiddlewareReturn {
                     x: Some(x + 1),
@@ -211,7 +207,7 @@ mod tests {
             REFERENCE,
             FLOATING,
             ComputePositionConfig {
-                platform: Box::new(PLATFORM),
+                platform: &PLATFORM,
                 placement: None,
                 strategy: None,
                 middleware: None,
@@ -222,10 +218,10 @@ mod tests {
             REFERENCE,
             FLOATING,
             ComputePositionConfig {
-                platform: Box::new(PLATFORM),
+                platform: &PLATFORM,
                 placement: None,
                 strategy: None,
-                middleware: Some(vec![Box::new(TestMiddleware {})]),
+                middleware: Some(vec![&TestMiddleware {}]),
             },
         );
 

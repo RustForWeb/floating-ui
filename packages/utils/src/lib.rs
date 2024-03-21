@@ -94,6 +94,17 @@ pub struct SideObject {
     pub left: isize,
 }
 
+impl SideObject {
+    pub fn get_side(&self, side: Side) -> isize {
+        match side {
+            Side::Top => self.top,
+            Side::Right => self.right,
+            Side::Bottom => self.bottom,
+            Side::Left => self.left,
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct PartialSideObject {
     pub top: Option<isize>,
@@ -142,6 +153,21 @@ pub struct ElementRects {
     pub reference: Rect,
     pub floating: Rect,
 }
+
+pub const ALL_PLACEMENTS: [Placement; 12] = [
+    Placement::Top,
+    Placement::TopStart,
+    Placement::TopEnd,
+    Placement::Right,
+    Placement::RightStart,
+    Placement::RightEnd,
+    Placement::Bottom,
+    Placement::BottomStart,
+    Placement::BottomEnd,
+    Placement::Left,
+    Placement::LeftStart,
+    Placement::LeftEnd,
+];
 
 pub fn get_side(placement: Placement) -> Side {
     match placement {
@@ -223,7 +249,7 @@ pub fn get_alignment_axis(placement: Placement) -> Axis {
 
 pub fn get_alignment_sides(
     placement: Placement,
-    rects: ElementRects,
+    rects: &ElementRects,
     rtl: Option<bool>,
 ) -> (Side, Side) {
     let alignment = get_alignment(placement);
