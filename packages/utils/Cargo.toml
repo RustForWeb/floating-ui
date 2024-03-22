@@ -10,3 +10,9 @@ version.workspace = true
 
 [dependencies]
 serde.workspace = true
+web-sys = { workspace = true, optional = true }
+
+[features]
+# TODO: remove default
+default = ["dom"]
+dom = ["dep:web-sys"]

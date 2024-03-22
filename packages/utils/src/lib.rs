@@ -1,3 +1,6 @@
+#[cfg(feature = "dom")]
+pub mod dom;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Debug, PartialEq)]

@@ -1,3 +1,4 @@
+mod platform;
 mod types;
 
 // TODO: consider copying the exported types instead of using star
