@@ -61,7 +61,7 @@ pub fn detect_overflow<Element>(
     let root_boundary = options.root_boundary.unwrap_or(RootBoundary::Viewport);
     let element_context = options.element_context.unwrap_or(ElementContext::Floating);
     let alt_boundary = options.alt_boundary.unwrap_or(false);
-    let padding = options.padding.unwrap_or(Padding::All(0));
+    let padding = options.padding.unwrap_or(Padding::All(0.0));
 
     let padding_object = get_padding_object(padding);
     let alt_context = match element_context {
@@ -99,10 +99,10 @@ pub fn detect_overflow<Element>(
         Some(offset_parent) => match platform.is_element(offset_parent).unwrap_or(false) {
             true => platform
                 .get_scale(offset_parent)
-                .unwrap_or(Coords { x: 1, y: 1 }),
-            false => Coords { x: 1, y: 1 },
+                .unwrap_or(Coords { x: 1.0, y: 1.0 }),
+            false => Coords { x: 1.0, y: 1.0 },
         },
-        None => Coords { x: 1, y: 1 },
+        None => Coords { x: 1.0, y: 1.0 },
     };
 
     let element_client_rect = rect_to_client_rect(

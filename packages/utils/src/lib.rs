@@ -59,14 +59,18 @@ pub enum Axis {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Coords {
-    pub x: isize,
-    pub y: isize,
+    pub x: f64,
+    pub y: f64,
 }
 
 impl Coords {
+    pub fn new(value: f64) -> Self {
+        Self { x: value, y: value }
+    }
+
     pub fn update_axis<F>(&mut self, axis: Axis, update: F)
     where
-        F: Fn(isize) -> isize,
+        F: Fn(f64) -> f64,
     {
         match axis {
             Axis::X => {
@@ -87,20 +91,20 @@ pub enum Length {
 
 #[derive(Clone, Debug)]
 pub struct Dimensions {
-    pub width: isize,
-    pub height: isize,
+    pub width: f64,
+    pub height: f64,
 }
 
 #[derive(Clone, Debug)]
 pub struct SideObject {
-    pub top: isize,
-    pub right: isize,
-    pub bottom: isize,
-    pub left: isize,
+    pub top: f64,
+    pub right: f64,
+    pub bottom: f64,
+    pub left: f64,
 }
 
 impl SideObject {
-    pub fn get_side(&self, side: Side) -> isize {
+    pub fn get_side(&self, side: Side) -> f64 {
         match side {
             Side::Top => self.top,
             Side::Right => self.right,
@@ -112,22 +116,22 @@ impl SideObject {
 
 #[derive(Clone, Debug)]
 pub struct PartialSideObject {
-    pub top: Option<isize>,
-    pub right: Option<isize>,
-    pub bottom: Option<isize>,
-    pub left: Option<isize>,
+    pub top: Option<f64>,
+    pub right: Option<f64>,
+    pub bottom: Option<f64>,
+    pub left: Option<f64>,
 }
 
 #[derive(Clone, Debug)]
 pub struct Rect {
-    pub x: isize,
-    pub y: isize,
-    pub width: isize,
-    pub height: isize,
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
 }
 
 impl Rect {
-    pub fn get_length(&self, length: Length) -> isize {
+    pub fn get_length(&self, length: Length) -> f64 {
         match length {
             Length::Width => self.width,
             Length::Height => self.height,
@@ -137,26 +141,52 @@ impl Rect {
 
 #[derive(Clone, Debug)]
 pub enum Padding {
-    All(isize),
+    All(f64),
     PerSide(PartialSideObject),
 }
 
 #[derive(Clone, Debug)]
 pub struct ClientRectObject {
-    pub x: isize,
-    pub y: isize,
-    pub width: isize,
-    pub height: isize,
-    pub top: isize,
-    pub right: isize,
-    pub bottom: isize,
-    pub left: isize,
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+    pub top: f64,
+    pub right: f64,
+    pub bottom: f64,
+    pub left: f64,
 }
 
 #[derive(Clone, Debug)]
 pub struct ElementRects {
     pub reference: Rect,
     pub floating: Rect,
+}
+
+pub enum ElementOrVirtual<'a, Element> {
+    Element(&'a Element),
+    VirtualElement(&'a dyn VirtualElement<Element>),
+}
+
+impl<'a, Element> ElementOrVirtual<'a, Element> {
+    pub fn unwrap(&self) -> Option<&'a Element> {
+        match self {
+            ElementOrVirtual::Element(element) => Some(element),
+            ElementOrVirtual::VirtualElement(virtal_element) => virtal_element.context_element(),
+        }
+    }
+}
+
+impl<'a, Element> From<&'a Element> for ElementOrVirtual<'a, Element> {
+    fn from(value: &'a Element) -> Self {
+        ElementOrVirtual::Element(value)
+    }
+}
+
+pub trait VirtualElement<Element> {
+    fn get_bounding_client_rect(&self) -> ClientRectObject;
+
+    fn context_element(&self) -> Option<&Element>;
 }
 
 pub const ALL_PLACEMENTS: [Placement; 12] = [
@@ -386,10 +416,10 @@ pub fn get_opposite_placement(placement: Placement) -> Placement {
 
 pub fn expand_padding_object(padding: PartialSideObject) -> SideObject {
     SideObject {
-        top: padding.top.unwrap_or(0),
-        right: padding.right.unwrap_or(0),
-        bottom: padding.bottom.unwrap_or(0),
-        left: padding.left.unwrap_or(0),
+        top: padding.top.unwrap_or(0.0),
+        right: padding.right.unwrap_or(0.0),
+        bottom: padding.bottom.unwrap_or(0.0),
+        left: padding.left.unwrap_or(0.0),
     }
 }
 

@@ -1,11 +1,18 @@
-mod get_client_rects;
-mod is_rtl;
+pub mod get_client_rects;
+pub mod get_dimensions;
+pub mod get_element_rects;
+pub mod get_scale;
+pub mod is_rtl;
 
 use floating_ui_core::Platform as CorePlatform;
+use floating_ui_utils::dom::get_document_element;
 use floating_ui_utils::{ClientRectObject, Coords, Dimensions, ElementRects, Rect};
 use web_sys::Element;
 
 use self::get_client_rects::get_client_rects;
+use self::get_dimensions::get_dimensions;
+use self::get_element_rects::get_element_rects;
+use self::get_scale::get_scale;
 use self::is_rtl::is_rtl;
 
 pub struct Platform {}
@@ -15,7 +22,7 @@ impl CorePlatform<Element> for Platform {
         &self,
         args: floating_ui_core::GetElementRectsArgs<Element>,
     ) -> ElementRects {
-        todo!()
+        get_element_rects(self, args)
     }
 
     fn get_clipping_rect(&self, args: floating_ui_core::GetClippingRectArgs<Element>) -> Rect {
@@ -23,7 +30,7 @@ impl CorePlatform<Element> for Platform {
     }
 
     fn get_dimensions(&self, element: &Element) -> Dimensions {
-        todo!()
+        get_dimensions(element)
     }
 
     fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
@@ -40,11 +47,12 @@ impl CorePlatform<Element> for Platform {
     }
 
     fn is_element(&self, _value: &Element) -> Option<bool> {
-        None
+        // TODO
+        Some(true)
     }
 
-    fn get_document_element(&self, _element: &Element) -> Option<&Element> {
-        None
+    fn get_document_element(&self, element: &Element) -> Option<Element> {
+        Some(get_document_element(element.into()))
     }
 
     fn get_client_rects(&self, element: &Element) -> Option<Vec<ClientRectObject>> {
@@ -55,7 +63,7 @@ impl CorePlatform<Element> for Platform {
         Some(is_rtl(element))
     }
 
-    fn get_scale(&self, _element: &Element) -> Option<Coords> {
-        None
+    fn get_scale(&self, element: &Element) -> Option<Coords> {
+        Some(get_scale(element.into()))
     }
 }

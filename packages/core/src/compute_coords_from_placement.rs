@@ -17,10 +17,10 @@ pub fn compute_coords_from_placement(
     let side = get_side(placement);
     let is_vertical = side_axis == Axis::Y;
 
-    let common_x = reference.x + reference.width / 2 - floating.width / 2;
-    let common_y = reference.y + reference.height / 2 - floating.height / 2;
+    let common_x = reference.x + reference.width / 2.0 - floating.width / 2.0;
+    let common_y = reference.y + reference.height / 2.0 - floating.height / 2.0;
     let common_align =
-        reference.get_length(align_length) / 2 - floating.get_length(align_length) / 2;
+        reference.get_length(align_length) / 2.0 - floating.get_length(align_length) / 2.0;
 
     let mut coords = match side {
         Side::Top => Coords {
@@ -45,12 +45,12 @@ pub fn compute_coords_from_placement(
     match get_alignment(placement) {
         Some(Alignment::Start) => {
             coords.update_axis(alignment_axis, |value| {
-                value - common_align * (if rtl && is_vertical { -1 } else { 1 })
+                value - common_align * (if rtl && is_vertical { -1.0 } else { 1.0 })
             });
         }
         Some(Alignment::End) => {
             coords.update_axis(alignment_axis, |value| {
-                value + common_align * (if rtl && is_vertical { -1 } else { 1 })
+                value + common_align * (if rtl && is_vertical { -1.0 } else { 1.0 })
             });
         }
         None => {}
@@ -67,16 +67,16 @@ mod tests {
 
     const ELEMENT_RECTS: ElementRects = ElementRects {
         reference: Rect {
-            x: 0,
-            y: 0,
-            width: 100,
-            height: 100,
+            x: 0.0,
+            y: 0.0,
+            width: 100.0,
+            height: 100.0,
         },
         floating: Rect {
-            x: 0,
-            y: 0,
-            width: 50,
-            height: 50,
+            x: 0.0,
+            y: 0.0,
+            width: 50.0,
+            height: 50.0,
         },
     };
 
@@ -84,7 +84,7 @@ mod tests {
     fn test_top() {
         assert_eq!(
             compute_coords_from_placement(&ELEMENT_RECTS, Placement::Top, None),
-            Coords { x: 25, y: -50 }
+            Coords { x: 25.0, y: -50.0 }
         )
     }
 
@@ -92,7 +92,7 @@ mod tests {
     fn test_top_start() {
         assert_eq!(
             compute_coords_from_placement(&ELEMENT_RECTS, Placement::TopStart, None),
-            Coords { x: 0, y: -50 }
+            Coords { x: 0.0, y: -50.0 }
         )
     }
 
@@ -100,7 +100,7 @@ mod tests {
     fn test_top_end() {
         assert_eq!(
             compute_coords_from_placement(&ELEMENT_RECTS, Placement::TopEnd, None),
-            Coords { x: 50, y: -50 }
+            Coords { x: 50.0, y: -50.0 }
         )
     }
 
@@ -108,7 +108,7 @@ mod tests {
     fn test_right() {
         assert_eq!(
             compute_coords_from_placement(&ELEMENT_RECTS, Placement::Right, None),
-            Coords { x: 100, y: 25 }
+            Coords { x: 100.0, y: 25.0 }
         )
     }
 
@@ -116,7 +116,7 @@ mod tests {
     fn test_right_start() {
         assert_eq!(
             compute_coords_from_placement(&ELEMENT_RECTS, Placement::RightStart, None),
-            Coords { x: 100, y: 0 }
+            Coords { x: 100.0, y: 0.0 }
         )
     }
 
@@ -124,7 +124,7 @@ mod tests {
     fn test_right_end() {
         assert_eq!(
             compute_coords_from_placement(&ELEMENT_RECTS, Placement::RightEnd, None),
-            Coords { x: 100, y: 50 }
+            Coords { x: 100.0, y: 50.0 }
         )
     }
 
@@ -132,7 +132,7 @@ mod tests {
     fn test_bottom() {
         assert_eq!(
             compute_coords_from_placement(&ELEMENT_RECTS, Placement::Bottom, None),
-            Coords { x: 25, y: 100 }
+            Coords { x: 25.0, y: 100.0 }
         )
     }
 
@@ -140,7 +140,7 @@ mod tests {
     fn test_bottom_start() {
         assert_eq!(
             compute_coords_from_placement(&ELEMENT_RECTS, Placement::BottomStart, None),
-            Coords { x: 0, y: 100 }
+            Coords { x: 0.0, y: 100.0 }
         )
     }
 
@@ -148,7 +148,7 @@ mod tests {
     fn test_bottom_end() {
         assert_eq!(
             compute_coords_from_placement(&ELEMENT_RECTS, Placement::BottomEnd, None),
-            Coords { x: 50, y: 100 }
+            Coords { x: 50.0, y: 100.0 }
         )
     }
 
@@ -156,7 +156,7 @@ mod tests {
     fn test_left() {
         assert_eq!(
             compute_coords_from_placement(&ELEMENT_RECTS, Placement::Left, None),
-            Coords { x: -50, y: 25 }
+            Coords { x: -50.0, y: 25.0 }
         )
     }
 
@@ -164,7 +164,7 @@ mod tests {
     fn test_left_start() {
         assert_eq!(
             compute_coords_from_placement(&ELEMENT_RECTS, Placement::LeftStart, None),
-            Coords { x: -50, y: 0 }
+            Coords { x: -50.0, y: 0.0 }
         )
     }
 
@@ -172,7 +172,7 @@ mod tests {
     fn test_left_end() {
         assert_eq!(
             compute_coords_from_placement(&ELEMENT_RECTS, Placement::LeftEnd, None),
-            Coords { x: -50, y: 50 }
+            Coords { x: -50.0, y: 50.0 }
         )
     }
 }

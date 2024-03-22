@@ -50,7 +50,7 @@ pub trait Platform<Element> {
         None
     }
 
-    fn get_document_element(&self, _element: &Element) -> Option<&Element> {
+    fn get_document_element(&self, _element: &Element) -> Option<Element> {
         None
     }
 
@@ -103,8 +103,8 @@ pub struct ComputePositionConfig<'a, Element> {
 
 #[derive(Clone, Debug)]
 pub struct ComputePositionReturn {
-    pub x: isize,
-    pub y: isize,
+    pub x: f64,
+    pub y: f64,
     pub placement: Placement,
     pub strategy: Strategy,
     pub middleware_data: MiddlewareData,
@@ -130,8 +130,8 @@ pub enum Reset {
 
 #[derive(Clone, Debug)]
 pub struct MiddlewareReturn {
-    pub x: Option<isize>,
-    pub y: Option<isize>,
+    pub x: Option<f64>,
+    pub y: Option<f64>,
     pub data: Option<serde_json::Value>,
     pub reset: Option<Reset>,
 }
@@ -163,8 +163,8 @@ impl<'a, Element> Elements<'a, Element> {
 
 #[derive(Clone)]
 pub struct MiddlewareState<'a, Element> {
-    pub x: isize,
-    pub y: isize,
+    pub x: f64,
+    pub y: f64,
     pub initial_placement: Placement,
     pub placement: Placement,
     pub strategy: Strategy,

@@ -11,8 +11,8 @@ pub struct UseFloatingOptions {
 }
 
 pub struct UseFloatingData {
-    x: isize,
-    y: isize,
+    x: f64,
+    y: f64,
     strategy: Strategy,
     placement: Placement,
     // TODO
@@ -22,8 +22,8 @@ pub struct UseFloatingData {
 
 pub fn use_floating(options: UseFloatingOptions) {
     let (data, set_data) = create_signal(UseFloatingData {
-        x: 0,
-        y: 0,
+        x: 0.0,
+        y: 0.0,
         strategy: options.strategy,
         placement: options.placement,
         middleware_data: false,

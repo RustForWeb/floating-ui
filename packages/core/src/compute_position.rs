@@ -154,8 +154,8 @@ mod tests {
             },
         );
 
-        assert_eq!(x, 25);
-        assert_eq!(y, -50);
+        assert_eq!(x, 25.0);
+        assert_eq!(y, -50.0);
         assert_eq!(placement, Placement::Top);
         assert_eq!(strategy, Strategy::Absolute);
         assert_eq!(
@@ -178,8 +178,8 @@ mod tests {
                 MiddlewareState { x, y, .. }: MiddlewareState<Element>,
             ) -> MiddlewareReturn {
                 MiddlewareReturn {
-                    x: Some(x + 1),
-                    y: Some(y + 1),
+                    x: Some(x + 1.0),
+                    y: Some(y + 1.0),
                     data: None,
                     reset: None,
                 }
@@ -208,7 +208,7 @@ mod tests {
             },
         );
 
-        assert_eq!((x2, y2), (x + 1, y + 1));
+        assert_eq!((x2, y2), (x + 1.0, y + 1.0));
     }
 
     #[test]

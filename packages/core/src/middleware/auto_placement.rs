@@ -83,7 +83,7 @@ impl<'a, Element> Default for AutoPlacementOptions<'a, Element> {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct AutoPlacementDataOverflow {
     placement: Placement,
-    overflows: Vec<isize>,
+    overflows: Vec<f64>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -220,7 +220,7 @@ impl<'a, Element> Middleware<Element> for AutoPlacement<'a, Element> {
                 })
                 .collect();
 
-            placements_sorted_by_most_space.sort_by_key(|v| v.1);
+            placements_sorted_by_most_space.sort_by_key(|v| v.1 as i64);
 
             let placements_that_fit_on_each_side: Vec<_> = placements_sorted_by_most_space
                 .clone()
@@ -232,7 +232,7 @@ impl<'a, Element> Middleware<Element> for AutoPlacement<'a, Element> {
                         None => 3,
                     }]
                         .iter()
-                        .all(|v| *v <= 0)
+                        .all(|v| *v <= 0.0)
                 })
                 .collect();
 
@@ -421,8 +421,8 @@ mod tests {
             },
         );
 
-        assert_eq!(x, 100);
-        assert_eq!(y, 25);
+        assert_eq!(x, 100.0);
+        assert_eq!(y, 25.0);
         assert_eq!(placement, Placement::Right);
         assert_eq!(strategy, Strategy::Absolute);
         assert_eq!(
@@ -432,19 +432,19 @@ mod tests {
                 overflows: vec![
                     AutoPlacementDataOverflow {
                         placement: Placement::Top,
-                        overflows: vec![50, -925, -25]
+                        overflows: vec![50.0, -925.0, -25.0]
                     },
                     AutoPlacementDataOverflow {
                         placement: Placement::Right,
-                        overflows: vec![-850, -925, -25]
+                        overflows: vec![-850.0, -925.0, -25.0]
                     },
                     AutoPlacementDataOverflow {
                         placement: Placement::Bottom,
-                        overflows: vec![-850, -925, -25]
+                        overflows: vec![-850.0, -925.0, -25.0]
                     },
                     AutoPlacementDataOverflow {
                         placement: Placement::Left,
-                        overflows: vec![50, -925, -25]
+                        overflows: vec![50.0, -925.0, -25.0]
                     }
                 ]
             })

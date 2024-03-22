@@ -1,5 +1,6 @@
 mod platform;
 mod types;
+mod utils;
 
 // TODO: consider copying the exported types instead of using star
 pub use types::*;
