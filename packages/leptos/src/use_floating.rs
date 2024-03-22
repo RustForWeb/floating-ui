@@ -1,13 +1,14 @@
 use floating_ui_core::Middleware;
 use floating_ui_utils::{Placement, Strategy};
-use leptos::{create_signal, leptos_dom::Element};
+use leptos::create_signal;
+use web_sys::{Element, Window};
 
 pub struct UseFloatingOptions {
     // TODO: should these be signals?
     // TODO: check these types and implement the rest
     strategy: Strategy,
     placement: Placement,
-    middleware: Vec<Box<dyn Middleware<Element>>>,
+    middleware: Vec<Box<dyn Middleware<Element, Window>>>,
 }
 
 pub struct UseFloatingData {

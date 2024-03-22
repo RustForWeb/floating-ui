@@ -3,67 +3,99 @@ use web_sys::{
     ShadowRoot, Window,
 };
 
+use crate::ElementOrWindow;
+
 #[derive(Clone, Debug)]
-pub enum NodeOrWindow<'a> {
+pub enum DomNodeOrWindow<'a> {
     Node(&'a Node),
     Window(&'a Window),
 }
 
-impl<'a> From<&'a Node> for NodeOrWindow<'a> {
+impl<'a> From<&'a Node> for DomNodeOrWindow<'a> {
     fn from(value: &'a Node) -> Self {
-        NodeOrWindow::Node(value)
+        DomNodeOrWindow::Node(value)
     }
 }
 
-impl<'a> From<&'a Element> for NodeOrWindow<'a> {
+impl<'a> From<&'a Element> for DomNodeOrWindow<'a> {
     fn from(value: &'a Element) -> Self {
-        NodeOrWindow::Node(value)
+        DomNodeOrWindow::Node(value)
     }
 }
 
-impl<'a> From<&'a Window> for NodeOrWindow<'a> {
+impl<'a> From<&'a Window> for DomNodeOrWindow<'a> {
     fn from(value: &'a Window) -> Self {
-        NodeOrWindow::Window(value)
+        DomNodeOrWindow::Window(value)
     }
 }
 
-impl<'a> From<&'a ElementOrWindow<'a>> for NodeOrWindow<'a> {
-    fn from(value: &'a ElementOrWindow) -> Self {
+impl<'a> From<ElementOrWindow<'a, Element, Window>> for DomNodeOrWindow<'a> {
+    fn from(value: ElementOrWindow<'a, Element, Window>) -> Self {
         match value {
-            ElementOrWindow::Element(element) => NodeOrWindow::Node(element),
-            ElementOrWindow::Window(window) => NodeOrWindow::Window(window),
+            ElementOrWindow::Element(element) => DomNodeOrWindow::Node(element),
+            ElementOrWindow::Window(window) => DomNodeOrWindow::Window(window),
+        }
+    }
+}
+
+impl<'a> From<&ElementOrWindow<'a, Element, Window>> for DomNodeOrWindow<'a> {
+    fn from(value: &ElementOrWindow<'a, Element, Window>) -> Self {
+        match value {
+            ElementOrWindow::Element(element) => DomNodeOrWindow::Node(element),
+            ElementOrWindow::Window(window) => DomNodeOrWindow::Window(window),
+        }
+    }
+}
+
+impl<'a> From<&'a DomElementOrWindow<'a>> for DomNodeOrWindow<'a> {
+    fn from(value: &'a DomElementOrWindow) -> Self {
+        match value {
+            DomElementOrWindow::Element(element) => DomNodeOrWindow::Node(element),
+            DomElementOrWindow::Window(window) => DomNodeOrWindow::Window(window),
         }
     }
 }
 
 #[derive(Clone, Debug)]
-pub enum ElementOrWindow<'a> {
+pub enum DomElementOrWindow<'a> {
     Element(&'a Element),
     Window(&'a Window),
 }
 
-impl<'a> From<&'a Element> for ElementOrWindow<'a> {
+impl<'a> From<&'a Element> for DomElementOrWindow<'a> {
     fn from(value: &'a Element) -> Self {
-        ElementOrWindow::Element(value)
+        DomElementOrWindow::Element(value)
     }
 }
 
-impl<'a> From<&'a Window> for ElementOrWindow<'a> {
+impl<'a> From<&'a Window> for DomElementOrWindow<'a> {
     fn from(value: &'a Window) -> Self {
-        ElementOrWindow::Window(value)
+        DomElementOrWindow::Window(value)
     }
 }
 
-#[derive(Clone, Debug)]
-pub enum OwnedElementOrWindow {
-    Element(Element),
-    Window(Window),
+impl<'a> From<ElementOrWindow<'a, Element, Window>> for DomElementOrWindow<'a> {
+    fn from(value: ElementOrWindow<'a, Element, Window>) -> Self {
+        match value {
+            ElementOrWindow::Element(element) => DomElementOrWindow::Element(element),
+            ElementOrWindow::Window(window) => DomElementOrWindow::Window(window),
+        }
+    }
 }
 
-pub fn get_node_name(node_or_window: NodeOrWindow) -> String {
+impl<'a> From<&ElementOrWindow<'a, Element, Window>> for DomElementOrWindow<'a> {
+    fn from(value: &ElementOrWindow<'a, Element, Window>) -> Self {
+        match value {
+            ElementOrWindow::Element(element) => DomElementOrWindow::Element(element),
+            ElementOrWindow::Window(window) => DomElementOrWindow::Window(window),
+        }
+    }
+}
+
+pub fn get_node_name(node_or_window: DomNodeOrWindow) -> String {
     match node_or_window {
-        NodeOrWindow::Node(node) => node.node_name().to_lowercase(),
-        NodeOrWindow::Window(_) => "#document".into(),
+        DomNodeOrWindow::Node(node) => node.node_name().to_lowercase(),
+        DomNodeOrWindow::Window(_) => "#document".into(),
     }
 }
 
@@ -78,10 +110,10 @@ pub fn get_window(node: Option<&Node>) -> Window {
     .expect("Window should exist.")
 }
 
-pub fn get_document_element(node_or_window: Option<NodeOrWindow>) -> Element {
+pub fn get_document_element(node_or_window: Option<DomNodeOrWindow>) -> Element {
     let document = match node_or_window {
-        Some(NodeOrWindow::Node(node)) => node.owner_document(),
-        Some(NodeOrWindow::Window(window)) => window.document(),
+        Some(DomNodeOrWindow::Node(node)) => node.owner_document(),
+        Some(DomNodeOrWindow::Window(window)) => window.document(),
         None => get_window(None).document(),
     }
     .expect("Node or window should have document.");
@@ -205,13 +237,13 @@ impl NodeScroll {
     }
 }
 
-pub fn get_node_scroll(element_or_window: ElementOrWindow) -> NodeScroll {
+pub fn get_node_scroll(element_or_window: DomElementOrWindow) -> NodeScroll {
     match element_or_window {
-        ElementOrWindow::Element(element) => NodeScroll {
+        DomElementOrWindow::Element(element) => NodeScroll {
             scroll_left: element.scroll_left() as f64,
             scroll_top: element.scroll_top() as f64,
         },
-        ElementOrWindow::Window(window) => NodeScroll {
+        DomElementOrWindow::Window(window) => NodeScroll {
             scroll_left: window
                 .page_x_offset()
                 .expect("Window should have page x offset."),

@@ -1,12 +1,9 @@
 use floating_ui_core::ConvertOffsetParentRelativeRectToViewportRelativeRectArgs;
 use floating_ui_utils::{
-    dom::{
-        get_document_element, get_node_name, get_node_scroll, is_overflow_element, NodeOrWindow,
-        NodeScroll,
-    },
-    Coords, Rect, Strategy,
+    dom::{get_document_element, get_node_name, get_node_scroll, is_overflow_element, NodeScroll},
+    Coords, ElementOrWindow, Rect, Strategy,
 };
-use web_sys::Element;
+use web_sys::{Element, Window};
 
 use crate::{
     platform::get_scale::get_scale,
@@ -17,22 +14,24 @@ pub fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
     ConvertOffsetParentRelativeRectToViewportRelativeRectArgs {
         elements,
         rect,
-        // TODO: should accept ElementOrWindow
         offset_parent,
         strategy,
-    }: ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<Element>,
+    }: ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<Element, Window>,
 ) -> Rect {
     let is_fixed = strategy == Strategy::Fixed;
     let document_element = get_document_element(
         offset_parent
             .as_ref()
-            .map(|offset_parent| NodeOrWindow::Node(offset_parent)),
+            .map(|offset_parent| offset_parent.into()),
     );
     let top_layer = elements.map_or(false, |elements| is_top_layer(elements.floating));
 
     if offset_parent
         .as_ref()
-        .is_some_and(|offset_parent| offset_parent == &document_element)
+        .is_some_and(|offset_parent| match offset_parent {
+            ElementOrWindow::Element(element) => *element == &document_element,
+            ElementOrWindow::Window(_) => false,
+        })
         || (top_layer && is_fixed)
     {
         return rect;
@@ -41,8 +40,13 @@ pub fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
     let mut scroll = NodeScroll::new(0.0);
     let mut scale = Coords::new(1.0);
     let mut offsets = Coords::new(0.0);
-    // TODO: change to match if args accepts ElementOrWindow
-    let is_offset_parent_an_element = true;
+    let is_offset_parent_an_element =
+        offset_parent
+            .as_ref()
+            .is_some_and(|offset_parent| match offset_parent {
+                ElementOrWindow::Element(_) => true,
+                ElementOrWindow::Window(_) => false,
+            });
 
     #[allow(clippy::nonminimal_bool)]
     if is_offset_parent_an_element || (!is_offset_parent_an_element && !is_fixed) {
@@ -54,11 +58,14 @@ pub fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
             }
         }
 
-        if let Some(offset_parent) = offset_parent.as_ref() {
-            let offset_rect = get_bounding_client_rect(offset_parent.into(), false, false, None);
-            scale = get_scale(offset_parent.into());
-            offsets.x = offset_rect.x + offset_parent.client_left() as f64;
-            offsets.y = offset_rect.y + offset_parent.client_top() as f64;
+        if let Some(offset_parent) = offset_parent {
+            if let ElementOrWindow::Element(offset_parent) = offset_parent {
+                let offset_rect =
+                    get_bounding_client_rect(offset_parent.into(), false, false, None);
+                scale = get_scale(offset_parent.into());
+                offsets.x = offset_rect.x + offset_parent.client_left() as f64;
+                offsets.y = offset_rect.y + offset_parent.client_top() as f64;
+            }
         }
     }
 

@@ -6,10 +6,10 @@ use crate::types::{
     MiddlewareReturn, MiddlewareState, Reset, ResetRects,
 };
 
-pub fn compute_position<Element>(
+pub fn compute_position<Element, Window>(
     reference: &Element,
     floating: &Element,
-    config: ComputePositionConfig<Element>,
+    config: ComputePositionConfig<Element, Window>,
 ) -> ComputePositionReturn {
     let placement = config.placement.unwrap_or(Placement::Bottom);
     let strategy = config.strategy.unwrap_or(Strategy::Absolute);
@@ -122,12 +122,12 @@ mod tests {
     fn test_returned_data() {
         struct CustomMiddleware {}
 
-        impl<Element> Middleware<Element> for CustomMiddleware {
+        impl<Element, Window> Middleware<Element, Window> for CustomMiddleware {
             fn name(&self) -> &'static str {
                 "custom"
             }
 
-            fn compute(&self, _state: MiddlewareState<Element>) -> MiddlewareReturn {
+            fn compute(&self, _state: MiddlewareState<Element, Window>) -> MiddlewareReturn {
                 MiddlewareReturn {
                     x: None,
                     y: None,
@@ -168,14 +168,14 @@ mod tests {
     fn test_middleware() {
         struct TestMiddleware {}
 
-        impl<Element> Middleware<Element> for TestMiddleware {
+        impl<Element, Window> Middleware<Element, Window> for TestMiddleware {
             fn name(&self) -> &'static str {
                 "test"
             }
 
             fn compute(
                 &self,
-                MiddlewareState { x, y, .. }: MiddlewareState<Element>,
+                MiddlewareState { x, y, .. }: MiddlewareState<Element, Window>,
             ) -> MiddlewareReturn {
                 MiddlewareReturn {
                     x: Some(x + 1.0),
@@ -215,12 +215,12 @@ mod tests {
     fn test_middleware_data() {
         struct TestMiddleware {}
 
-        impl<Element> Middleware<Element> for TestMiddleware {
+        impl<Element, Window> Middleware<Element, Window> for TestMiddleware {
             fn name(&self) -> &'static str {
                 "test"
             }
 
-            fn compute(&self, _state: MiddlewareState<Element>) -> MiddlewareReturn {
+            fn compute(&self, _state: MiddlewareState<Element, Window>) -> MiddlewareReturn {
                 MiddlewareReturn {
                     x: None,
                     y: None,

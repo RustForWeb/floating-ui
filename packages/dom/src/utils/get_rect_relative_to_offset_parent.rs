@@ -1,7 +1,7 @@
 use floating_ui_utils::{
     dom::{
-        get_document_element, get_node_name, get_node_scroll, is_overflow_element, ElementOrWindow,
-        NodeScroll,
+        get_document_element, get_node_name, get_node_scroll, is_overflow_element,
+        DomElementOrWindow, NodeScroll,
     },
     Coords, Rect, Strategy,
 };
@@ -16,10 +16,10 @@ use crate::{
 
 pub fn get_rect_relative_to_offset_parent(
     element_or_virtual: ElementOrVirtual,
-    offset_parent: ElementOrWindow,
+    offset_parent: DomElementOrWindow,
     strategy: Strategy,
 ) -> Rect {
-    let is_offset_parent_an_element = matches!(offset_parent, ElementOrWindow::Element(_));
+    let is_offset_parent_an_element = matches!(offset_parent, DomElementOrWindow::Element(_));
     let document_element = get_document_element(Some((&offset_parent).into()));
     let is_fixed = strategy == Strategy::Fixed;
     let rect = get_bounding_client_rect(
@@ -41,7 +41,7 @@ pub fn get_rect_relative_to_offset_parent(
         }
 
         match offset_parent {
-            ElementOrWindow::Element(offset_parent) => {
+            DomElementOrWindow::Element(offset_parent) => {
                 let offset_rect = get_bounding_client_rect(
                     offset_parent.into(),
                     true,
@@ -51,7 +51,7 @@ pub fn get_rect_relative_to_offset_parent(
                 offsets.x = offset_rect.x + offset_parent.client_left() as f64;
                 offsets.y = offset_rect.y + offset_parent.client_top() as f64;
             }
-            ElementOrWindow::Window(_) => {
+            DomElementOrWindow::Window(_) => {
                 offsets.x = get_window_scroll_bar_x(&document_element);
             }
         }

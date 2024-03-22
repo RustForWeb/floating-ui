@@ -1,5 +1,5 @@
 use floating_ui_utils::{
-    dom::{get_computed_style, get_window, ElementOrWindow},
+    dom::{get_computed_style, get_window, DomElementOrWindow},
     rect_to_client_rect, ClientRectObject, Coords, Rect,
 };
 use web_sys::DomRect;
@@ -27,7 +27,7 @@ pub fn get_bounding_client_rect(
     element_or_virtual: ElementOrVirtual,
     include_scale: bool,
     is_fixed_strategy: bool,
-    offset_parent: Option<ElementOrWindow>,
+    offset_parent: Option<DomElementOrWindow>,
 ) -> ClientRectObject {
     let client_rect = match element_or_virtual {
         ElementOrVirtual::Element(element) => {
@@ -42,8 +42,8 @@ pub fn get_bounding_client_rect(
     let scale = match include_scale {
         true => match &offset_parent {
             Some(offset_parent) => match offset_parent {
-                ElementOrWindow::Element(element) => get_scale((*element).into()),
-                ElementOrWindow::Window(_) => Coords::new(1.0),
+                DomElementOrWindow::Element(element) => get_scale((*element).into()),
+                DomElementOrWindow::Window(_) => Coords::new(1.0),
             },
             None => get_scale(element_or_virtual),
         },
@@ -64,8 +64,8 @@ pub fn get_bounding_client_rect(
     if let Some(dom_element) = dom_element {
         let window = get_window(Some(dom_element));
         let offset_window = match offset_parent {
-            Some(ElementOrWindow::Element(element)) => Some(get_window(Some(element))),
-            Some(ElementOrWindow::Window(window)) => Some(window.clone()),
+            Some(DomElementOrWindow::Element(element)) => Some(get_window(Some(element))),
+            Some(DomElementOrWindow::Window(window)) => Some(window.clone()),
             None => None,
         };
 

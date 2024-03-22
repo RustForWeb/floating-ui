@@ -1,7 +1,9 @@
 use floating_ui_utils::dom::{
     get_computed_style, get_containing_block, get_node_name, get_window, is_containing_block,
-    is_html_element, is_table_element, OwnedElementOrWindow,
+    is_html_element, is_table_element,
 };
+use floating_ui_utils::OwnedElementOrWindow;
+use web_sys::Window;
 use web_sys::{wasm_bindgen::JsCast, Element, HtmlElement};
 
 use crate::utils::is_top_layer::is_top_layer;
@@ -35,7 +37,7 @@ where
 pub fn get_offset_parent<Polyfill>(
     element: &Element,
     polyfill: Option<Polyfill>,
-) -> OwnedElementOrWindow
+) -> OwnedElementOrWindow<Element, Window>
 where
     Polyfill: Fn(&HtmlElement) -> Option<Element>,
 {

@@ -12,3 +12,4 @@ version.workspace = true
 floating-ui-core = { path = "../core" }
 floating-ui-utils = { path = "../utils" }
 leptos = { version = "0.6.9", features = ["nightly"] }
+web-sys.workspace = true

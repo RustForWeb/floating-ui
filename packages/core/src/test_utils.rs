@@ -5,6 +5,9 @@ use crate::types::{GetClippingRectArgs, GetElementRectsArgs, Platform};
 #[derive(Clone, Debug)]
 pub struct Element {}
 
+#[derive(Clone, Debug)]
+pub struct Window {}
+
 pub const REFERENCE: Element = Element {};
 pub const FLOATING: Element = Element {};
 pub const REFERENCE_RECT: Rect = Rect {
@@ -23,7 +26,7 @@ pub const FLOATING_RECT: Rect = Rect {
 #[derive(Debug)]
 pub struct TestPlatform {}
 
-impl Platform<Element> for TestPlatform {
+impl Platform<Element, Window> for TestPlatform {
     fn get_element_rects(&self, _args: GetElementRectsArgs<Element>) -> ElementRects {
         ElementRects {
             reference: REFERENCE_RECT,

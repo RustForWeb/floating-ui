@@ -1,5 +1,3 @@
-use std::borrow::Borrow;
-
 use floating_ui_core::{GetClippingRectArgs, RootBoundary};
 use floating_ui_utils::{
     dom::{

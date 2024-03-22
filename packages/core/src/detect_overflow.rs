@@ -1,5 +1,6 @@
 use floating_ui_utils::{
-    get_padding_object, rect_to_client_rect, Coords, Padding, Rect, SideObject,
+    get_padding_object, rect_to_client_rect, Coords, OwnedElementOrWindow, Padding, Rect,
+    SideObject,
 };
 
 use crate::{
@@ -43,8 +44,8 @@ impl<'a, Element> Default for DetectOverflowOptions<'a, Element> {
     }
 }
 
-pub fn detect_overflow<Element>(
-    state: MiddlewareState<Element>,
+pub fn detect_overflow<Element, Window>(
+    state: MiddlewareState<Element, Window>,
     options: DetectOverflowOptions<Element>,
 ) -> SideObject {
     let MiddlewareState {
@@ -73,15 +74,16 @@ pub fn detect_overflow<Element>(
         false => *elements.get_element_context(element_context),
     };
 
-    let document_element = platform.get_document_element(elements.floating);
+    // let document_element = platform.get_document_element(elements.floating);
 
     let clipping_client_rect =
         rect_to_client_rect(platform.get_clipping_rect(GetClippingRectArgs {
-            element: match platform.is_element(element).unwrap_or(true) {
-                true => element,
-                // TODO: virtual element
-                false => document_element.as_ref().unwrap_or(element),
-            },
+            element,
+            // TODO: virtual element
+            //  match platform.is_element(element).unwrap_or(true) {
+            //     true => element,
+            //     false => document_element.as_ref().unwrap_or(element),
+            // },
             boundary,
             root_boundary,
             strategy,
@@ -99,11 +101,11 @@ pub fn detect_overflow<Element>(
 
     let offset_parent = platform.get_offset_parent(elements.floating);
     let offset_scale = match offset_parent.as_ref() {
-        Some(offset_parent) => match platform.is_element(offset_parent).unwrap_or(false) {
-            true => platform
-                .get_scale(offset_parent)
-                .unwrap_or(Coords::new(1.0)),
-            false => Coords::new(1.0),
+        Some(offset_parent) => match offset_parent {
+            OwnedElementOrWindow::Element(element) => {
+                platform.get_scale(element).unwrap_or(Coords::new(1.0))
+            }
+            OwnedElementOrWindow::Window(_) => Coords::new(1.0),
         },
         None => Coords::new(1.0),
     };
@@ -117,7 +119,9 @@ pub fn detect_overflow<Element>(
                         floating: elements.floating,
                     }),
                     rect: rect.clone(),
-                    offset_parent,
+                    offset_parent: offset_parent
+                        .as_ref()
+                        .map(|offset_parent| offset_parent.into()),
                     strategy,
                 },
             )

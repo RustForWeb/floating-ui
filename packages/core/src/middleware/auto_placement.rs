@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use floating_ui_utils::{
     get_alignment, get_alignment_sides, get_opposite_alignment_placement, get_side, Alignment,
     Placement, ALL_PLACEMENTS,
@@ -92,22 +94,27 @@ struct AutoPlacementData {
     overflows: Vec<AutoPlacementDataOverflow>,
 }
 
-pub struct AutoPlacement<'a, Element> {
+pub struct AutoPlacement<'a, Element, Window> {
+    window: PhantomData<Window>,
+
     options: AutoPlacementOptions<'a, Element>,
 }
 
-impl<'a, Element> AutoPlacement<'a, Element> {
+impl<'a, Element, Window> AutoPlacement<'a, Element, Window> {
     pub fn new(options: AutoPlacementOptions<'a, Element>) -> Self {
-        AutoPlacement { options }
+        AutoPlacement {
+            window: PhantomData,
+            options,
+        }
     }
 }
 
-impl<'a, Element> Middleware<Element> for AutoPlacement<'a, Element> {
+impl<'a, Element, Window> Middleware<Element, Window> for AutoPlacement<'a, Element, Window> {
     fn name(&self) -> &'static str {
         "autoPlacement"
     }
 
-    fn compute(&self, state: MiddlewareState<Element>) -> MiddlewareReturn {
+    fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn {
         let MiddlewareState {
             rects,
             middleware_data,
@@ -272,8 +279,8 @@ impl<'a, Element> Middleware<Element> for AutoPlacement<'a, Element> {
     }
 }
 
-impl<'a, Element> MiddlewareWithOptions<AutoPlacementOptions<'a, Element>>
-    for AutoPlacement<'a, Element>
+impl<'a, Element, Window> MiddlewareWithOptions<AutoPlacementOptions<'a, Element>>
+    for AutoPlacement<'a, Element, Window>
 {
     fn options(&self) -> &AutoPlacementOptions<'a, Element> {
         &self.options

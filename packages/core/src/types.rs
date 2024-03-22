@@ -4,7 +4,8 @@ use std::fmt::Debug;
 use serde::{de::DeserializeOwned, Serialize};
 
 use floating_ui_utils::{
-    ClientRectObject, Coords, Dimensions, ElementRects, Placement, Rect, Strategy,
+    ClientRectObject, Coords, Dimensions, ElementOrWindow, ElementRects, OwnedElementOrWindow,
+    Placement, Rect, Strategy,
 };
 
 pub struct GetElementRectsArgs<'a, Element> {
@@ -20,14 +21,14 @@ pub struct GetClippingRectArgs<'a, Element> {
     pub strategy: Strategy,
 }
 
-pub struct ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<'a, Element> {
+pub struct ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<'a, Element, Window> {
     pub elements: Option<Elements<'a, Element>>,
     pub rect: Rect,
-    pub offset_parent: Option<Element>,
+    pub offset_parent: Option<ElementOrWindow<'a, Element, Window>>,
     pub strategy: Strategy,
 }
 
-pub trait Platform<Element>: Debug {
+pub trait Platform<Element, Window>: Debug {
     // TODO: check arg type, currently all anys are replaced by Element
 
     fn get_element_rects(&self, args: GetElementRectsArgs<Element>) -> ElementRects;
@@ -38,16 +39,19 @@ pub trait Platform<Element>: Debug {
 
     fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
         &self,
-        _args: ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<Element>,
+        _args: ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<Element, Window>,
     ) -> Option<Rect> {
         None
     }
 
-    fn get_offset_parent(&self, _element: &Element) -> Option<Element> {
+    fn get_offset_parent(
+        &self,
+        _element: &Element,
+    ) -> Option<OwnedElementOrWindow<Element, Window>> {
         None
     }
 
-    fn is_element(&self, _value: &Element) -> Option<bool> {
+    fn is_element(&self, _value: &ElementOrWindow<Element, Window>) -> Option<bool> {
         None
     }
 
@@ -95,11 +99,11 @@ impl MiddlewareData {
 }
 
 #[derive(Clone)]
-pub struct ComputePositionConfig<'a, Element> {
-    pub platform: &'a dyn Platform<Element>,
+pub struct ComputePositionConfig<'a, Element, Window> {
+    pub platform: &'a dyn Platform<Element, Window>,
     pub placement: Option<Placement>,
     pub strategy: Option<Strategy>,
-    pub middleware: Option<Vec<&'a dyn Middleware<Element>>>,
+    pub middleware: Option<Vec<&'a dyn Middleware<Element, Window>>>,
 }
 
 #[derive(Clone, Debug)]
@@ -137,10 +141,10 @@ pub struct MiddlewareReturn {
     pub reset: Option<Reset>,
 }
 
-pub trait Middleware<Element> {
+pub trait Middleware<Element, Window> {
     fn name(&self) -> &'static str;
 
-    fn compute(&self, state: MiddlewareState<Element>) -> MiddlewareReturn;
+    fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn;
 }
 
 pub trait MiddlewareWithOptions<O> {
@@ -163,7 +167,7 @@ impl<'a, Element> Elements<'a, Element> {
 }
 
 #[derive(Debug)]
-pub struct MiddlewareState<'a, Element> {
+pub struct MiddlewareState<'a, Element, Window> {
     pub x: f64,
     pub y: f64,
     pub initial_placement: Placement,
@@ -172,7 +176,7 @@ pub struct MiddlewareState<'a, Element> {
     pub middleware_data: &'a MiddlewareData,
     pub elements: Elements<'a, &'a Element>,
     pub rects: &'a ElementRects,
-    pub platform: &'a dyn Platform<Element>,
+    pub platform: &'a dyn Platform<Element, Window>,
 }
 
 #[derive(Debug)]
