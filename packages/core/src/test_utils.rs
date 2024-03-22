@@ -20,6 +20,7 @@ pub const FLOATING_RECT: Rect = Rect {
     height: 50.0,
 };
 
+#[derive(Debug)]
 pub struct TestPlatform {}
 
 impl Platform<Element> for TestPlatform {

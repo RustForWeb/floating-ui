@@ -7,7 +7,7 @@ use web_sys::DomRect;
 use crate::{
     platform::get_scale::get_scale,
     types::ElementOrVirtual,
-    utils::get_visual_offsets::{get_visual_offset, should_add_visual_offsets},
+    utils::get_visual_offsets::{get_visual_offsets, should_add_visual_offsets},
 };
 
 pub fn dom_rect_to_client_rect_object(dom_rect: DomRect) -> ClientRectObject {
@@ -52,7 +52,7 @@ pub fn get_bounding_client_rect(
 
     let visual_offsets =
         match should_add_visual_offsets(dom_element, is_fixed_strategy, offset_parent.clone()) {
-            true => get_visual_offset(dom_element),
+            true => get_visual_offsets(dom_element),
             false => Coords::new(0.0),
         };
 
@@ -74,7 +74,7 @@ pub fn get_bounding_client_rect(
             loop {
                 let current_iframe = &current_window
                     .frame_element()
-                    .expect("Window should return frame element option.");
+                    .expect("Window should have frame element option.");
 
                 if let Some(current_iframe) = current_iframe {
                     if offset_window

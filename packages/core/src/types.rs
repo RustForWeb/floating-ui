@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt::Debug;
 
 use serde::{de::DeserializeOwned, Serialize};
 
@@ -13,7 +14,7 @@ pub struct GetElementRectsArgs<'a, Element> {
 }
 
 pub struct GetClippingRectArgs<'a, Element> {
-    pub element: Option<&'a Element>,
+    pub element: &'a Element,
     pub boundary: Boundary<'a, Element>,
     pub root_boundary: RootBoundary,
     pub strategy: Strategy,
@@ -26,7 +27,7 @@ pub struct ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<'a, Element
     pub strategy: Strategy,
 }
 
-pub trait Platform<Element> {
+pub trait Platform<Element>: Debug {
     // TODO: check arg type, currently all anys are replaced by Element
 
     fn get_element_rects(&self, args: GetElementRectsArgs<Element>) -> ElementRects;
@@ -161,7 +162,7 @@ impl<'a, Element> Elements<'a, Element> {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug)]
 pub struct MiddlewareState<'a, Element> {
     pub x: f64,
     pub y: f64,
@@ -169,7 +170,7 @@ pub struct MiddlewareState<'a, Element> {
     pub placement: Placement,
     pub strategy: Strategy,
     pub middleware_data: &'a MiddlewareData,
-    pub elements: &'a Elements<'a, &'a Element>,
+    pub elements: Elements<'a, &'a Element>,
     pub rects: &'a ElementRects,
     pub platform: &'a dyn Platform<Element>,
 }
@@ -179,7 +180,6 @@ pub enum Boundary<'a, Element> {
     ClippingAncestors,
     Element(&'a Element),
     Elements(Vec<&'a Element>),
-    Rect(Rect),
 }
 
 impl<'a, Element> Clone for Boundary<'a, Element> {
@@ -188,7 +188,6 @@ impl<'a, Element> Clone for Boundary<'a, Element> {
             Self::ClippingAncestors => Self::ClippingAncestors,
             Self::Element(e) => Self::Element(e),
             Self::Elements(e) => Self::Elements(e.clone()),
-            Self::Rect(r) => Self::Rect(r.clone()),
         }
     }
 }

@@ -134,7 +134,10 @@ impl<'a, Element> Middleware<Element> for AutoPlacement<'a, Element> {
         };
 
         let overflow = detect_overflow(
-            state,
+            MiddlewareState {
+                elements: elements.clone(),
+                ..state
+            },
             self.options.detect_overflow.clone().unwrap_or_default(),
         );
 

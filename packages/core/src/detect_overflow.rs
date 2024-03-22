@@ -69,15 +69,18 @@ pub fn detect_overflow<Element>(
         ElementContext::Floating => ElementContext::Reference,
     };
     let element = match alt_boundary {
-        true => elements.get_element_context(alt_context),
-        false => elements.get_element_context(element_context),
+        true => *elements.get_element_context(alt_context),
+        false => *elements.get_element_context(element_context),
     };
+
+    let document_element = platform.get_document_element(elements.floating);
 
     let clipping_client_rect =
         rect_to_client_rect(platform.get_clipping_rect(GetClippingRectArgs {
-            element: match platform.is_element(element).unwrap_or(false) {
-                true => Some(element),
-                false => None, // TODO
+            element: match platform.is_element(element).unwrap_or(true) {
+                true => element,
+                // TODO: virtual element
+                false => document_element.as_ref().unwrap_or(element),
             },
             boundary,
             root_boundary,

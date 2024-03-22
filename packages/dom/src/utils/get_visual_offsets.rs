@@ -4,7 +4,7 @@ use floating_ui_utils::{
 };
 use web_sys::Element;
 
-pub fn get_visual_offset(_element: Option<&Element>) -> Coords {
+pub fn get_visual_offsets(_element: Option<&Element>) -> Coords {
     // TODO: web-sys does not support VisualViewport
 
     // let window = get_window(element.map(|element| element.as_ref()));

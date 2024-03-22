@@ -1,6 +1,6 @@
 use web_sys::{
-    css, wasm_bindgen::JsCast, window, CssStyleDeclaration, Element, HtmlElement, Node, ShadowRoot,
-    Window,
+    css, wasm_bindgen::JsCast, window, CssStyleDeclaration, Document, Element, HtmlElement, Node,
+    ShadowRoot, Window,
 };
 
 #[derive(Clone, Debug)]
@@ -84,15 +84,15 @@ pub fn get_document_element(node_or_window: Option<NodeOrWindow>) -> Element {
         Some(NodeOrWindow::Window(window)) => window.document(),
         None => get_window(None).document(),
     }
-    .expect("Document should exist.");
+    .expect("Node or window should have document.");
 
     document
         .document_element()
-        .expect("Document element should exist.")
+        .expect("Document should have document element.")
 }
 
-pub fn is_html_element(element: &Element) -> bool {
-    element.is_instance_of::<HtmlElement>()
+pub fn is_html_element(node: &Node) -> bool {
+    node.is_instance_of::<HtmlElement>()
 }
 
 const OVERFLOW_VALUES: [&str; 5] = ["auto", "scroll", "overlay", "hidden", "clip"];
@@ -243,5 +243,73 @@ pub fn get_parent_node(node: &Node) -> Node {
     match node.dyn_ref::<ShadowRoot>() {
         Some(shadow_root) => shadow_root.host().into(),
         None => result,
+    }
+}
+
+pub fn get_nearest_overflow_ancestor(node: &Node) -> HtmlElement {
+    let parent_node = get_parent_node(node);
+
+    if is_last_traversable_node(&parent_node) {
+        node.owner_document()
+            .as_ref()
+            .or(node.dyn_ref::<Document>())
+            .expect("Node should be document or have owner document.")
+            .body()
+            .expect("Document should have body.")
+    } else if is_html_element(&parent_node)
+        && is_overflow_element(parent_node.unchecked_ref::<Element>())
+    {
+        parent_node.unchecked_into()
+    } else {
+        get_nearest_overflow_ancestor(&parent_node)
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum OverflowAncestor {
+    Element(Element),
+    Window(Window),
+    // TODO
+    // VisualViewport(VisualViewport)
+}
+
+pub fn get_overflow_ancestors(
+    node: &Node,
+    mut list: Vec<OverflowAncestor>,
+    traverse_iframe: bool,
+) -> Vec<OverflowAncestor> {
+    let scrollable_ancestor = get_nearest_overflow_ancestor(node);
+    let is_body = node
+        .owner_document()
+        .and_then(|document| document.body())
+        .is_some_and(|body| scrollable_ancestor == body);
+    let window = get_window(Some(&scrollable_ancestor));
+
+    if is_body {
+        let frame_element = window
+            .frame_element()
+            .expect("Window should have frame element option.");
+
+        list.push(OverflowAncestor::Window(window));
+        // TODO: visual viewport
+
+        if is_overflow_element(&scrollable_ancestor) {
+            list.push(OverflowAncestor::Element(scrollable_ancestor.into()));
+        }
+
+        if let Some(frame_element) = frame_element {
+            if traverse_iframe {
+                list.append(&mut get_overflow_ancestors(&frame_element, vec![], true))
+            }
+        }
+
+        list
+    } else {
+        let mut other_list = get_overflow_ancestors(&scrollable_ancestor, vec![], traverse_iframe);
+
+        list.push(OverflowAncestor::Element(scrollable_ancestor.into()));
+        list.append(&mut other_list);
+
+        list
     }
 }

@@ -31,7 +31,7 @@ where
     }
 }
 
-// Gets the closest ancestor positioned element. Handles some edge cases, such as table ancestors and cross browser bugs.
+/// Gets the closest ancestor positioned element. Handles some edge cases, such as table ancestors and cross browser bugs.
 pub fn get_offset_parent<Polyfill>(
     element: &Element,
     polyfill: Option<Polyfill>,

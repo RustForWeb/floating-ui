@@ -1,5 +1,6 @@
 pub mod convert_offset_parent_relative_rect_to_viewport_relative_rect;
 pub mod get_client_rects;
+pub mod get_clipping_rect;
 pub mod get_dimensions;
 pub mod get_element_rects;
 pub mod get_offset_parent;
@@ -16,12 +17,14 @@ use web_sys::Element;
 
 use self::convert_offset_parent_relative_rect_to_viewport_relative_rect::convert_offset_parent_relative_rect_to_viewport_relative_rect;
 use self::get_client_rects::get_client_rects;
+use self::get_clipping_rect::get_clipping_rect;
 use self::get_dimensions::get_dimensions;
 use self::get_element_rects::get_element_rects;
 // use self::get_offset_parent::get_offset_parent;
 use self::get_scale::get_scale;
 use self::is_rtl::is_rtl;
 
+#[derive(Debug)]
 pub struct Platform {}
 
 impl CorePlatform<Element> for Platform {
@@ -29,8 +32,8 @@ impl CorePlatform<Element> for Platform {
         get_element_rects(self, args)
     }
 
-    fn get_clipping_rect(&self, _args: GetClippingRectArgs<Element>) -> Rect {
-        todo!()
+    fn get_clipping_rect(&self, args: GetClippingRectArgs<Element>) -> Rect {
+        get_clipping_rect(self, args)
     }
 
     fn get_dimensions(&self, element: &Element) -> Dimensions {

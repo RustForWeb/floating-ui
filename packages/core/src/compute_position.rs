@@ -46,7 +46,7 @@ pub fn compute_position<Element>(
             middleware_data: &middleware_data,
             rects: &rects,
             platform,
-            elements: &Elements {
+            elements: Elements {
                 reference: &reference,
                 floating: &floating,
             },
