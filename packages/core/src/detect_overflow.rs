@@ -95,14 +95,14 @@ pub fn detect_overflow<Element>(
     };
 
     let offset_parent = platform.get_offset_parent(elements.floating);
-    let offset_scale = match offset_parent {
+    let offset_scale = match offset_parent.as_ref() {
         Some(offset_parent) => match platform.is_element(offset_parent).unwrap_or(false) {
             true => platform
                 .get_scale(offset_parent)
-                .unwrap_or(Coords { x: 1.0, y: 1.0 }),
-            false => Coords { x: 1.0, y: 1.0 },
+                .unwrap_or(Coords::new(1.0)),
+            false => Coords::new(1.0),
         },
-        None => Coords { x: 1.0, y: 1.0 },
+        None => Coords::new(1.0),
     };
 
     let element_client_rect = rect_to_client_rect(

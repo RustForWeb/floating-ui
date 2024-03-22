@@ -1,5 +1,8 @@
-use floating_ui_utils::{dom::get_computed_style, Dimensions};
-use web_sys::Element;
+use floating_ui_utils::{
+    dom::{get_computed_style, is_html_element},
+    Dimensions,
+};
+use web_sys::{wasm_bindgen::JsCast, Element, HtmlElement};
 
 #[derive(Clone, Debug)]
 pub struct CssDimensions {
@@ -23,9 +26,16 @@ pub fn get_css_dimensions(element: &Element) -> CssDimensions {
         .parse::<f64>()
         .expect("Height should be a number.");
 
-    // TODO: check if element is HtmlElement?
-    let offset_width = width;
-    let offset_height = height;
+    let offset_width;
+    let offset_height;
+    if is_html_element(element) {
+        let element = element.unchecked_ref::<HtmlElement>();
+        offset_width = element.offset_width() as f64;
+        offset_height = element.offset_height() as f64;
+    } else {
+        offset_width = width;
+        offset_height = height;
+    }
     let should_fallback = width.round() != offset_width || height.round() != offset_height;
 
     CssDimensions {

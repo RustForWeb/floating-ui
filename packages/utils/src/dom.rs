@@ -1,4 +1,7 @@
-use web_sys::{window, CssStyleDeclaration, Element, Node, Window};
+use web_sys::{
+    css, wasm_bindgen::JsCast, window, CssStyleDeclaration, Element, HtmlElement, Node, ShadowRoot,
+    Window,
+};
 
 #[derive(Clone, Debug)]
 pub enum NodeOrWindow<'a> {
@@ -51,25 +54,35 @@ impl<'a> From<&'a Window> for ElementOrWindow<'a> {
     }
 }
 
+#[derive(Clone, Debug)]
+pub enum OwnedElementOrWindow {
+    Element(Element),
+    Window(Window),
+}
+
 pub fn get_node_name(node_or_window: NodeOrWindow) -> String {
     match node_or_window {
-        NodeOrWindow::Node(node) => node.node_name(),
+        NodeOrWindow::Node(node) => node.node_name().to_lowercase(),
         NodeOrWindow::Window(_) => "#document".into(),
     }
 }
 
-pub fn get_window(node: &Node) -> Window {
-    match node.owner_document() {
-        Some(document) => document.default_view(),
+pub fn get_window(node: Option<&Node>) -> Window {
+    match node {
+        Some(node) => match node.owner_document() {
+            Some(document) => document.default_view(),
+            None => window(),
+        },
         None => window(),
     }
     .expect("Window should exist.")
 }
 
-pub fn get_document_element(node_or_window: NodeOrWindow) -> Element {
+pub fn get_document_element(node_or_window: Option<NodeOrWindow>) -> Element {
     let document = match node_or_window {
-        NodeOrWindow::Node(node) => node.owner_document(),
-        NodeOrWindow::Window(window) => window.document(),
+        Some(NodeOrWindow::Node(node)) => node.owner_document(),
+        Some(NodeOrWindow::Window(window)) => window.document(),
+        None => get_window(None).document(),
     }
     .expect("Document should exist.");
 
@@ -78,7 +91,12 @@ pub fn get_document_element(node_or_window: NodeOrWindow) -> Element {
         .expect("Document element should exist.")
 }
 
-// pub fn is_shadow_root
+pub fn is_html_element(element: &Element) -> bool {
+    element.is_instance_of::<HtmlElement>()
+}
+
+const OVERFLOW_VALUES: [&str; 5] = ["auto", "scroll", "overlay", "hidden", "clip"];
+const DISPLAY_VALUES: [&str; 2] = ["inline", "contents"];
 
 pub fn is_overflow_element(element: &Element) -> bool {
     let style = get_computed_style(element);
@@ -89,10 +107,10 @@ pub fn is_overflow_element(element: &Element) -> bool {
 
     let overflow_combined = format!("{}{}{}", overflow, overflow_x, overflow_y);
 
-    ["auto", "scroll", "overlay", "hidden", "clip"]
+    OVERFLOW_VALUES
         .into_iter()
         .any(|s| overflow_combined.contains(s))
-        && !["inline", "contents"].into_iter().any(|s| display == s)
+        && !DISPLAY_VALUES.into_iter().any(|s| display == s)
 }
 
 pub fn is_table_element(element: &Element) -> bool {
@@ -100,17 +118,91 @@ pub fn is_table_element(element: &Element) -> bool {
     ["table", "td", "th"].into_iter().any(|s| node_name == s)
 }
 
+const WILL_CHANGE_VALUES: [&str; 3] = ["transform", "perspective", "filter"];
+const CONTAIN_VALUES: [&str; 4] = ["paint", "layout", "strict", "content"];
+
+pub fn is_containing_block(element: &Element) -> bool {
+    let webkit = is_web_kit();
+    let css = get_computed_style(element);
+
+    css.get_property_value("transform").unwrap_or("none".into()) != "none"
+        || css
+            .get_property_value("perspective")
+            .unwrap_or("none".into())
+            != "none"
+        || css
+            .get_property_value("container-type")
+            .map(|value| value != "normal")
+            .unwrap_or(false)
+        || (!webkit
+            && css
+                .get_property_value("backdrop-filter")
+                .map(|value| value != "none")
+                .unwrap_or(false))
+        || (!webkit
+            && css
+                .get_property_value("filter")
+                .map(|value| value != "none")
+                .unwrap_or(false))
+        || css
+            .get_property_value("will-change")
+            .map(|value| WILL_CHANGE_VALUES.into_iter().any(|v| v == value))
+            .unwrap_or(false)
+        || css
+            .get_property_value("contain")
+            .map(|value| CONTAIN_VALUES.into_iter().any(|v| v == value))
+            .unwrap_or(false)
+}
+
+pub fn get_containing_block(element: &Element) -> Option<HtmlElement> {
+    let mut current_node = get_parent_node(element);
+
+    while !is_last_traversable_node(&current_node) {
+        if let Ok(element) = current_node.dyn_into::<HtmlElement>() {
+            if is_containing_block(&element) {
+                return Some(element);
+            }
+
+            current_node = get_parent_node(&element);
+        } else {
+            break;
+        }
+    }
+
+    None
+}
+
+pub fn is_web_kit() -> bool {
+    css::supports_with_value("-webkit-backdrop-filter", "none").unwrap_or(false)
+}
+
+pub fn is_last_traversable_node(node: &Node) -> bool {
+    let node_name = get_node_name(node.into());
+    ["html", "body", "#document"]
+        .into_iter()
+        .any(|s| node_name == s)
+}
+
 pub fn get_computed_style(element: &Element) -> CssStyleDeclaration {
-    get_window(element)
+    get_window(Some(element))
         .get_computed_style(element)
         .expect("Valid element.")
-        .expect("CSSStyleDeclaration should exist.")
+        .expect("Element should have computed style.")
 }
 
 #[derive(Clone, Debug)]
 pub struct NodeScroll {
     pub scroll_left: f64,
     pub scroll_top: f64,
+}
+
+impl NodeScroll {
+    pub fn new(value: f64) -> Self {
+        Self {
+            scroll_left: value,
+            scroll_top: value,
+        }
+    }
 }
 
 pub fn get_node_scroll(element_or_window: ElementOrWindow) -> NodeScroll {
@@ -122,10 +214,34 @@ pub fn get_node_scroll(element_or_window: ElementOrWindow) -> NodeScroll {
         ElementOrWindow::Window(window) => NodeScroll {
             scroll_left: window
                 .page_x_offset()
-                .expect("Window should have pageXOffset."),
+                .expect("Window should have page x offset."),
             scroll_top: window
                 .page_y_offset()
-                .expect("Window should have pageYOffset."),
+                .expect("Window should have page y offset."),
         },
+    }
+}
+
+pub fn get_parent_node(node: &Node) -> Node {
+    if get_node_name(node.into()) == "html" {
+        return node.clone();
+    }
+
+    let element = node.dyn_ref::<Element>();
+
+    let result: Node;
+    if let Some(slot) = element.and_then(|element| element.assigned_slot()) {
+        result = slot.into();
+    } else if let Some(parent_node) = node.parent_node() {
+        result = parent_node;
+    } else if let Some(shadow_root) = node.dyn_ref::<ShadowRoot>() {
+        result = shadow_root.host().into();
+    } else {
+        result = get_document_element(Some(node.into())).into();
+    }
+
+    match node.dyn_ref::<ShadowRoot>() {
+        Some(shadow_root) => shadow_root.host().into(),
+        None => result,
     }
 }

@@ -5,7 +5,7 @@ use crate::utils::get_bounding_client_rect::get_bounding_client_rect;
 
 pub fn get_window_scroll_bar_x(element: &Element) -> f64 {
     get_bounding_client_rect(
-        (&get_document_element(element.into())).into(),
+        (&get_document_element(Some(element.into()))).into(),
         false,
         false,
         None,

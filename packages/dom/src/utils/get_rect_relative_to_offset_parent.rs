@@ -20,7 +20,7 @@ pub fn get_rect_relative_to_offset_parent(
     strategy: Strategy,
 ) -> Rect {
     let is_offset_parent_an_element = matches!(offset_parent, ElementOrWindow::Element(_));
-    let document_element = get_document_element((&offset_parent).into());
+    let document_element = get_document_element(Some((&offset_parent).into()));
     let is_fixed = strategy == Strategy::Fixed;
     let rect = get_bounding_client_rect(
         element_or_virtual,
@@ -29,12 +29,10 @@ pub fn get_rect_relative_to_offset_parent(
         Some(offset_parent.clone()),
     );
 
-    let mut scroll = NodeScroll {
-        scroll_left: 0.0,
-        scroll_top: 0.0,
-    };
-    let mut offsets = Coords { x: 0.0, y: 0.0 };
+    let mut scroll = NodeScroll::new(0.0);
+    let mut offsets = Coords::new(0.0);
 
+    #[allow(clippy::nonminimal_bool)]
     if is_offset_parent_an_element || (!is_offset_parent_an_element && !is_fixed) {
         if get_node_name((&offset_parent).into()) != "body"
             || is_overflow_element(&document_element)

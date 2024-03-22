@@ -16,11 +16,14 @@ serde_json = "1.0.114"
 [workspace.dependencies.web-sys]
 version = "0.3.69"
 features = [
+    "css",
     "CssStyleDeclaration",
     "DomRect",
     "DomRectList",
     "Element",
     "HtmlElement",
+    "HtmlSlotElement",
     "Node",
+    "ShadowRoot",
     "Window",
 ]

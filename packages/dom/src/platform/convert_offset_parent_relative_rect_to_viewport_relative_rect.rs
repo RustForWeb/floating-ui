@@ -1,0 +1,71 @@
+use floating_ui_core::ConvertOffsetParentRelativeRectToViewportRelativeRectArgs;
+use floating_ui_utils::{
+    dom::{
+        get_document_element, get_node_name, get_node_scroll, is_overflow_element, NodeOrWindow,
+        NodeScroll,
+    },
+    Coords, Rect, Strategy,
+};
+use web_sys::Element;
+
+use crate::{
+    platform::get_scale::get_scale,
+    utils::{get_bounding_client_rect::get_bounding_client_rect, is_top_layer::is_top_layer},
+};
+
+pub fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
+    ConvertOffsetParentRelativeRectToViewportRelativeRectArgs {
+        elements,
+        rect,
+        // TODO: should accept ElementOrWindow
+        offset_parent,
+        strategy,
+    }: ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<Element>,
+) -> Rect {
+    let is_fixed = strategy == Strategy::Fixed;
+    let document_element = get_document_element(
+        offset_parent
+            .as_ref()
+            .map(|offset_parent| NodeOrWindow::Node(offset_parent)),
+    );
+    let top_layer = elements.map_or(false, |elements| is_top_layer(elements.floating));
+
+    if offset_parent
+        .as_ref()
+        .is_some_and(|offset_parent| offset_parent == &document_element)
+        || (top_layer && is_fixed)
+    {
+        return rect;
+    }
+
+    let mut scroll = NodeScroll::new(0.0);
+    let mut scale = Coords::new(1.0);
+    let mut offsets = Coords::new(0.0);
+    // TODO: change to match if args accepts ElementOrWindow
+    let is_offset_parent_an_element = true;
+
+    #[allow(clippy::nonminimal_bool)]
+    if is_offset_parent_an_element || (!is_offset_parent_an_element && !is_fixed) {
+        if let Some(offset_parent) = offset_parent.as_ref() {
+            if get_node_name(offset_parent.into()) != "body"
+                || is_overflow_element(&document_element)
+            {
+                scroll = get_node_scroll(offset_parent.into());
+            }
+        }
+
+        if let Some(offset_parent) = offset_parent.as_ref() {
+            let offset_rect = get_bounding_client_rect(offset_parent.into(), false, false, None);
+            scale = get_scale(offset_parent.into());
+            offsets.x = offset_rect.x + offset_parent.client_left() as f64;
+            offsets.y = offset_rect.y + offset_parent.client_top() as f64;
+        }
+    }
+
+    Rect {
+        x: rect.x * scale.x - scroll.scroll_left * scale.x + offsets.x,
+        y: rect.y * scale.y - scroll.scroll_top * scale.y + offsets.y,
+        width: rect.width * scale.x,
+        height: rect.height * scale.y,
+    }
+}

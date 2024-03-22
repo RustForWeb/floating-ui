@@ -37,12 +37,12 @@ pub trait Platform<Element> {
 
     fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
         &self,
-        _args: ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<&Element>,
+        _args: ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<Element>,
     ) -> Option<Rect> {
         None
     }
 
-    fn get_offset_parent(&self, _element: &Element) -> Option<&Element> {
+    fn get_offset_parent(&self, _element: &Element) -> Option<Element> {
         None
     }
 

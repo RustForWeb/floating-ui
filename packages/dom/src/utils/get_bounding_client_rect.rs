@@ -4,7 +4,11 @@ use floating_ui_utils::{
 };
 use web_sys::DomRect;
 
-use crate::{platform::get_scale::get_scale, types::ElementOrVirtual};
+use crate::{
+    platform::get_scale::get_scale,
+    types::ElementOrVirtual,
+    utils::get_visual_offsets::{get_visual_offset, should_add_visual_offsets},
+};
 
 pub fn dom_rect_to_client_rect_object(dom_rect: DomRect) -> ClientRectObject {
     ClientRectObject {
@@ -46,8 +50,11 @@ pub fn get_bounding_client_rect(
         false => Coords::new(1.0),
     };
 
-    // TODO
-    let visual_offsets = Coords::new(0.0);
+    let visual_offsets =
+        match should_add_visual_offsets(dom_element, is_fixed_strategy, offset_parent.clone()) {
+            true => get_visual_offset(dom_element),
+            false => Coords::new(0.0),
+        };
 
     let mut x = (client_rect.left + visual_offsets.x) / scale.x;
     let mut y = (client_rect.top + visual_offsets.y) / scale.y;
@@ -55,9 +62,9 @@ pub fn get_bounding_client_rect(
     let mut height = client_rect.height / scale.y;
 
     if let Some(dom_element) = dom_element {
-        let window = get_window(dom_element);
+        let window = get_window(Some(dom_element));
         let offset_window = match offset_parent {
-            Some(ElementOrWindow::Element(element)) => Some(get_window(element)),
+            Some(ElementOrWindow::Element(element)) => Some(get_window(Some(element))),
             Some(ElementOrWindow::Window(window)) => Some(window.clone()),
             None => None,
         };
@@ -76,7 +83,7 @@ pub fn get_bounding_client_rect(
                     {
                         let iframe_scale = get_scale(current_iframe.into());
                         let iframe_rect = current_iframe.get_bounding_client_rect();
-                        let css = get_computed_style(&current_iframe);
+                        let css = get_computed_style(current_iframe);
                         let padding_left = css
                             .get_property_value("padding-left")
                             .expect("Computed style should have padding left.")
@@ -101,7 +108,7 @@ pub fn get_bounding_client_rect(
                         x += left;
                         y += top;
 
-                        current_window = get_window(&current_iframe);
+                        current_window = get_window(Some(current_iframe));
                     }
                 } else {
                     break;

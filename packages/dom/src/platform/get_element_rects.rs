@@ -18,7 +18,7 @@ pub fn get_element_rects(platform: &Platform, args: GetElementRectsArgs<Element>
         reference: get_rect_relative_to_offset_parent(
             args.reference.into(),
             // TODO: into can be removed if offset_parent is also ElementOrWindow
-            offset_parent.into(),
+            (&offset_parent).into(),
             args.strategy,
         ),
         floating: Rect {
