@@ -1,4 +1,7 @@
-use floating_ui_dom::{compute_position, ComputePositionConfig, ComputePositionReturn, Placement};
+use floating_ui_dom::{
+    compute_position, ComputePositionConfig, ComputePositionReturn, Offset, OffsetOptions,
+    Placement,
+};
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlElement;
 
@@ -20,7 +23,7 @@ fn run() -> Result<(), JsValue> {
         Some(ComputePositionConfig {
             placement: Some(Placement::Right),
             strategy: None,
-            middleware: None,
+            middleware: Some(vec![&Offset::new(OffsetOptions::Value(10.0))]),
         }),
     );
 

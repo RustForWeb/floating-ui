@@ -57,7 +57,7 @@ pub enum Axis {
     Y,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Coords {
     pub x: f64,
     pub y: f64,

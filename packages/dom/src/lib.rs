@@ -1,3 +1,4 @@
+mod middleware;
 mod platform;
 mod types;
 mod utils;
@@ -5,6 +6,7 @@ mod utils;
 // TODO: consider copying the exported types instead of using star
 // pub use types::*;
 
+pub use crate::middleware::*;
 pub use floating_ui_core::ComputePositionReturn;
 pub use floating_ui_utils::{Placement, Strategy};
 

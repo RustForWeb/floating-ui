@@ -126,6 +126,14 @@ impl<'a, Element, Window> Middleware<Element, Window> for AutoPlacement<'a, Elem
 
         // TODO: support options fn
 
+        let data: AutoPlacementData =
+            middleware_data
+                .get_as(self.name())
+                .unwrap_or(AutoPlacementData {
+                    index: 0,
+                    overflows: vec![],
+                });
+
         let cross_axis = self.options.cross_axis.unwrap_or(false);
         let alignment = self.options.alignment;
         let allowed_placements = self
@@ -147,14 +155,6 @@ impl<'a, Element, Window> Middleware<Element, Window> for AutoPlacement<'a, Elem
             },
             self.options.detect_overflow.clone().unwrap_or_default(),
         );
-
-        let data: AutoPlacementData =
-            middleware_data
-                .get_as(self.name())
-                .unwrap_or(AutoPlacementData {
-                    index: 0,
-                    overflows: vec![],
-                });
 
         let current_index = data.index;
         let current_placement = placements.get(current_index);
