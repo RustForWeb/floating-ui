@@ -5,17 +5,33 @@
         <!-- <meta content="text/html;charset=utf-8" http-equiv="Content-Type" /> -->
 
         <style>
+            body {
+                font-family: system-ui;
+            }
+
+            #button {
+                background-color: #dce2ec;
+                color: #1f2028;
+                border: 0px;
+                padding: 0px 8px;
+                border-radius: 4px;
+                font-size: 1.125rem;
+                line-height: 1.778;
+            }
+
             #tooltip {
                 width: max-content;
                 position: absolute;
                 top: 0;
                 left: 0;
-                background: #222;
-                color: white;
+                background: #1f2028;
+                color: #ffffff;
                 font-weight: bold;
-                padding: 5px;
+                padding: 4px;
                 border-radius: 4px;
-                font-size: 90%;
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+                pointer-events: none;
             }
         </style>
     </head>
