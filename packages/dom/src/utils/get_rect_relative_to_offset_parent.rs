@@ -7,11 +7,11 @@ use floating_ui_utils::{
 };
 
 use crate::{
+    types::ElementOrVirtual,
     utils::{
         get_bounding_client_rect::get_bounding_client_rect,
         get_window_scroll_bar_x::get_window_scroll_bar_x,
     },
-    ElementOrVirtual,
 };
 
 pub fn get_rect_relative_to_offset_parent(

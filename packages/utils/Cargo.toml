@@ -13,6 +13,5 @@ serde.workspace = true
 web-sys = { workspace = true, optional = true }
 
 [features]
-# TODO: remove default
-default = ["dom"]
+default = []
 dom = ["dep:web-sys"]

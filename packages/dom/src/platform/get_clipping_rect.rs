@@ -11,11 +11,11 @@ use web_sys::{wasm_bindgen::JsCast, CssStyleDeclaration, Element, Node};
 
 use crate::{
     platform::{get_scale::get_scale, Platform},
+    types::Boundary,
     utils::{
         get_bounding_client_rect::get_bounding_client_rect, get_document_rect::get_document_rect,
         get_viewport_rect::get_viewport_rect, get_visual_offsets::get_visual_offsets,
     },
-    Boundary,
 };
 
 #[derive(Clone, Debug)]

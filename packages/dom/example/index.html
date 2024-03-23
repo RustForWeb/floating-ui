@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>Floating UI DOM Example</title>
+
+        <!-- <meta content="text/html;charset=utf-8" http-equiv="Content-Type" /> -->
+
+        <style>
+            #tooltip {
+                width: max-content;
+                position: absolute;
+                top: 0;
+                left: 0;
+                background: #222;
+                color: white;
+                font-weight: bold;
+                padding: 5px;
+                border-radius: 4px;
+                font-size: 90%;
+            }
+        </style>
+    </head>
+    <body>
+        <button id="button" aria-describedby="tooltip">My button</button>
+        <div id="tooltip" role="tooltip">My tooltip</div>
+    </body>
+</html>
