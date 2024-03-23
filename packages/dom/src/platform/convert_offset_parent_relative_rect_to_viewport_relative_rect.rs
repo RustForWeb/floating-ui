@@ -58,14 +58,11 @@ pub fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
             }
         }
 
-        if let Some(offset_parent) = offset_parent {
-            if let ElementOrWindow::Element(offset_parent) = offset_parent {
-                let offset_rect =
-                    get_bounding_client_rect(offset_parent.into(), false, false, None);
-                scale = get_scale(offset_parent.into());
-                offsets.x = offset_rect.x + offset_parent.client_left() as f64;
-                offsets.y = offset_rect.y + offset_parent.client_top() as f64;
-            }
+        if let Some(ElementOrWindow::Element(offset_parent)) = offset_parent {
+            let offset_rect = get_bounding_client_rect(offset_parent.into(), false, false, None);
+            scale = get_scale(offset_parent.into());
+            offsets.x = offset_rect.x + offset_parent.client_left() as f64;
+            offsets.y = offset_rect.y + offset_parent.client_top() as f64;
         }
     }
 

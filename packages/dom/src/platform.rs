@@ -53,7 +53,6 @@ impl CorePlatform<Element, Window> for Platform {
         &self,
         element: &Element,
     ) -> Option<OwnedElementOrWindow<Element, Window>> {
-        // TODO: fix polyfill type
         Some(get_offset_parent(element, None))
     }
 

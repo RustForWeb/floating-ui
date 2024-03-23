@@ -8,13 +8,9 @@ use web_sys::{wasm_bindgen::JsCast, Element, HtmlElement};
 
 use crate::utils::is_top_layer::is_top_layer;
 
-pub fn get_true_offset_parent<Polyfill>(
-    element: &Element,
-    polyfill: &Option<Polyfill>,
-) -> Option<Element>
-where
-    Polyfill: Fn(&HtmlElement) -> Option<Element>,
-{
+pub type Polyfill = Box<dyn Fn(&HtmlElement) -> Option<Element>>;
+
+pub fn get_true_offset_parent(element: &Element, polyfill: &Option<Polyfill>) -> Option<Element> {
     if !is_html_element(element)
         || get_computed_style(element)
             .get_property_value("position")
@@ -34,13 +30,10 @@ where
 }
 
 /// Gets the closest ancestor positioned element. Handles some edge cases, such as table ancestors and cross browser bugs.
-pub fn get_offset_parent<Polyfill>(
+pub fn get_offset_parent(
     element: &Element,
     polyfill: Option<Polyfill>,
-) -> OwnedElementOrWindow<Element, Window>
-where
-    Polyfill: Fn(&HtmlElement) -> Option<Element>,
-{
+) -> OwnedElementOrWindow<Element, Window> {
     let window = get_window(Some(element));
 
     if is_top_layer(element) {
