@@ -6,7 +6,11 @@ Rust port of [Floating UI](https://floating-ui.com).
 
 ## Documentation
 
-TODO
+Documentation for the crates is available on [Docs.rs](https://docs.rs/):
+
+-   [`floating-ui-core`](https://docs.rs/floating-ui-core/latest/floating_ui_core/)
+-   [`floating-ui-dom`](https://docs.rs/floating-ui-dom/latest/floating_ui_dom/)
+-   [`floating-ui-utils`](https://docs.rs/floating-ui-utils/latest/floating_ui_utils/)
 
 ## License
 
