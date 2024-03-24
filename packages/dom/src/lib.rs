@@ -1,4 +1,8 @@
+//! Rust port of [Floating UI](https://floating-ui.com/).
+//!
 //! This is the library to use Floating UI on the web, wrapping [`floating_ui_core`] with DOM interface logic.
+//!
+//! See [@floating-ui/dom](https://www.npmjs.com/package/@floating-ui/dom) for the original package.
 
 mod middleware;
 mod platform;

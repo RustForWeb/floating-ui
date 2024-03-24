@@ -1,6 +1,6 @@
 [package]
 name = "floating-ui-dom"
-description = "Floating UI for the web."
+description = "Rust port of Floating UI. Floating UI for the web."
 
 authors.workspace = true
 edition.workspace = true

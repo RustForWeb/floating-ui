@@ -1,4 +1,8 @@
+//! Rust port of [Floating UI](https://floating-ui.com/).
+//!
 //! Utility functions shared across Floating UI packages. You may use these functions in your own projects, but are subject to breaking changes.
+//!
+//! See [@floating-ui/utils](https://www.npmjs.com/package/@floating-ui/utils) for the original package.
 
 #[cfg(feature = "dom")]
 pub mod dom;
