@@ -4,8 +4,8 @@ use std::fmt::Debug;
 use serde::{de::DeserializeOwned, Serialize};
 
 use floating_ui_utils::{
-    ClientRectObject, Coords, Dimensions, ElementOrWindow, ElementRects, OwnedElementOrWindow,
-    Placement, Rect, Strategy,
+    ClientRectObject, Coords, Dimensions, ElementOrWindow, ElementRects, Length,
+    OwnedElementOrWindow, Placement, Rect, Strategy,
 };
 
 pub struct GetElementRectsArgs<'a, Element> {
@@ -29,8 +29,6 @@ pub struct ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<'a, Element
 }
 
 pub trait Platform<Element, Window>: Debug {
-    // TODO: check arg type, currently all anys are replaced by Element
-
     fn get_element_rects(&self, args: GetElementRectsArgs<Element>) -> ElementRects;
 
     fn get_clipping_rect(&self, args: GetClippingRectArgs<Element>) -> Rect;
@@ -68,6 +66,10 @@ pub trait Platform<Element, Window>: Debug {
     }
 
     fn get_scale(&self, _element: &Element) -> Option<Coords> {
+        None
+    }
+
+    fn get_client_length(&self, _element: &Element, _length: Length) -> Option<f64> {
         None
     }
 }

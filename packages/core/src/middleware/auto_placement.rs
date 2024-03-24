@@ -83,15 +83,15 @@ impl<'a, Element> Default for AutoPlacementOptions<'a, Element> {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-struct AutoPlacementDataOverflow {
-    placement: Placement,
-    overflows: Vec<f64>,
+pub struct AutoPlacementDataOverflow {
+    pub placement: Placement,
+    pub overflows: Vec<f64>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-struct AutoPlacementData {
-    index: usize,
-    overflows: Vec<AutoPlacementDataOverflow>,
+pub struct AutoPlacementData {
+    pub index: usize,
+    pub overflows: Vec<AutoPlacementDataOverflow>,
 }
 
 pub struct AutoPlacement<'a, Element, Window> {

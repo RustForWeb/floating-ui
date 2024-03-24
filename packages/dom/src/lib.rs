@@ -5,10 +5,7 @@ mod utils;
 
 pub use crate::middleware::*;
 pub use floating_ui_core::{ComputePositionReturn, DetectOverflowOptions};
-pub use floating_ui_utils::{
-    AlignedPlacement, Alignment, Axis, ClientRectObject, Coords, Dimensions, ElementRects, Length,
-    Padding, Placement, Rect, Side, SideObject, Strategy,
-};
+pub use floating_ui_utils::*;
 
 use floating_ui_core::{
     compute_position as compute_position_core, ComputePositionConfig as CoreComputePositionConfig,

@@ -102,6 +102,15 @@ pub struct Dimensions {
     pub height: f64,
 }
 
+impl Dimensions {
+    pub fn get_length(&self, length: Length) -> f64 {
+        match length {
+            Length::Width => self.width,
+            Length::Height => self.height,
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct SideObject {
     pub top: f64,
@@ -138,6 +147,13 @@ pub struct Rect {
 }
 
 impl Rect {
+    pub fn get_axis(&self, axis: Axis) -> f64 {
+        match axis {
+            Axis::X => self.x,
+            Axis::Y => self.y,
+        }
+    }
+
     pub fn get_length(&self, length: Length) -> f64 {
         match length {
             Length::Width => self.width,

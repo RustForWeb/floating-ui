@@ -1,4 +1,5 @@
 pub mod convert_offset_parent_relative_rect_to_viewport_relative_rect;
+pub mod get_client_length;
 pub mod get_client_rects;
 pub mod get_clipping_rect;
 pub mod get_dimensions;
@@ -18,6 +19,7 @@ use floating_ui_utils::{
 use web_sys::{Element, Window};
 
 use self::convert_offset_parent_relative_rect_to_viewport_relative_rect::convert_offset_parent_relative_rect_to_viewport_relative_rect;
+use self::get_client_length::get_client_length;
 use self::get_client_rects::get_client_rects;
 use self::get_clipping_rect::get_clipping_rect;
 use self::get_dimensions::get_dimensions;
@@ -75,5 +77,13 @@ impl CorePlatform<Element, Window> for Platform {
 
     fn get_scale(&self, element: &Element) -> Option<Coords> {
         Some(get_scale(element.into()))
+    }
+
+    fn get_client_length(
+        &self,
+        element: &Element,
+        length: floating_ui_utils::Length,
+    ) -> Option<f64> {
+        Some(get_client_length(element, length))
     }
 }

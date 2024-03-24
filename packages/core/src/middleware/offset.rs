@@ -81,7 +81,7 @@ impl Default for OffsetOptions {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-struct OffsetData {
+pub struct OffsetData {
     pub diff_coords: Option<Coords>,
     pub placement: Option<Placement>,
 }

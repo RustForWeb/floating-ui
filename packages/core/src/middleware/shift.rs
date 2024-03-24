@@ -43,9 +43,9 @@ impl<'a, Element, Window> Default for ShiftOptions<'a, Element, Window> {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-struct ShiftData {
-    x: f64,
-    y: f64,
+pub struct ShiftData {
+    pub x: f64,
+    pub y: f64,
 }
 
 pub struct Shift<'a, Element, Window> {

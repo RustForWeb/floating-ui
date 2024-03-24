@@ -45,15 +45,15 @@ impl<'a, Element> Default for FlipOptions<'a, Element> {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-struct FlipDataOverflow {
-    placement: Placement,
-    overflows: Vec<f64>,
+pub struct FlipDataOverflow {
+    pub placement: Placement,
+    pub overflows: Vec<f64>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-struct FlipData {
-    index: usize,
-    overflows: Vec<FlipDataOverflow>,
+pub struct FlipData {
+    pub index: usize,
+    pub overflows: Vec<FlipDataOverflow>,
 }
 
 pub struct Flip<'a, Element, Window> {

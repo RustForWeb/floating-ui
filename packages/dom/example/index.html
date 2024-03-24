@@ -2,8 +2,6 @@
     <head>
         <title>Floating UI DOM Example</title>
 
-        <!-- <meta content="text/html;charset=utf-8" http-equiv="Content-Type" /> -->
-
         <style>
             body {
                 font-family: system-ui;
@@ -34,10 +32,21 @@
                 line-height: 1.25rem;
                 pointer-events: none;
             }
+
+            #arrow {
+                position: absolute;
+                background: #1f2028;
+                width: 8px;
+                height: 8px;
+                transform: rotate(45deg);
+            }
         </style>
     </head>
     <body>
         <button id="button" aria-describedby="tooltip">My button</button>
-        <div id="tooltip" role="tooltip">My tooltip with more content</div>
+        <div id="tooltip" role="tooltip">
+            My tooltip with more content
+            <div id="arrow"></div>
+        </div>
     </body>
 </html>
