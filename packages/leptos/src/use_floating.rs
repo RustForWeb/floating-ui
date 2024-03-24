@@ -1,5 +1,4 @@
-use floating_ui_core::Middleware;
-use floating_ui_utils::{Placement, Strategy};
+use floating_ui_dom::{Middleware, Placement, Strategy};
 use leptos::create_signal;
 use web_sys::{Element, Window};
 

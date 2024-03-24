@@ -6,13 +6,15 @@ mod types;
 mod utils;
 
 pub use crate::middleware::*;
-pub use floating_ui_core::{ComputePositionReturn, DetectOverflowOptions};
+pub use floating_ui_core::{
+    ComputePositionReturn, DetectOverflowOptions, Middleware, MiddlewareData, MiddlewareReturn,
+    MiddlewareState, MiddlewareWithOptions,
+};
 #[doc(no_inline)]
 pub use floating_ui_utils::*;
 
 use floating_ui_core::{
     compute_position as compute_position_core, ComputePositionConfig as CoreComputePositionConfig,
-    Middleware,
 };
 use web_sys::{Element, Window};
 
