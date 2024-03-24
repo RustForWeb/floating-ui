@@ -9,6 +9,9 @@ use crate::{
     },
 };
 
+/// Name of the [`Shift`] middleware.
+pub const SHIFT_NAME: &str = "shift";
+
 /// Limiter used by [`Shift`] middleware. Limits the shifting done in order to prevent detachment.
 pub trait Limiter<Element, Window> {
     fn compute(&self, state: MiddlewareState<Element, Window>) -> Coords;
@@ -105,7 +108,7 @@ impl<'a, Element, Window> Shift<'a, Element, Window> {
 
 impl<'a, Element, Window> Middleware<Element, Window> for Shift<'a, Element, Window> {
     fn name(&self) -> &'static str {
-        "shift"
+        SHIFT_NAME
     }
 
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn {

@@ -3,9 +3,16 @@ use floating_ui_utils::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::types::{
-    Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions,
+use crate::{
+    middleware::{ArrowData, ARROW_NAME},
+    types::{
+        Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
+        MiddlewareWithOptions,
+    },
 };
+
+/// Name of the [`Offset`] middleware.
+const OFFSET_NAME: &str = "offset";
 
 fn convert_value_to_coords<Element, Window>(
     state: MiddlewareState<Element, Window>,
@@ -130,7 +137,7 @@ impl<Element, Window> Offset<Element, Window> {
 
 impl<Element, Window> Middleware<Element, Window> for Offset<Element, Window> {
     fn name(&self) -> &'static str {
-        "offset"
+        OFFSET_NAME
     }
 
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn {
@@ -144,24 +151,27 @@ impl<Element, Window> Middleware<Element, Window> for Offset<Element, Window> {
             ..
         } = state;
 
-        let _data: OffsetData = middleware_data.get_as(self.name()).unwrap_or(OffsetData {
+        let data: OffsetData = middleware_data.get_as(self.name()).unwrap_or(OffsetData {
             diff_coords: None,
             placement: None,
         });
 
         let diff_coords = convert_value_to_coords(state, &options);
 
-        // TODO: arrow check
-        // if let Some(data_placement) = data.placement {
-        //     if placement == data_placement && false {
-        //         return MiddlewareReturn {
-        //             x: None,
-        //             y: None,
-        //             data: None,
-        //             reset: None,
-        //         };
-        //     }
-        // }
+        // If the placement is the same and the arrow caused an alignment offset then we don't need to change the positioning coordinates.
+        if let Some(data_placement) = data.placement {
+            if placement == data_placement {
+                let arrow_data: Option<ArrowData> = middleware_data.get_as(ARROW_NAME);
+                if arrow_data.map_or(false, |arrow_data| arrow_data.alignment_offset.is_some()) {
+                    return MiddlewareReturn {
+                        x: None,
+                        y: None,
+                        data: None,
+                        reset: None,
+                    };
+                }
+            }
+        }
 
         MiddlewareReturn {
             x: Some(x + diff_coords.x),

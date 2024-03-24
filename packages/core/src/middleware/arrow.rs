@@ -4,10 +4,12 @@ use floating_ui_utils::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    types::{Derivable, Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions},
-    DerivableFn,
+use crate::types::{
+    Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions,
 };
+
+/// Name of the [`Arrow`] middleware.
+pub const ARROW_NAME: &str = "arrow";
 
 /// Options for [`Arrow`].
 pub struct ArrowOptions<'a, Element> {
@@ -64,7 +66,7 @@ impl<'a, Element, Window> Arrow<'a, Element, Window> {
 
 impl<'a, Element, Window> Middleware<Element, Window> for Arrow<'a, Element, Window> {
     fn name(&self) -> &'static str {
-        "arrow"
+        ARROW_NAME
     }
 
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn {

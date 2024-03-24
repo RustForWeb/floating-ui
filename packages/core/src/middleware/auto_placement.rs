@@ -12,6 +12,9 @@ use crate::{
     },
 };
 
+/// Name of the [`AutoPlacement`] middleware.
+pub const AUTO_PLACEMENT_NAME: &str = "autoPlacement";
+
 fn get_placement_list(
     alignment: Option<Alignment>,
     auto_alignment: bool,
@@ -155,7 +158,7 @@ impl<'a, Element, Window> AutoPlacement<'a, Element, Window> {
 
 impl<'a, Element, Window> Middleware<Element, Window> for AutoPlacement<'a, Element, Window> {
     fn name(&self) -> &'static str {
-        "autoPlacement"
+        AUTO_PLACEMENT_NAME
     }
 
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn {

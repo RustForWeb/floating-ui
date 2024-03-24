@@ -6,11 +6,15 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     detect_overflow::{detect_overflow, DetectOverflowOptions},
+    middleware::arrow::{ArrowData, ARROW_NAME},
     types::{
         Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
         MiddlewareWithOptions, Reset, ResetValue,
     },
 };
+
+/// Name of the [`Flip`] middleware.
+pub const FLIP_NAME: &str = "flip";
 
 /// Fallback strategy used by [`Flip`] middleware.
 #[derive(Copy, Clone, Debug, Default)]
@@ -127,7 +131,7 @@ impl<'a, Element, Window> Flip<'a, Element, Window> {
 
 impl<'a, Element, Window> Middleware<Element, Window> for Flip<'a, Element, Window> {
     fn name(&self) -> &'static str {
-        "flip"
+        FLIP_NAME
     }
 
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn {
@@ -155,7 +159,17 @@ impl<'a, Element, Window> Middleware<Element, Window> for Flip<'a, Element, Wind
         let fallback_axis_side_direction = options.fallback_axis_side_direction;
         let flip_alignment = options.flip_alignment.unwrap_or(true);
 
-        // TODO: arrow check
+        // If a reset by the arrow was caused due to an alignment offset being added,
+        // we should skip any logic now since `flip()` has already done its work.
+        let arrow_data: Option<ArrowData> = middleware_data.get_as(ARROW_NAME);
+        if arrow_data.map_or(false, |arrow_data| arrow_data.alignment_offset.is_some()) {
+            return MiddlewareReturn {
+                x: None,
+                y: None,
+                data: None,
+                reset: None,
+            };
+        }
 
         let side = get_side(placement);
         let is_base_placement = get_alignment(initial_placement).is_none();
