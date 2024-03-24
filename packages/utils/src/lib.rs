@@ -1,3 +1,5 @@
+//! Utility functions shared across Floating UI packages. You may use these functions in your own projects, but are subject to breaking changes.
+
 #[cfg(feature = "dom")]
 pub mod dom;
 
@@ -206,6 +208,9 @@ impl<'a, Element> From<&'a Element> for ElementOrVirtual<'a, Element> {
     }
 }
 
+/// Custom positioning reference element.
+///
+/// See <https://floating-ui.com/docs/virtual-elements> for the original documentation.
 pub trait VirtualElement<Element> {
     fn get_bounding_client_rect(&self) -> ClientRectObject;
 

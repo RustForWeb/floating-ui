@@ -263,12 +263,16 @@ pub fn get_parent_node(node: &Node) -> Node {
 
     let result: Node;
     if let Some(slot) = element.and_then(|element| element.assigned_slot()) {
+        // Step into the shadow DOM of the parent of a slotted node.
         result = slot.into();
     } else if let Some(parent_node) = node.parent_node() {
+        // DOM Element detected.
         result = parent_node;
     } else if let Some(shadow_root) = node.dyn_ref::<ShadowRoot>() {
+        // ShadowRoot detected.
         result = shadow_root.host().into();
     } else {
+        // Fallback.
         result = get_document_element(Some(node.into())).into();
     }
 

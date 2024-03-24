@@ -8,10 +8,12 @@ use crate::{
     types::{Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions},
 };
 
+/// Limiter used by [`Shift`] middleware. Limits the shifting done in order to prevent detachment.
 pub trait Limiter<Element, Window> {
     fn compute(&self, state: MiddlewareState<Element, Window>) -> Coords;
 }
 
+/// Default [`Limiter`], which doesn't limit shifting.
 pub struct DefaultLimiter;
 
 impl<Element, Window> Limiter<Element, Window> for DefaultLimiter {
@@ -23,11 +25,27 @@ impl<Element, Window> Limiter<Element, Window> for DefaultLimiter {
     }
 }
 
+/// Options for [`Shift`] middleware.
 #[derive(Clone)]
 pub struct ShiftOptions<'a, Element, Window> {
+    /// Options for [`detect_overflow`].
+    ///
+    /// Defaults to [`DetectOverflowOptions::default`].
     pub detect_overflow: Option<DetectOverflowOptions<'a, Element>>,
+
+    /// The axis that runs along the alignment of the floating element. Determines whether overflow along this axis is checked to perform shifting.
+    ///
+    /// Defaults to `true`.
     pub main_axis: Option<bool>,
+
+    /// The axis that runs along the side of the floating element. Determines whether overflow along this axis is checked to perform shifting.
+    ///
+    /// Defaults to `false`.
     pub cross_axis: Option<bool>,
+
+    /// Accepts a limiter that limits the shifting done in order to prevent detachment.
+    ///
+    /// Defaults to [`DefaultLimiter`].
     pub limiter: Option<&'a dyn Limiter<Element, Window>>,
 }
 
@@ -42,17 +60,22 @@ impl<'a, Element, Window> Default for ShiftOptions<'a, Element, Window> {
     }
 }
 
+/// Data stored by [`Shift`] middleware.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ShiftData {
     pub x: f64,
     pub y: f64,
 }
 
+/// Optimizes the visibility of the floating element by shifting it in order to keep it in view when it will overflow the clipping boundary.
+///
+/// See <https://floating-ui.com/docs/shift> for the original documentation.
 pub struct Shift<'a, Element, Window> {
     options: ShiftOptions<'a, Element, Window>,
 }
 
 impl<'a, Element, Window> Shift<'a, Element, Window> {
+    /// Constructs a new instance of this middleware.
     pub fn new(options: ShiftOptions<'a, Element, Window>) -> Self {
         Shift { options }
     }

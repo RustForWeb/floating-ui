@@ -3,20 +3,37 @@ use floating_ui_utils::{
     SideObject,
 };
 
-use crate::{
-    types::{
-        Boundary, ConvertOffsetParentRelativeRectToViewportRelativeRectArgs, ElementContext,
-        MiddlewareState, RootBoundary,
-    },
-    Elements, GetClippingRectArgs,
+use crate::types::{
+    Boundary, ConvertOffsetParentRelativeRectToViewportRelativeRectArgs, ElementContext, Elements,
+    GetClippingRectArgs, MiddlewareState, RootBoundary,
 };
 
+/// Options for [`detect_overflow`].
 #[derive(Debug)]
 pub struct DetectOverflowOptions<'a, Element> {
+    /// The clipping element(s) or area in which overflow will be checked.
+    ///
+    /// Defaults to [`Boundary::ClippingAncestors`].
     pub boundary: Option<Boundary<'a, Element>>,
+
+    /// The root clipping area in which overflow will be checked.
+    ///
+    /// Defaults to [`RootBoundary::Viewport`].
     pub root_boundary: Option<RootBoundary>,
+
+    /// The element in which overflow is being checked relative to a boundary.
+    ///
+    /// Defaults to [`ElementContext::Floating`].
     pub element_context: Option<ElementContext>,
+
+    /// Whether to check for overflow using the alternate element's boundary (only when [`boundary`][`Self::boundary`] is [`Boundary::ClippingAncestors`]).
+    ///
+    /// Defaults to `false`.
     pub alt_boundary: Option<bool>,
+
+    /// Virtual padding for the resolved overflow detection offsets.
+    ///
+    /// Defaults to `0` on all sides.
     pub padding: Option<Padding>,
 }
 
@@ -44,6 +61,12 @@ impl<'a, Element> Default for DetectOverflowOptions<'a, Element> {
     }
 }
 
+/// Resolves with an object of overflow side offsets that determine how much the element is overflowing a given clipping boundary on each side.
+/// - positive = overflowing the boundary by that number of pixels
+/// - negative = how many pixels left before it will overflow
+/// - `0` = lies flush with the boundary
+///
+/// See <https://floating-ui.com/docs/detectOverflow> for the original documentation.
 pub fn detect_overflow<Element, Window>(
     state: MiddlewareState<Element, Window>,
     options: DetectOverflowOptions<Element>,

@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::types::{Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions};
 
-pub fn convert_value_to_coords<Element, Window>(
+fn convert_value_to_coords<Element, Window>(
     state: MiddlewareState<Element, Window>,
     options: &OffsetOptions,
 ) -> Coords {
@@ -61,13 +61,31 @@ pub fn convert_value_to_coords<Element, Window>(
     }
 }
 
+/// Axes configuration for [`OffsetOptions`].
 #[derive(Clone, Debug)]
 pub struct OffsetOptionsValues {
+    /// The axis that runs along the side of the floating element. Represents the distance (gutter or margin) between the reference and floating element.
+    ///
+    /// Defaults to `0`.
     pub main_axis: Option<f64>,
+
+    /// The axis that runs along the alignment of the floating element. Represents the skidding between the reference and floating element.
+    ///
+    /// Defaults to `0`.
     pub cross_axis: Option<f64>,
+
+    /// The same axis as [`cross_axis`][`Self::cross_axis`] but applies only to aligned placements and inverts the [`End`][`floating_ui_utils::Alignment::End`] alignment.
+    /// When set to a number, it overrides the [`cross_axis`][`Self::cross_axis`] value.
+    ///
+    /// A positive number will move the floating element in the direction of the opposite edge to the one that is aligned, while a negative number the reverse.
+    ///
+    /// Defaults to [`Option::None`].
     pub alignment_axis: Option<f64>,
 }
 
+/// Options for [`Offset`] middleware.
+///
+/// A number (shorthand for [`main_axis`][`OffsetOptionsValues::main_axis`] or distance) or an axes configuration ([`OffsetOptionsValues`]).
 #[derive(Clone, Debug)]
 pub enum OffsetOptions {
     Value(f64),
@@ -80,12 +98,16 @@ impl Default for OffsetOptions {
     }
 }
 
+/// Data stored by [`Offset`] middleware.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct OffsetData {
     pub diff_coords: Option<Coords>,
     pub placement: Option<Placement>,
 }
 
+/// Modifies the placement by translating the floating element along the specified axes.
+///
+/// See <https://floating-ui.com/docs/offset> for the original documentation.
 pub struct Offset<Element, Window> {
     element: PhantomData<Element>,
     window: PhantomData<Window>,
@@ -94,6 +116,7 @@ pub struct Offset<Element, Window> {
 }
 
 impl<Element, Window> Offset<Element, Window> {
+    /// Constructs a new instance of this middleware.
     pub fn new(options: OffsetOptions) -> Self {
         Offset {
             element: PhantomData,

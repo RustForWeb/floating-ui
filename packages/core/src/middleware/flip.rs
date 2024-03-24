@@ -8,10 +8,12 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     detect_overflow::{detect_overflow, DetectOverflowOptions},
-    types::{Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions},
-    Reset, ResetValue,
+    types::{
+        Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions, Reset, ResetValue,
+    },
 };
 
+/// Fallback strategy used by [`Flip`] middleware.
 #[derive(Copy, Clone, Debug, Default)]
 pub enum FallbackStrategy {
     #[default]
@@ -19,14 +21,42 @@ pub enum FallbackStrategy {
     InitialPlacement,
 }
 
+/// Options for [`Flip`] middleware.
 #[derive(Clone, Debug)]
 pub struct FlipOptions<'a, Element> {
+    /// Options for [`detect_overflow`].
+    ///
+    /// Defaults to [`DetectOverflowOptions::default`].
     pub detect_overflow: Option<DetectOverflowOptions<'a, Element>>,
+
+    /// The axis that runs along the side of the floating element. Determines whether overflow along this axis is checked to perform a flip.
+    ///
+    /// Defaults to `true`.
     pub main_axis: Option<bool>,
+
+    /// The axis that runs along the alignment of the floating element. Determines whether overflow along this axis is checked to perform a flip.
+    ///
+    /// Defaults to `true`.
     pub cross_axis: Option<bool>,
+
+    /// Placements to try sequentially if the preferred `placement` does not fit.
+    ///
+    /// Defaults to the opposite placement.
     pub fallback_placements: Option<Vec<Placement>>,
+
+    /// What strategy to use when no placements fit.
+    ///
+    /// Defaults to [`FallbackStrategy::BestFit`].
     pub fallback_strategy: Option<FallbackStrategy>,
+
+    /// Whether to allow fallback to the perpendicular axis of the preferred placement, and if so, which side direction along the axis to prefer.
+    ///
+    /// Defaults to [`Option::None`] (disallow fallback).
     pub fallback_axis_side_direction: Option<Alignment>,
+
+    /// Whether to flip to placements with the opposite alignment if they fit better.
+    ///
+    /// Defaults to `true`.
     pub flip_alignment: Option<bool>,
 }
 
@@ -44,18 +74,24 @@ impl<'a, Element> Default for FlipOptions<'a, Element> {
     }
 }
 
+/// An overflow stored in [`FlipData`].
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct FlipDataOverflow {
     pub placement: Placement,
     pub overflows: Vec<f64>,
 }
 
+/// Data stored by [`Flip`] middleware.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct FlipData {
     pub index: usize,
     pub overflows: Vec<FlipDataOverflow>,
 }
 
+/// Optimizes the visibility of the floating element by flipping the `placement` in order to keep it in view when the preferred placement(s) will overflow the clipping boundary.
+/// Alternative to [`AutoPlacement`][`crate::middleware::AutoPlacement`].
+///
+/// See <https://floating-ui.com/docs/flip> for the original documentation.
 pub struct Flip<'a, Element, Window> {
     window: PhantomData<Window>,
 
@@ -63,6 +99,7 @@ pub struct Flip<'a, Element, Window> {
 }
 
 impl<'a, Element, Window> Flip<'a, Element, Window> {
+    /// Constructs a new instance of this middleware.
     pub fn new(options: FlipOptions<'a, Element>) -> Self {
         Flip {
             window: PhantomData,

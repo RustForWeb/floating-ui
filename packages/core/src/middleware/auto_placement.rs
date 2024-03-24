@@ -13,7 +13,7 @@ use crate::{
     },
 };
 
-pub fn get_placement_list(
+fn get_placement_list(
     alignment: Option<Alignment>,
     auto_alignment: bool,
     allowed_placements: Vec<Placement>,
@@ -61,12 +61,32 @@ pub fn get_placement_list(
         .collect()
 }
 
+/// Options for [`AutoPlacement`] middleware.
 #[derive(Clone, Debug)]
 pub struct AutoPlacementOptions<'a, Element> {
+    /// Options for [`detect_overflow`].
+    ///
+    /// Defaults to [`DetectOverflowOptions::default`].
     pub detect_overflow: Option<DetectOverflowOptions<'a, Element>>,
+
+    /// The axis that runs along the alignment of the floating element. Determines whether to check for most space along this axis.
+    ///
+    /// Defaults to `false`.
     pub cross_axis: Option<bool>,
+
+    /// Choose placements with a particular alignment.
+    ///
+    /// Defaults to [`Option::None`].
     pub alignment: Option<Alignment>,
+
+    /// Whether to choose placements with the opposite alignment if the preferred alignment does not fit.
+    ///
+    /// Defaults to `true`.
     pub auto_alignment: Option<bool>,
+
+    /// Which placements are allowed to be chosen. Placements must be within the [`alignment`][`Self::alignment`] option if explicitly set.
+    ///
+    /// Defaults to all possible placements.
     pub allowed_placements: Option<Vec<Placement>>,
 }
 
@@ -82,18 +102,24 @@ impl<'a, Element> Default for AutoPlacementOptions<'a, Element> {
     }
 }
 
+/// An overflow stored in [`AutoPlacementData`].
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct AutoPlacementDataOverflow {
     pub placement: Placement,
     pub overflows: Vec<f64>,
 }
 
+/// Data stored by [`AutoPlacement`] middleware.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct AutoPlacementData {
     pub index: usize,
     pub overflows: Vec<AutoPlacementDataOverflow>,
 }
 
+/// Optimizes the visibility of the floating element by choosing the placement that has the most space available automatically, without needing to specify a preferred placement.
+/// Alternative to [`Flip`][`crate::middleware::Flip`].
+///
+/// See <https://floating-ui.com/docs/autoPlacement> for the original documentation.
 pub struct AutoPlacement<'a, Element, Window> {
     window: PhantomData<Window>,
 
@@ -101,6 +127,7 @@ pub struct AutoPlacement<'a, Element, Window> {
 }
 
 impl<'a, Element, Window> AutoPlacement<'a, Element, Window> {
+    /// Constructs a new instance of this middleware.
     pub fn new(options: AutoPlacementOptions<'a, Element>) -> Self {
         AutoPlacement {
             window: PhantomData,

@@ -8,11 +8,19 @@ use serde::{Deserialize, Serialize};
 
 use crate::types::{Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions};
 
+/// Options for [`Arrow`].
 pub struct ArrowOptions<'a, Element> {
+    /// The arrow element to be positioned.
     pub element: &'a Element,
+
+    /// The padding between the arrow element and the floating element edges.
+    /// Useful when the floating element has rounded corners.
+    ///
+    /// Defaults to `0` on all sides.
     pub padding: Option<Padding>,
 }
 
+/// Data stored by [`Arrow`] middleware.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ArrowData {
     pub x: Option<f64>,
@@ -21,6 +29,9 @@ pub struct ArrowData {
     pub alignment_offset: Option<f64>,
 }
 
+/// Provides data to position an inner element of the floating element so that it appears centered to the reference element.
+///
+/// See <https://floating-ui.com/docs/arrow> for the original documentation.
 pub struct Arrow<'a, Element, Window> {
     window: PhantomData<Window>,
 
@@ -28,6 +39,7 @@ pub struct Arrow<'a, Element, Window> {
 }
 
 impl<'a, Element, Window> Arrow<'a, Element, Window> {
+    /// Constructs a new instance of this middleware.
     pub fn new(options: ArrowOptions<'a, Element>) -> Self {
         Arrow {
             window: PhantomData,

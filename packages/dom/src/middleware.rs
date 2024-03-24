@@ -1,17 +1,38 @@
-use floating_ui_core::{
+use floating_ui_core::middleware::{
     Arrow as CoreArrow, AutoPlacement as CoreAutoPlacement, Flip as CoreFlip, Offset as CoreOffset,
     Shift as CoreShift,
 };
 use web_sys::{Element, Window};
 
-pub use floating_ui_core::{
+pub use floating_ui_core::middleware::{
     ArrowData, ArrowOptions, AutoPlacementData, AutoPlacementDataOverflow, AutoPlacementOptions,
     FlipData, FlipDataOverflow, FlipOptions, OffsetData, OffsetOptions, OffsetOptionsValues,
     ShiftData, ShiftOptions,
 };
 
+/// Provides data to position an inner element of the floating element so that it appears centered to the reference element.
+///
+/// See <https://floating-ui.com/docs/arrow> for the original documentation.
 pub type Arrow<'a> = CoreArrow<'a, Element, Window>;
+
+/// Optimizes the visibility of the floating element by choosing the placement that has the most space available automatically, without needing to specify a preferred placement.
+/// Alternative to [`Flip`].
+///
+/// See <https://floating-ui.com/docs/autoPlacement> for the original documentation.
 pub type AutoPlacement<'a> = CoreAutoPlacement<'a, Element, Window>;
+
+/// Optimizes the visibility of the floating element by flipping the `placement` in order to keep it in view when the preferred placement(s) will overflow the clipping boundary.
+/// Alternative to [`AutoPlacement`].
+///
+/// See <https://floating-ui.com/docs/flip> for the original documentation.
 pub type Flip<'a> = CoreFlip<'a, Element, Window>;
+
+/// Modifies the placement by translating the floating element along the specified axes.
+///
+/// See <https://floating-ui.com/docs/offset> for the original documentation.
 pub type Offset = CoreOffset<Element, Window>;
+
+/// Optimizes the visibility of the floating element by shifting it in order to keep it in view when it will overflow the clipping boundary.
+///
+/// See <https://floating-ui.com/docs/shift> for the original documentation.
 pub type Shift<'a> = CoreShift<'a, Element, Window>;

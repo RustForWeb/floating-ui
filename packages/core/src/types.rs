@@ -8,12 +8,14 @@ use floating_ui_utils::{
     OwnedElementOrWindow, Placement, Rect, Strategy,
 };
 
+/// Arguments for [`Platform::get_element_rects`].
 pub struct GetElementRectsArgs<'a, Element> {
     pub reference: &'a Element,
     pub floating: &'a Element,
     pub strategy: Strategy,
 }
 
+/// Arguments for [`Platform::get_clipping_rect`].
 pub struct GetClippingRectArgs<'a, Element> {
     pub element: &'a Element,
     pub boundary: Boundary<'a, Element>,
@@ -21,6 +23,7 @@ pub struct GetClippingRectArgs<'a, Element> {
     pub strategy: Strategy,
 }
 
+/// Arguments for [`Platform::convert_offset_parent_relative_rect_to_viewport_relative_rect`].
 pub struct ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<'a, Element, Window> {
     pub elements: Option<Elements<'a, Element>>,
     pub rect: Rect,
@@ -28,6 +31,9 @@ pub struct ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<'a, Element
     pub strategy: Strategy,
 }
 
+/// Platform interface methods to work with the current platform.
+///
+/// See <https://floating-ui.com/docs/platform> for the original documentation.
 pub trait Platform<Element, Window>: Debug {
     fn get_element_rects(&self, args: GetElementRectsArgs<Element>) -> ElementRects;
 
@@ -74,6 +80,7 @@ pub trait Platform<Element, Window>: Debug {
     }
 }
 
+/// Data stored by middleware.
 #[derive(Clone, Debug, Default)]
 pub struct MiddlewareData {
     values: HashMap<String, serde_json::Value>,
@@ -100,20 +107,41 @@ impl MiddlewareData {
     }
 }
 
+/// Options for [`compute_position`][crate::compute_position::compute_position].
 #[derive(Clone)]
 pub struct ComputePositionConfig<'a, Element, Window> {
+    /// Object to interface with the current platform.
     pub platform: &'a dyn Platform<Element, Window>,
+
+    /// Where to place the floating element relative to the reference element.
+    ///
+    /// Defaults to [`Placement::Bottom`].
     pub placement: Option<Placement>,
+
+    /// The strategy to use when positioning the floating element.
+    ///
+    /// Defaults to [`Strategy::Absolute`].
     pub strategy: Option<Strategy>,
+
+    /// Array of middleware objects to modify the positioning or provide data for rendering.
+    ///
+    /// Defaults to an empty vector.
     pub middleware: Option<Vec<&'a dyn Middleware<Element, Window>>>,
 }
 
+/// Return of [`compute_position`][crate::compute_position::compute_position].
 #[derive(Clone, Debug)]
 pub struct ComputePositionReturn {
     pub x: f64,
     pub y: f64,
+
+    /// The final chosen placement of the floating element.
     pub placement: Placement,
+
+    /// The strategy used to position the floating element.
     pub strategy: Strategy,
+
+    /// Object containing data returned from all middleware, keyed by their name.
     pub middleware_data: MiddlewareData,
 }
 
@@ -135,6 +163,7 @@ pub enum Reset {
     Value(ResetValue),
 }
 
+/// Return of [`Middleware::compute`].
 #[derive(Clone, Debug)]
 pub struct MiddlewareReturn {
     pub x: Option<f64>,
@@ -143,13 +172,18 @@ pub struct MiddlewareReturn {
     pub reset: Option<Reset>,
 }
 
+/// Middleware used by [`compute_position`][`crate::compute_position::compute_position`].
 pub trait Middleware<Element, Window> {
+    /// The name of this middleware.
     fn name(&self) -> &'static str;
 
+    /// Executes this middleware.
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn;
 }
 
+/// Middleware with options.
 pub trait MiddlewareWithOptions<O> {
+    /// The options passed to this middleware.
     fn options(&self) -> &O;
 }
 
@@ -168,6 +202,7 @@ impl<'a, Element> Elements<'a, Element> {
     }
 }
 
+/// State passed to [`Middleware::compute`].
 #[derive(Debug)]
 pub struct MiddlewareState<'a, Element, Window> {
     pub x: f64,

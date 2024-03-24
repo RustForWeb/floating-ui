@@ -3,6 +3,7 @@ use floating_ui_utils::{
     Coords, ElementRects, Placement, Side,
 };
 
+/// Computes the `x` and `y` coordinates that will place the floating element next to a given reference element based on a `placement`.
 pub fn compute_coords_from_placement(
     ElementRects {
         reference,

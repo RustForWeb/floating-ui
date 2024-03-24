@@ -2,9 +2,7 @@
 
 Rust port of [Floating UI](https://floating-ui.com).
 
-## Features
-
-TODO
+[Floating UI](https://floating-ui.com) is a small library that helps you create "floating" elements such as tooltips, popovers, dropdowns, and more.
 
 ## Documentation
 
