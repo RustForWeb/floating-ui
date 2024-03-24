@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 use floating_ui_utils::{
     get_alignment, get_alignment_sides, get_expanded_placements, get_opposite_axis_placements,
     get_opposite_placement, get_side, Alignment, Placement,
@@ -9,7 +7,8 @@ use serde::{Deserialize, Serialize};
 use crate::{
     detect_overflow::{detect_overflow, DetectOverflowOptions},
     types::{
-        Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions, Reset, ResetValue,
+        Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
+        MiddlewareWithOptions, Reset, ResetValue,
     },
 };
 
@@ -22,7 +21,7 @@ pub enum FallbackStrategy {
 }
 
 /// Options for [`Flip`] middleware.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct FlipOptions<'a, Element> {
     /// Options for [`detect_overflow`].
     ///
@@ -60,6 +59,20 @@ pub struct FlipOptions<'a, Element> {
     pub flip_alignment: Option<bool>,
 }
 
+impl<'a, Element> Clone for FlipOptions<'a, Element> {
+    fn clone(&self) -> Self {
+        Self {
+            detect_overflow: self.detect_overflow.clone(),
+            main_axis: self.main_axis,
+            cross_axis: self.cross_axis,
+            fallback_placements: self.fallback_placements.clone(),
+            fallback_strategy: self.fallback_strategy,
+            fallback_axis_side_direction: self.fallback_axis_side_direction,
+            flip_alignment: self.flip_alignment,
+        }
+    }
+}
+
 impl<'a, Element> Default for FlipOptions<'a, Element> {
     fn default() -> Self {
         Self {
@@ -93,17 +106,21 @@ pub struct FlipData {
 ///
 /// See <https://floating-ui.com/docs/flip> for the original documentation.
 pub struct Flip<'a, Element, Window> {
-    window: PhantomData<Window>,
-
-    options: FlipOptions<'a, Element>,
+    options: Derivable<Element, Window, FlipOptions<'a, Element>>,
 }
 
 impl<'a, Element, Window> Flip<'a, Element, Window> {
     /// Constructs a new instance of this middleware.
     pub fn new(options: FlipOptions<'a, Element>) -> Self {
         Flip {
-            window: PhantomData,
-            options,
+            options: options.into(),
+        }
+    }
+
+    /// Constructs a new instance of this middleware with derivable options.
+    pub fn new_derivable(options: DerivableFn<Element, Window, FlipOptions<'a, Element>>) -> Self {
+        Flip {
+            options: options.into(),
         }
     }
 }
@@ -114,6 +131,8 @@ impl<'a, Element, Window> Middleware<Element, Window> for Flip<'a, Element, Wind
     }
 
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn {
+        let options = self.options.evaluate(state.clone());
+
         let MiddlewareState {
             placement,
             initial_placement,
@@ -124,19 +143,17 @@ impl<'a, Element, Window> Middleware<Element, Window> for Flip<'a, Element, Wind
             ..
         } = state;
 
-        // TODO: support options fn
-
         let data: FlipData = middleware_data.get_as(self.name()).unwrap_or(FlipData {
             index: 0,
             overflows: vec![],
         });
 
-        let check_main_axis = self.options.main_axis.unwrap_or(true);
-        let check_cross_axis = self.options.cross_axis.unwrap_or(true);
-        let specified_fallback_placements = self.options.fallback_placements.clone();
-        let fallback_strategy = self.options.fallback_strategy.unwrap_or_default();
-        let fallback_axis_side_direction = self.options.fallback_axis_side_direction;
-        let flip_alignment = self.options.flip_alignment.unwrap_or(true);
+        let check_main_axis = options.main_axis.unwrap_or(true);
+        let check_cross_axis = options.cross_axis.unwrap_or(true);
+        let specified_fallback_placements = options.fallback_placements.clone();
+        let fallback_strategy = options.fallback_strategy.unwrap_or_default();
+        let fallback_axis_side_direction = options.fallback_axis_side_direction;
+        let flip_alignment = options.flip_alignment.unwrap_or(true);
 
         // TODO: arrow check
 
@@ -167,7 +184,7 @@ impl<'a, Element, Window> Middleware<Element, Window> for Flip<'a, Element, Wind
                 elements: elements.clone(),
                 ..state
             },
-            self.options.detect_overflow.clone().unwrap_or_default(),
+            options.detect_overflow.unwrap_or_default(),
         );
 
         let mut overflows: Vec<f64> = Vec::new();
@@ -272,10 +289,10 @@ impl<'a, Element, Window> Middleware<Element, Window> for Flip<'a, Element, Wind
     }
 }
 
-impl<'a, Element, Window> MiddlewareWithOptions<FlipOptions<'a, Element>>
+impl<'a, Element, Window> MiddlewareWithOptions<Element, Window, FlipOptions<'a, Element>>
     for Flip<'a, Element, Window>
 {
-    fn options(&self) -> &FlipOptions<'a, Element> {
+    fn options(&self) -> &Derivable<Element, Window, FlipOptions<'a, Element>> {
         &self.options
     }
 }

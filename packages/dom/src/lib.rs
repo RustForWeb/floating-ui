@@ -29,8 +29,19 @@ const PLATFORM: Platform = Platform {};
 /// Options for [`compute_position`].
 #[derive(Clone, Default)]
 pub struct ComputePositionConfig<'a> {
+    /// Where to place the floating element relative to the reference element.
+    ///
+    /// Defaults to [`Placement::Bottom`].
     pub placement: Option<Placement>,
+
+    /// The strategy to use when positioning the floating element.
+    ///
+    /// Defaults to [`Strategy::Absolute`].
     pub strategy: Option<Strategy>,
+
+    /// Array of middleware objects to modify the positioning or provide data for rendering.
+    ///
+    /// Defaults to an empty vector.
     pub middleware: Option<Vec<&'a dyn Middleware<Element, Window>>>,
 }
 

@@ -8,6 +8,36 @@ use floating_ui_utils::{
     OwnedElementOrWindow, Placement, Rect, Strategy,
 };
 
+pub type DerivableFn<Element, Window, T> = Box<dyn Fn(MiddlewareState<Element, Window>) -> T>;
+
+pub enum Derivable<Element, Window, T: Clone> {
+    Value(T),
+    Fn(DerivableFn<Element, Window, T>),
+}
+
+impl<Element, Window, T: Clone> Derivable<Element, Window, T> {
+    pub fn evaluate(&self, state: MiddlewareState<Element, Window>) -> T {
+        match self {
+            Derivable::Value(value) => value.clone(),
+            Derivable::Fn(func) => func(state),
+        }
+    }
+}
+
+impl<Element, Window, T: Clone> From<T> for Derivable<Element, Window, T> {
+    fn from(value: T) -> Self {
+        Derivable::Value(value)
+    }
+}
+
+impl<Element, Window, T: Clone> From<DerivableFn<Element, Window, T>>
+    for Derivable<Element, Window, T>
+{
+    fn from(value: DerivableFn<Element, Window, T>) -> Self {
+        Derivable::Fn(value)
+    }
+}
+
 /// Arguments for [`Platform::get_element_rects`].
 pub struct GetElementRectsArgs<'a, Element> {
     pub reference: &'a Element,
@@ -182,9 +212,9 @@ pub trait Middleware<Element, Window> {
 }
 
 /// Middleware with options.
-pub trait MiddlewareWithOptions<O> {
+pub trait MiddlewareWithOptions<Element, Window, O: Clone> {
     /// The options passed to this middleware.
-    fn options(&self) -> &O;
+    fn options(&self) -> &Derivable<Element, Window, O>;
 }
 
 #[derive(Clone, Debug)]
@@ -214,6 +244,22 @@ pub struct MiddlewareState<'a, Element, Window> {
     pub elements: Elements<'a, &'a Element>,
     pub rects: &'a ElementRects,
     pub platform: &'a dyn Platform<Element, Window>,
+}
+
+impl<'a, Element, Window> Clone for MiddlewareState<'a, Element, Window> {
+    fn clone(&self) -> Self {
+        Self {
+            x: self.x,
+            y: self.y,
+            initial_placement: self.initial_placement,
+            placement: self.placement,
+            strategy: self.strategy,
+            middleware_data: self.middleware_data,
+            elements: self.elements.clone(),
+            rects: self.rects,
+            platform: self.platform,
+        }
+    }
 }
 
 #[derive(Debug)]

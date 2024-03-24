@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 use floating_ui_utils::{
     get_alignment, get_alignment_sides, get_opposite_alignment_placement, get_side, Alignment,
     Placement, ALL_PLACEMENTS,
@@ -9,7 +7,8 @@ use serde::{Deserialize, Serialize};
 use crate::{
     detect_overflow::{detect_overflow, DetectOverflowOptions},
     types::{
-        Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions, Reset, ResetValue,
+        Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
+        MiddlewareWithOptions, Reset, ResetValue,
     },
 };
 
@@ -62,7 +61,7 @@ fn get_placement_list(
 }
 
 /// Options for [`AutoPlacement`] middleware.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct AutoPlacementOptions<'a, Element> {
     /// Options for [`detect_overflow`].
     ///
@@ -88,6 +87,18 @@ pub struct AutoPlacementOptions<'a, Element> {
     ///
     /// Defaults to all possible placements.
     pub allowed_placements: Option<Vec<Placement>>,
+}
+
+impl<'a, Element> Clone for AutoPlacementOptions<'a, Element> {
+    fn clone(&self) -> Self {
+        Self {
+            detect_overflow: self.detect_overflow.clone(),
+            cross_axis: self.cross_axis,
+            alignment: self.alignment,
+            auto_alignment: self.auto_alignment,
+            allowed_placements: self.allowed_placements.clone(),
+        }
+    }
 }
 
 impl<'a, Element> Default for AutoPlacementOptions<'a, Element> {
@@ -121,17 +132,23 @@ pub struct AutoPlacementData {
 ///
 /// See <https://floating-ui.com/docs/autoPlacement> for the original documentation.
 pub struct AutoPlacement<'a, Element, Window> {
-    window: PhantomData<Window>,
-
-    options: AutoPlacementOptions<'a, Element>,
+    options: Derivable<Element, Window, AutoPlacementOptions<'a, Element>>,
 }
 
 impl<'a, Element, Window> AutoPlacement<'a, Element, Window> {
     /// Constructs a new instance of this middleware.
     pub fn new(options: AutoPlacementOptions<'a, Element>) -> Self {
         AutoPlacement {
-            window: PhantomData,
-            options,
+            options: options.into(),
+        }
+    }
+
+    /// Constructs a new instance of this middleware with derivable options.
+    pub fn new_derivable(
+        options: DerivableFn<Element, Window, AutoPlacementOptions<'a, Element>>,
+    ) -> Self {
+        AutoPlacement {
+            options: options.into(),
         }
     }
 }
@@ -142,6 +159,8 @@ impl<'a, Element, Window> Middleware<Element, Window> for AutoPlacement<'a, Elem
     }
 
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn {
+        let options = self.options.evaluate(state.clone());
+
         let MiddlewareState {
             rects,
             middleware_data,
@@ -151,8 +170,6 @@ impl<'a, Element, Window> Middleware<Element, Window> for AutoPlacement<'a, Elem
             ..
         } = state;
 
-        // TODO: support options fn
-
         let data: AutoPlacementData =
             middleware_data
                 .get_as(self.name())
@@ -161,16 +178,15 @@ impl<'a, Element, Window> Middleware<Element, Window> for AutoPlacement<'a, Elem
                     overflows: vec![],
                 });
 
-        let cross_axis = self.options.cross_axis.unwrap_or(false);
-        let alignment = self.options.alignment;
-        let allowed_placements = self
-            .options
+        let cross_axis = options.cross_axis.unwrap_or(false);
+        let alignment = options.alignment;
+        let has_allowed_placements = options.allowed_placements.is_some();
+        let allowed_placements = options
             .allowed_placements
-            .clone()
             .unwrap_or(Vec::from(ALL_PLACEMENTS));
-        let auto_alignment = self.options.auto_alignment.unwrap_or(true);
+        let auto_alignment = options.auto_alignment.unwrap_or(true);
 
-        let placements = match alignment.is_some() || self.options.allowed_placements.is_none() {
+        let placements = match alignment.is_some() || !has_allowed_placements {
             true => get_placement_list(alignment, auto_alignment, allowed_placements),
             false => allowed_placements,
         };
@@ -180,7 +196,7 @@ impl<'a, Element, Window> Middleware<Element, Window> for AutoPlacement<'a, Elem
                 elements: elements.clone(),
                 ..state
             },
-            self.options.detect_overflow.clone().unwrap_or_default(),
+            options.detect_overflow.unwrap_or_default(),
         );
 
         let current_index = data.index;
@@ -306,10 +322,10 @@ impl<'a, Element, Window> Middleware<Element, Window> for AutoPlacement<'a, Elem
     }
 }
 
-impl<'a, Element, Window> MiddlewareWithOptions<AutoPlacementOptions<'a, Element>>
+impl<'a, Element, Window> MiddlewareWithOptions<Element, Window, AutoPlacementOptions<'a, Element>>
     for AutoPlacement<'a, Element, Window>
 {
-    fn options(&self) -> &AutoPlacementOptions<'a, Element> {
+    fn options(&self) -> &Derivable<Element, Window, AutoPlacementOptions<'a, Element>> {
         &self.options
     }
 }

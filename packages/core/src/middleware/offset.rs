@@ -1,11 +1,11 @@
-use std::marker::PhantomData;
-
 use floating_ui_utils::{
     get_alignment, get_side, get_side_axis, Alignment, Axis, Coords, Placement, Side,
 };
 use serde::{Deserialize, Serialize};
 
-use crate::types::{Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions};
+use crate::types::{
+    Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions,
+};
 
 fn convert_value_to_coords<Element, Window>(
     state: MiddlewareState<Element, Window>,
@@ -62,7 +62,7 @@ fn convert_value_to_coords<Element, Window>(
 }
 
 /// Axes configuration for [`OffsetOptions`].
-#[derive(Clone, Debug)]
+#[derive(Clone, Default, Debug)]
 pub struct OffsetOptionsValues {
     /// The axis that runs along the side of the floating element. Represents the distance (gutter or margin) between the reference and floating element.
     ///
@@ -109,19 +109,21 @@ pub struct OffsetData {
 ///
 /// See <https://floating-ui.com/docs/offset> for the original documentation.
 pub struct Offset<Element, Window> {
-    element: PhantomData<Element>,
-    window: PhantomData<Window>,
-
-    options: OffsetOptions,
+    options: Derivable<Element, Window, OffsetOptions>,
 }
 
 impl<Element, Window> Offset<Element, Window> {
     /// Constructs a new instance of this middleware.
     pub fn new(options: OffsetOptions) -> Self {
         Offset {
-            element: PhantomData,
-            window: PhantomData,
-            options,
+            options: options.into(),
+        }
+    }
+
+    /// Constructs a new instance of this middleware with derivable options.
+    pub fn new_derivable(options: DerivableFn<Element, Window, OffsetOptions>) -> Self {
+        Offset {
+            options: options.into(),
         }
     }
 }
@@ -132,6 +134,8 @@ impl<Element, Window> Middleware<Element, Window> for Offset<Element, Window> {
     }
 
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn {
+        let options = self.options.evaluate(state.clone());
+
         let MiddlewareState {
             x,
             y,
@@ -140,14 +144,12 @@ impl<Element, Window> Middleware<Element, Window> for Offset<Element, Window> {
             ..
         } = state;
 
-        // TODO: support options fn
-
         let _data: OffsetData = middleware_data.get_as(self.name()).unwrap_or(OffsetData {
             diff_coords: None,
             placement: None,
         });
 
-        let diff_coords = convert_value_to_coords(state, &self.options);
+        let diff_coords = convert_value_to_coords(state, &options);
 
         // TODO: arrow check
         // if let Some(data_placement) = data.placement {
@@ -176,8 +178,10 @@ impl<Element, Window> Middleware<Element, Window> for Offset<Element, Window> {
     }
 }
 
-impl<Element, Window> MiddlewareWithOptions<OffsetOptions> for Offset<Element, Window> {
-    fn options(&self) -> &OffsetOptions {
+impl<Element, Window> MiddlewareWithOptions<Element, Window, OffsetOptions>
+    for Offset<Element, Window>
+{
+    fn options(&self) -> &Derivable<Element, Window, OffsetOptions> {
         &self.options
     }
 }

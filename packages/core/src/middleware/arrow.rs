@@ -1,12 +1,13 @@
-use std::marker::PhantomData;
-
 use floating_ui_utils::{
     clamp, get_alignment, get_alignment_axis, get_axis_length, get_padding_object, Axis, Coords,
     OwnedElementOrWindow, Padding, Side,
 };
 use serde::{Deserialize, Serialize};
 
-use crate::types::{Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions};
+use crate::{
+    types::{Derivable, Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions},
+    DerivableFn,
+};
 
 /// Options for [`Arrow`].
 pub struct ArrowOptions<'a, Element> {
@@ -18,6 +19,15 @@ pub struct ArrowOptions<'a, Element> {
     ///
     /// Defaults to `0` on all sides.
     pub padding: Option<Padding>,
+}
+
+impl<'a, Element> Clone for ArrowOptions<'a, Element> {
+    fn clone(&self) -> Self {
+        Self {
+            element: self.element,
+            padding: self.padding.clone(),
+        }
+    }
 }
 
 /// Data stored by [`Arrow`] middleware.
@@ -33,17 +43,21 @@ pub struct ArrowData {
 ///
 /// See <https://floating-ui.com/docs/arrow> for the original documentation.
 pub struct Arrow<'a, Element, Window> {
-    window: PhantomData<Window>,
-
-    options: ArrowOptions<'a, Element>,
+    options: Derivable<Element, Window, ArrowOptions<'a, Element>>,
 }
 
 impl<'a, Element, Window> Arrow<'a, Element, Window> {
     /// Constructs a new instance of this middleware.
     pub fn new(options: ArrowOptions<'a, Element>) -> Self {
         Arrow {
-            window: PhantomData,
-            options,
+            options: options.into(),
+        }
+    }
+
+    /// Constructs a new instance of this middleware with derivable options.
+    pub fn new_derivable(options: DerivableFn<Element, Window, ArrowOptions<'a, Element>>) -> Self {
+        Arrow {
+            options: options.into(),
         }
     }
 }
@@ -54,6 +68,8 @@ impl<'a, Element, Window> Middleware<Element, Window> for Arrow<'a, Element, Win
     }
 
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn {
+        let options = self.options.evaluate(state.clone());
+
         let MiddlewareState {
             x,
             y,
@@ -65,16 +81,13 @@ impl<'a, Element, Window> Middleware<Element, Window> for Arrow<'a, Element, Win
             ..
         } = state;
 
-        // TODO: support options fn
-
         let data: Option<ArrowData> = middleware_data.get_as(self.name());
 
-        let padding_object =
-            get_padding_object(self.options.padding.clone().unwrap_or(Padding::All(0.0)));
+        let padding_object = get_padding_object(options.padding.unwrap_or(Padding::All(0.0)));
         let coords = Coords { x, y };
         let axis = get_alignment_axis(placement);
         let length = get_axis_length(axis);
-        let arrow_dimensions = platform.get_dimensions(self.options.element);
+        let arrow_dimensions = platform.get_dimensions(options.element);
         let min_prop = match axis {
             Axis::X => Side::Left,
             Axis::Y => Side::Top,
@@ -89,7 +102,7 @@ impl<'a, Element, Window> Middleware<Element, Window> for Arrow<'a, Element, Win
             - coords.get_axis(axis)
             - rects.floating.get_length(length);
 
-        let arrow_offset_parent = platform.get_offset_parent(self.options.element);
+        let arrow_offset_parent = platform.get_offset_parent(options.element);
         let client_size = arrow_offset_parent
             .and_then(|arrow_offset_parent| match arrow_offset_parent {
                 OwnedElementOrWindow::Element(element) => {
@@ -172,10 +185,10 @@ impl<'a, Element, Window> Middleware<Element, Window> for Arrow<'a, Element, Win
     }
 }
 
-impl<'a, Element, Window> MiddlewareWithOptions<ArrowOptions<'a, Element>>
+impl<'a, Element, Window> MiddlewareWithOptions<Element, Window, ArrowOptions<'a, Element>>
     for Arrow<'a, Element, Window>
 {
-    fn options(&self) -> &ArrowOptions<'a, Element> {
+    fn options(&self) -> &Derivable<Element, Window, ArrowOptions<'a, Element>> {
         &self.options
     }
 }

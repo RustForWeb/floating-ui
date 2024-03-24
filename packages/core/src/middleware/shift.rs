@@ -1,11 +1,12 @@
-use std::fmt::Debug;
-
 use floating_ui_utils::{clamp, get_opposite_axis, get_side_axis, Axis, Coords, Side};
 use serde::{Deserialize, Serialize};
 
 use crate::{
     detect_overflow::{detect_overflow, DetectOverflowOptions},
-    types::{Middleware, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions},
+    types::{
+        Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
+        MiddlewareWithOptions,
+    },
 };
 
 /// Limiter used by [`Shift`] middleware. Limits the shifting done in order to prevent detachment.
@@ -26,7 +27,6 @@ impl<Element, Window> Limiter<Element, Window> for DefaultLimiter {
 }
 
 /// Options for [`Shift`] middleware.
-#[derive(Clone)]
 pub struct ShiftOptions<'a, Element, Window> {
     /// Options for [`detect_overflow`].
     ///
@@ -47,6 +47,17 @@ pub struct ShiftOptions<'a, Element, Window> {
     ///
     /// Defaults to [`DefaultLimiter`].
     pub limiter: Option<&'a dyn Limiter<Element, Window>>,
+}
+
+impl<'a, Element, Window> Clone for ShiftOptions<'a, Element, Window> {
+    fn clone(&self) -> Self {
+        Self {
+            detect_overflow: self.detect_overflow.clone(),
+            main_axis: self.main_axis,
+            cross_axis: self.cross_axis,
+            limiter: self.limiter,
+        }
+    }
 }
 
 impl<'a, Element, Window> Default for ShiftOptions<'a, Element, Window> {
@@ -71,13 +82,24 @@ pub struct ShiftData {
 ///
 /// See <https://floating-ui.com/docs/shift> for the original documentation.
 pub struct Shift<'a, Element, Window> {
-    options: ShiftOptions<'a, Element, Window>,
+    options: Derivable<Element, Window, ShiftOptions<'a, Element, Window>>,
 }
 
 impl<'a, Element, Window> Shift<'a, Element, Window> {
     /// Constructs a new instance of this middleware.
     pub fn new(options: ShiftOptions<'a, Element, Window>) -> Self {
-        Shift { options }
+        Shift {
+            options: options.into(),
+        }
+    }
+
+    /// Constructs a new instance of this middleware with derivable options.
+    pub fn new_derivable(
+        options: DerivableFn<Element, Window, ShiftOptions<'a, Element, Window>>,
+    ) -> Self {
+        Shift {
+            options: options.into(),
+        }
     }
 }
 
@@ -87,15 +109,15 @@ impl<'a, Element, Window> Middleware<Element, Window> for Shift<'a, Element, Win
     }
 
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn {
+        let options = self.options.evaluate(state.clone());
+
         let MiddlewareState {
             x, y, placement, ..
         } = state;
 
-        // TODO: support options fn
-
-        let check_main_axis = self.options.main_axis.unwrap_or(true);
-        let check_cross_axis = self.options.cross_axis.unwrap_or(false);
-        let limiter = self.options.limiter.unwrap_or(&DefaultLimiter {});
+        let check_main_axis = options.main_axis.unwrap_or(true);
+        let check_cross_axis = options.cross_axis.unwrap_or(false);
+        let limiter = options.limiter.unwrap_or(&DefaultLimiter {});
 
         let coords = Coords { x, y };
         let overflow = detect_overflow(
@@ -103,7 +125,7 @@ impl<'a, Element, Window> Middleware<Element, Window> for Shift<'a, Element, Win
                 elements: state.elements.clone(),
                 ..state
             },
-            self.options.detect_overflow.clone().unwrap_or_default(),
+            options.detect_overflow.unwrap_or_default(),
         );
         let cross_axis = get_side_axis(placement);
         let main_axis = get_opposite_axis(cross_axis);
@@ -168,10 +190,10 @@ impl<'a, Element, Window> Middleware<Element, Window> for Shift<'a, Element, Win
     }
 }
 
-impl<'a, Element, Window> MiddlewareWithOptions<ShiftOptions<'a, Element, Window>>
+impl<'a, Element, Window> MiddlewareWithOptions<Element, Window, ShiftOptions<'a, Element, Window>>
     for Shift<'a, Element, Window>
 {
-    fn options(&self) -> &ShiftOptions<'a, Element, Window> {
+    fn options(&self) -> &Derivable<Element, Window, ShiftOptions<'a, Element, Window>> {
         &self.options
     }
 }
