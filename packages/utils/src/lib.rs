@@ -334,14 +334,14 @@ pub fn get_alignment_sides(
     (main_alignment_side, get_opposite_side(main_alignment_side))
 }
 
-pub fn get_expanded_placements(placement: Placement) -> (Placement, Placement, Placement) {
+pub fn get_expanded_placements(placement: Placement) -> Vec<Placement> {
     let opposite_placement = get_opposite_placement(placement);
 
-    (
+    vec![
         get_opposite_alignment_placement(placement),
         opposite_placement,
         get_opposite_alignment_placement(opposite_placement),
-    )
+    ]
 }
 
 pub fn get_opposite_alignment_placement(placement: Placement) -> Placement {
