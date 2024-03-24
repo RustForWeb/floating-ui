@@ -21,13 +21,13 @@ pub enum FallbackStrategy {
 
 #[derive(Clone, Debug)]
 pub struct FlipOptions<'a, Element> {
-    detect_overflow: Option<DetectOverflowOptions<'a, Element>>,
-    main_axis: Option<bool>,
-    cross_axis: Option<bool>,
-    fallback_placements: Option<Vec<Placement>>,
-    fallback_strategy: Option<FallbackStrategy>,
-    fallback_axis_side_direction: Option<Alignment>,
-    flip_alignment: Option<bool>,
+    pub detect_overflow: Option<DetectOverflowOptions<'a, Element>>,
+    pub main_axis: Option<bool>,
+    pub cross_axis: Option<bool>,
+    pub fallback_placements: Option<Vec<Placement>>,
+    pub fallback_strategy: Option<FallbackStrategy>,
+    pub fallback_axis_side_direction: Option<Alignment>,
+    pub flip_alignment: Option<bool>,
 }
 
 impl<'a, Element> Default for FlipOptions<'a, Element> {
@@ -73,7 +73,7 @@ impl<'a, Element, Window> Flip<'a, Element, Window> {
 
 impl<'a, Element, Window> Middleware<Element, Window> for Flip<'a, Element, Window> {
     fn name(&self) -> &'static str {
-        "autoPlacement"
+        "flip"
     }
 
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn {

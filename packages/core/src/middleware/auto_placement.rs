@@ -63,11 +63,11 @@ pub fn get_placement_list(
 
 #[derive(Clone, Debug)]
 pub struct AutoPlacementOptions<'a, Element> {
-    detect_overflow: Option<DetectOverflowOptions<'a, Element>>,
-    cross_axis: Option<bool>,
-    alignment: Option<Alignment>,
-    auto_alignment: Option<bool>,
-    allowed_placements: Option<Vec<Placement>>,
+    pub detect_overflow: Option<DetectOverflowOptions<'a, Element>>,
+    pub cross_axis: Option<bool>,
+    pub alignment: Option<Alignment>,
+    pub auto_alignment: Option<bool>,
+    pub allowed_placements: Option<Vec<Placement>>,
 }
 
 impl<'a, Element> Default for AutoPlacementOptions<'a, Element> {

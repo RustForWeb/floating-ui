@@ -1,14 +1,17 @@
 use std::rc::Rc;
 
 use floating_ui_dom::{
-    compute_position, ComputePositionConfig, ComputePositionReturn, Flip, FlipOptions, Offset,
-    OffsetOptions, Placement,
+    compute_position, ComputePositionConfig, ComputePositionReturn, DetectOverflowOptions, Flip,
+    FlipOptions, Offset, OffsetOptions, Padding, Placement, Shift, ShiftOptions,
 };
+use log::Level;
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlElement;
 
 #[wasm_bindgen(start)]
 fn run() -> Result<(), JsValue> {
+    console_log::init_with_level(Level::Debug).expect("Console logger should be available.");
+
     let window = web_sys::window().expect("Window should exist.");
     let document = window.document().expect("Window should have document.");
 
@@ -35,6 +38,18 @@ fn run() -> Result<(), JsValue> {
                 middleware: Some(vec![
                     &Offset::new(OffsetOptions::Value(6.0)),
                     &Flip::new(FlipOptions::default()),
+                    &Shift::new(ShiftOptions {
+                        detect_overflow: Some(DetectOverflowOptions {
+                            boundary: None,
+                            root_boundary: None,
+                            element_context: None,
+                            alt_boundary: None,
+                            padding: Some(Padding::All(5.0)),
+                        }),
+                        main_axis: None,
+                        cross_axis: None,
+                        limiter: None,
+                    }),
                 ]),
             }),
         );

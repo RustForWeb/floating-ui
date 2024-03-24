@@ -68,6 +68,13 @@ impl Coords {
         Self { x: value, y: value }
     }
 
+    pub fn get_axis(&self, axis: Axis) -> f64 {
+        match axis {
+            Axis::X => self.x,
+            Axis::Y => self.y,
+        }
+    }
+
     pub fn update_axis<F>(&mut self, axis: Axis, update: F)
     where
         F: Fn(f64) -> f64,
@@ -226,6 +233,10 @@ pub const ALL_PLACEMENTS: [Placement; 12] = [
     Placement::LeftStart,
     Placement::LeftEnd,
 ];
+
+pub fn clamp(start: f64, value: f64, end: f64) -> f64 {
+    value.min(end).max(start)
+}
 
 pub fn get_side(placement: Placement) -> Side {
     match placement {

@@ -13,6 +13,8 @@ version.workspace = true
 crate-type = ["cdylib"]
 
 [dependencies]
+console_log = "1.0.0"
+log = "0.4.21"
 floating-ui-dom = { path = ".." }
 wasm-bindgen.workspace = true
 web-sys.workspace = true

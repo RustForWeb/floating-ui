@@ -10,8 +10,6 @@ use web_sys::Element;
 
 pub type Boundary<'a> = CoreBoundary<'a, Element>;
 
-// pub type DetectOverflowOptions<'a> = CoreDetectOverflowOptions<'a, Element>;
-
 // pub type ComputePositionConfig<'a> = CoreComputePositionConfig<'a, Element, Window>;
 
 pub type ElementOrVirtual<'a> = CoreElementOrVirtual<'a, Element>;

@@ -3,12 +3,12 @@ mod platform;
 mod types;
 mod utils;
 
-// TODO: consider copying the exported types instead of using star
-// pub use types::*;
-
 pub use crate::middleware::*;
-pub use floating_ui_core::ComputePositionReturn;
-pub use floating_ui_utils::{Placement, Strategy};
+pub use floating_ui_core::{ComputePositionReturn, DetectOverflowOptions};
+pub use floating_ui_utils::{
+    AlignedPlacement, Alignment, Axis, ClientRectObject, Coords, Dimensions, ElementRects, Length,
+    Padding, Placement, Rect, Side, SideObject, Strategy,
+};
 
 use floating_ui_core::{
     compute_position as compute_position_core, ComputePositionConfig as CoreComputePositionConfig,
