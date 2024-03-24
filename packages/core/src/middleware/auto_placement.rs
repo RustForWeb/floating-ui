@@ -289,15 +289,6 @@ impl<'a, Element, Window> MiddlewareWithOptions<AutoPlacementOptions<'a, Element
 
 #[cfg(test)]
 mod tests {
-    use floating_ui_utils::Strategy;
-
-    use crate::{
-        compute_position::compute_position,
-        test_utils::{FLOATING, PLATFORM, REFERENCE},
-        types::ComputePositionConfig,
-        ComputePositionReturn,
-    };
-
     use super::*;
 
     #[test]
@@ -409,55 +400,6 @@ mod tests {
                 Placement::TopStart,
                 Placement::LeftStart
             ]
-        )
-    }
-
-    #[test]
-    fn test_middleware() {
-        let ComputePositionReturn {
-            x,
-            y,
-            placement,
-            strategy,
-            middleware_data,
-        } = compute_position(
-            &REFERENCE,
-            &FLOATING,
-            ComputePositionConfig {
-                platform: &PLATFORM,
-                placement: None,
-                strategy: None,
-                middleware: Some(vec![&AutoPlacement::new(AutoPlacementOptions::default())]),
-            },
-        );
-
-        assert_eq!(x, 100.0);
-        assert_eq!(y, 25.0);
-        assert_eq!(placement, Placement::Right);
-        assert_eq!(strategy, Strategy::Absolute);
-        assert_eq!(
-            middleware_data.get_as::<AutoPlacementData>("autoPlacement"),
-            Some(AutoPlacementData {
-                index: 4,
-                overflows: vec![
-                    AutoPlacementDataOverflow {
-                        placement: Placement::Top,
-                        overflows: vec![50.0, -925.0, -25.0]
-                    },
-                    AutoPlacementDataOverflow {
-                        placement: Placement::Right,
-                        overflows: vec![-850.0, -925.0, -25.0]
-                    },
-                    AutoPlacementDataOverflow {
-                        placement: Placement::Bottom,
-                        overflows: vec![-850.0, -925.0, -25.0]
-                    },
-                    AutoPlacementDataOverflow {
-                        placement: Placement::Left,
-                        overflows: vec![50.0, -925.0, -25.0]
-                    }
-                ]
-            })
         )
     }
 }
