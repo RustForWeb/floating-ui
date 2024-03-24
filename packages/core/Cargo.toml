@@ -9,6 +9,6 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-floating-ui-utils = { path = "../utils", version = "0.0.1" }
+floating-ui-utils = { path = "../utils", version = "0.0.2" }
 serde.workspace = true
 serde_json.workspace = true
