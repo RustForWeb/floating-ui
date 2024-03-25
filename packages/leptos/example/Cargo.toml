@@ -1,0 +1,19 @@
+[package]
+name = "floating-ui-leptos-example"
+description = "Example for Floating UI Leptos."
+publish = false
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+console_log = "1.0.0"
+console_error_panic_hook = "0.1.7"
+leptos = { version = "0.6.9", features = ["csr", "nightly"] }
+log = "0.4.21"
+floating-ui-leptos = { path = ".." }
+wasm-bindgen.workspace = true
+web-sys.workspace = true

@@ -15,3 +15,6 @@ web-sys = { workspace = true, optional = true }
 [features]
 default = []
 dom = ["dep:web-sys"]
+
+[package.metadata.docs.rs]
+all-features = true

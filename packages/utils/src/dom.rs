@@ -1,3 +1,5 @@
+//! Utility functions for the DOM. Requires `dom` feature.
+
 use web_sys::{
     css, wasm_bindgen::JsCast, window, CssStyleDeclaration, Document, Element, HtmlElement, Node,
     ShadowRoot, Window,
