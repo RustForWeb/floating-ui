@@ -1,0 +1,32 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+    RUSTFLAGS: '-Dwarnings'
+
+jobs:
+    test:
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, macos-latest, windows-latest]
+
+        name: Test on ${{ matrix.os }}
+        runs-on: ${{ matrix.os}}
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Rust toolchain
+              run: rustup toolchain install stable --profile minimal --target wasm32-unknown-unknown --no-self-update
+
+            - uses: swatinem/rust-cache@v2
+              with:
+                  save-if: ${{ github.ref == 'refs/heads/main' }}
+
+            - name: Lint
+              run: cargo clippy --all-features
+
+            - name: Test
+              run: cargo test --all-features
