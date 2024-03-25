@@ -19,7 +19,7 @@ jobs:
             - uses: actions/checkout@v4
 
             - name: Setup Rust toolchain
-              run: rustup toolchain install nightly --no-self-update --target wasm32-unknown-unknown
+              run: rustup toolchain install nightly --no-self-update --profile default --target wasm32-unknown-unknown
 
             - uses: swatinem/rust-cache@v2
               with:
