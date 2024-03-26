@@ -4,17 +4,16 @@ use floating_ui_dom::{
     compute_position, ComputePositionConfig, MiddlewareData, Placement, Strategy,
 };
 use leptos::{
-    create_effect, create_memo, create_render_effect, create_rw_signal, create_signal,
-    html::ElementDescriptor, watch, MaybeSignal, NodeRef, Signal, SignalGet, SignalUpdate,
+    create_effect, create_memo, create_rw_signal, create_signal, html::ElementDescriptor, NodeRef,
+    SignalGet, SignalUpdate,
 };
-use log::info;
 
 use crate::{
     types::{FloatingStyles, UseFloatingOptions, UseFloatingReturn},
     utils::{get_dpr::get_dpr, round_by_dpr::round_by_dpr},
 };
 
-pub fn use_floating<Reference, Floating, ReferenceEl, FloatingEl>(
+pub fn use_floating<Reference, ReferenceEl, Floating, FloatingEl>(
     reference: NodeRef<Reference>,
     floating: NodeRef<Floating>,
     options: UseFloatingOptions,
@@ -127,23 +126,11 @@ where
         }
     });
 
-    // _ = watch(
-    //     move || (middleware_option(), placement_option(), strategy_option()),
-    //     move |_, _, _| {
-    //         info!("watch update");
-    //         update();
-    //     },
-    //     false,
-    // );
+    create_effect(move |_| {
+        reset();
+    });
 
-    _ = watch(
-        open_option,
-        move |_, _, _| {
-            info!("watch reset");
-            reset();
-        },
-        false,
-    );
+    // TODO: placement_option() is called outside the reactive context in update, probably because on_mount is outside the reactive context
 
     UseFloatingReturn {
         x: x.into(),

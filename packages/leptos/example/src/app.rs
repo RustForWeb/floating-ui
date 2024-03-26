@@ -1,32 +1,32 @@
-use floating_ui_leptos::{
-    use_floating, Middleware, Placement, Strategy, UseFloatingOptions, UseFloatingReturn,
-};
+use floating_ui_leptos::{use_floating, Placement, UseFloatingOptions, UseFloatingReturn};
 use leptos::{
     html::{Div, Span},
     *,
 };
-use web_sys::{Element, Window};
 
 #[component]
 pub fn App() -> impl IntoView {
     let open = create_rw_signal(false);
+    let placement = create_rw_signal(Placement::Bottom);
 
     let reference = create_node_ref::<Span>();
     let floating = create_node_ref::<Div>();
+    let floating_arrow = create_node_ref::<Div>();
 
     let UseFloatingReturn {
         floating_styles, ..
     } = use_floating(
         reference,
         floating,
-        UseFloatingOptions {
-            open: open.into(),
-            placement: None::<Placement>.into(),
-            strategy: None::<Strategy>.into(),
-            middleware: None::<Vec<&dyn Middleware<Element, Window>>>.into(),
-            transform: None::<bool>.into(),
-            while_elements_mounted: None::<bool>.into(),
-        },
+        UseFloatingOptions::default()
+            .open(open.into())
+            .placement(placement.into()),
+        // .middleware(Some(MaybeSignal::Static(Some(vec![&Arrow::new(
+        //     ArrowOptions {
+        //         element: floating_arrow,
+        //         padding: None,
+        //     },
+        // )])))),
     );
 
     view! {
@@ -36,6 +36,12 @@ pub fn App() -> impl IntoView {
             false => "none"
         }, String::from(floating_styles()))>
             Floating
+
+            <div _ref=floating_arrow style:position="absolute" style:left="0px" style:top="0px" />
         </div>
+
+        <p>
+            <button on:click=move |_| placement.set(Placement::Right)>Change placement</button>
+        </p>
     }
 }

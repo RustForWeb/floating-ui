@@ -1,5 +1,4 @@
-#[doc(no_inline)]
-pub use floating_ui_dom::*;
+use floating_ui_dom::{Middleware, MiddlewareData, Placement, Strategy};
 use leptos::{Attribute, IntoAttribute, MaybeProp, Signal};
 use web_sys::{Element, Window};
 
@@ -35,6 +34,47 @@ pub struct UseFloatingOptions {
     ///
     ///Detauls to [`Option::None`].
     pub while_elements_mounted: MaybeProp<bool>, // TODO: type
+}
+
+impl UseFloatingOptions {
+    /// Set [`Self::open`] option.
+    pub fn open(mut self, value: MaybeProp<bool>) -> Self {
+        self.open = value;
+        self
+    }
+
+    /// Set [`Self::placement`] option.
+    pub fn placement(mut self, value: MaybeProp<Placement>) -> Self {
+        self.placement = value;
+        self
+    }
+
+    /// Set [`Self::strategy`] option.
+    pub fn strategy(mut self, value: MaybeProp<Strategy>) -> Self {
+        self.strategy = value;
+        self
+    }
+
+    /// Set [`Self::middleware`] option.
+    pub fn middleware(
+        mut self,
+        value: MaybeProp<Vec<&'static dyn Middleware<Element, Window>>>,
+    ) -> Self {
+        self.middleware = value;
+        self
+    }
+
+    /// Set [`Self::transform`] option.
+    pub fn transform(mut self, value: MaybeProp<bool>) -> Self {
+        self.transform = value;
+        self
+    }
+
+    /// Set [`Self::while_elements_mounted`] option.
+    pub fn while_elements_mounted(mut self, value: MaybeProp<bool>) -> Self {
+        self.while_elements_mounted = value;
+        self
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]

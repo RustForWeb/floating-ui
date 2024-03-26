@@ -11,8 +11,8 @@ mod utils;
 
 pub use crate::middleware::*;
 pub use floating_ui_core::{
-    ComputePositionReturn, DetectOverflowOptions, Middleware, MiddlewareData, MiddlewareReturn,
-    MiddlewareState, MiddlewareWithOptions,
+    ComputePositionReturn, Derivable, DetectOverflowOptions, Middleware, MiddlewareData,
+    MiddlewareReturn, MiddlewareState, MiddlewareWithOptions,
 };
 #[doc(no_inline)]
 pub use floating_ui_utils::*;
