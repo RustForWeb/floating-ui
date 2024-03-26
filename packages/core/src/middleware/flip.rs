@@ -110,7 +110,7 @@ pub struct FlipData {
 ///
 /// See <https://floating-ui.com/docs/flip> for the original documentation.
 pub struct Flip<'a, Element, Window> {
-    options: Derivable<Element, Window, FlipOptions<'a, Element>>,
+    options: Derivable<'a, Element, Window, FlipOptions<'a, Element>>,
 }
 
 impl<'a, Element, Window> Flip<'a, Element, Window> {
@@ -122,9 +122,19 @@ impl<'a, Element, Window> Flip<'a, Element, Window> {
     }
 
     /// Constructs a new instance of this middleware with derivable options.
-    pub fn new_derivable(options: DerivableFn<Element, Window, FlipOptions<'a, Element>>) -> Self {
+    pub fn new_derivable(
+        options: DerivableFn<'a, Element, Window, FlipOptions<'a, Element>>,
+    ) -> Self {
         Flip {
             options: options.into(),
+        }
+    }
+}
+
+impl<'a, Element, Window> Clone for Flip<'a, Element, Window> {
+    fn clone(&self) -> Self {
+        Self {
+            options: self.options.clone(),
         }
     }
 }

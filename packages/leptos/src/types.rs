@@ -23,7 +23,7 @@ pub struct UseFloatingOptions {
     /// Array of middleware objects to modify the positioning or provide data for rendering.
     ///
     /// Defaults to an empty vector.
-    pub middleware: MaybeProp<Vec<&'static dyn Middleware<Element, Window>>>,
+    pub middleware: MaybeProp<Vec<Box<dyn Middleware<Element, Window>>>>,
 
     ///  Whether to use `transform` for positioning instead of `top` and `left` in the `floatingStyles` object.
     ///
@@ -58,7 +58,7 @@ impl UseFloatingOptions {
     /// Set [`Self::middleware`] option.
     pub fn middleware(
         mut self,
-        value: MaybeProp<Vec<&'static dyn Middleware<Element, Window>>>,
+        value: MaybeProp<Vec<Box<dyn Middleware<Element, Window>>>>,
     ) -> Self {
         self.middleware = value;
         self

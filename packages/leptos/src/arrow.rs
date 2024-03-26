@@ -7,6 +7,7 @@ use floating_ui_dom::{
 use leptos::{html::ElementDescriptor, NodeRef};
 
 /// Options for [`Arrow`].
+#[derive(Clone)]
 pub struct ArrowOptions<Descriptor, Element>
 where
     Descriptor: ElementDescriptor + Deref<Target = Element> + Clone + 'static,
@@ -22,10 +23,11 @@ where
     pub padding: Option<Padding>,
 }
 
+#[derive(Clone)]
 pub struct Arrow<Descriptor, Element>
 where
     Descriptor: ElementDescriptor + Deref<Target = Element> + Clone + 'static,
-    Element: Deref<Target = web_sys::HtmlElement>,
+    Element: Deref<Target = web_sys::HtmlElement> + Clone,
 {
     options: ArrowOptions<Descriptor, Element>,
 }
@@ -33,7 +35,7 @@ where
 impl<Descriptor, Element> Arrow<Descriptor, Element>
 where
     Descriptor: ElementDescriptor + Deref<Target = Element> + Clone + 'static,
-    Element: Deref<Target = web_sys::HtmlElement>,
+    Element: Deref<Target = web_sys::HtmlElement> + Clone,
 {
     pub fn new(options: ArrowOptions<Descriptor, Element>) -> Self {
         Arrow { options }
@@ -44,7 +46,7 @@ impl<Descriptor, Element> Middleware<web_sys::Element, web_sys::Window>
     for Arrow<Descriptor, Element>
 where
     Descriptor: ElementDescriptor + Deref<Target = Element> + Clone + 'static,
-    Element: Deref<Target = web_sys::HtmlElement>,
+    Element: Deref<Target = web_sys::HtmlElement> + Clone,
 {
     fn name(&self) -> &'static str {
         ARROW_NAME

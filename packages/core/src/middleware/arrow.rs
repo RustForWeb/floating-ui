@@ -45,7 +45,7 @@ pub struct ArrowData {
 ///
 /// See <https://floating-ui.com/docs/arrow> for the original documentation.
 pub struct Arrow<'a, Element, Window> {
-    options: Derivable<Element, Window, ArrowOptions<'a, Element>>,
+    options: Derivable<'a, Element, Window, ArrowOptions<'a, Element>>,
 }
 
 impl<'a, Element, Window> Arrow<'a, Element, Window> {
@@ -57,9 +57,19 @@ impl<'a, Element, Window> Arrow<'a, Element, Window> {
     }
 
     /// Constructs a new instance of this middleware with derivable options.
-    pub fn new_derivable(options: DerivableFn<Element, Window, ArrowOptions<'a, Element>>) -> Self {
+    pub fn new_derivable(
+        options: DerivableFn<'a, Element, Window, ArrowOptions<'a, Element>>,
+    ) -> Self {
         Arrow {
             options: options.into(),
+        }
+    }
+}
+
+impl<'a, Element, Window> Clone for Arrow<'a, Element, Window> {
+    fn clone(&self) -> Self {
+        Self {
+            options: self.options.clone(),
         }
     }
 }

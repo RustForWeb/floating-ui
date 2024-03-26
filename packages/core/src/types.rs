@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fmt::Debug;
 
+use dyn_clone::DynClone;
 use serde::{de::DeserializeOwned, Serialize};
 
 use floating_ui_utils::{
@@ -8,14 +9,23 @@ use floating_ui_utils::{
     OwnedElementOrWindow, Placement, Rect, Strategy,
 };
 
-pub type DerivableFn<Element, Window, T> = Box<dyn Fn(MiddlewareState<Element, Window>) -> T>;
+pub type DerivableFn<'a, Element, Window, T> = &'a dyn Fn(MiddlewareState<Element, Window>) -> T;
 
-pub enum Derivable<Element, Window, T: Clone> {
+pub enum Derivable<'a, Element, Window, T: Clone> {
     Value(T),
-    Fn(DerivableFn<Element, Window, T>),
+    Fn(DerivableFn<'a, Element, Window, T>),
 }
 
-impl<Element, Window, T: Clone> Derivable<Element, Window, T> {
+impl<'a, Element, Window, T: Clone> Clone for Derivable<'a, Element, Window, T> {
+    fn clone(&self) -> Self {
+        match self {
+            Self::Value(value) => Self::Value(value.clone()),
+            Self::Fn(value) => Self::Fn(*value),
+        }
+    }
+}
+
+impl<'a, Element, Window, T: Clone> Derivable<'a, Element, Window, T> {
     pub fn evaluate(&self, state: MiddlewareState<Element, Window>) -> T {
         match self {
             Derivable::Value(value) => value.clone(),
@@ -24,16 +34,16 @@ impl<Element, Window, T: Clone> Derivable<Element, Window, T> {
     }
 }
 
-impl<Element, Window, T: Clone> From<T> for Derivable<Element, Window, T> {
+impl<'a, Element, Window, T: Clone> From<T> for Derivable<'a, Element, Window, T> {
     fn from(value: T) -> Self {
         Derivable::Value(value)
     }
 }
 
-impl<Element, Window, T: Clone> From<DerivableFn<Element, Window, T>>
-    for Derivable<Element, Window, T>
+impl<'a, Element, Window, T: Clone> From<DerivableFn<'a, Element, Window, T>>
+    for Derivable<'a, Element, Window, T>
 {
-    fn from(value: DerivableFn<Element, Window, T>) -> Self {
+    fn from(value: DerivableFn<'a, Element, Window, T>) -> Self {
         Derivable::Fn(value)
     }
 }
@@ -158,7 +168,7 @@ pub struct ComputePositionConfig<'a, Element, Window> {
     /// Array of middleware objects to modify the positioning or provide data for rendering.
     ///
     /// Defaults to an empty vector.
-    pub middleware: Option<Vec<&'a dyn Middleware<Element, Window>>>,
+    pub middleware: Option<Vec<Box<dyn Middleware<Element, Window>>>>,
 }
 
 /// Return of [`compute_position`][crate::compute_position::compute_position].
@@ -205,13 +215,15 @@ pub struct MiddlewareReturn {
 }
 
 /// Middleware used by [`compute_position`][`crate::compute_position::compute_position`].
-pub trait Middleware<Element, Window> {
+pub trait Middleware<Element, Window>: DynClone {
     /// The name of this middleware.
     fn name(&self) -> &'static str;
 
     /// Executes this middleware.
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn;
 }
+
+dyn_clone::clone_trait_object!(<Element, Window> Middleware<Element, Window>);
 
 /// Middleware with options.
 pub trait MiddlewareWithOptions<Element, Window, O: Clone> {

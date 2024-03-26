@@ -115,11 +115,11 @@ pub struct OffsetData {
 /// Modifies the placement by translating the floating element along the specified axes.
 ///
 /// See <https://floating-ui.com/docs/offset> for the original documentation.
-pub struct Offset<Element, Window> {
-    options: Derivable<Element, Window, OffsetOptions>,
+pub struct Offset<'a, Element, Window> {
+    options: Derivable<'a, Element, Window, OffsetOptions>,
 }
 
-impl<Element, Window> Offset<Element, Window> {
+impl<'a, Element, Window> Offset<'a, Element, Window> {
     /// Constructs a new instance of this middleware.
     pub fn new(options: OffsetOptions) -> Self {
         Offset {
@@ -128,14 +128,22 @@ impl<Element, Window> Offset<Element, Window> {
     }
 
     /// Constructs a new instance of this middleware with derivable options.
-    pub fn new_derivable(options: DerivableFn<Element, Window, OffsetOptions>) -> Self {
+    pub fn new_derivable(options: DerivableFn<'a, Element, Window, OffsetOptions>) -> Self {
         Offset {
             options: options.into(),
         }
     }
 }
 
-impl<Element, Window> Middleware<Element, Window> for Offset<Element, Window> {
+impl<'a, Element, Window> Clone for Offset<'a, Element, Window> {
+    fn clone(&self) -> Self {
+        Self {
+            options: self.options.clone(),
+        }
+    }
+}
+
+impl<'a, Element, Window> Middleware<Element, Window> for Offset<'a, Element, Window> {
     fn name(&self) -> &'static str {
         OFFSET_NAME
     }
@@ -188,8 +196,8 @@ impl<Element, Window> Middleware<Element, Window> for Offset<Element, Window> {
     }
 }
 
-impl<Element, Window> MiddlewareWithOptions<Element, Window, OffsetOptions>
-    for Offset<Element, Window>
+impl<'a, Element, Window> MiddlewareWithOptions<Element, Window, OffsetOptions>
+    for Offset<'a, Element, Window>
 {
     fn options(&self) -> &Derivable<Element, Window, OffsetOptions> {
         &self.options

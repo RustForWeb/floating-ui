@@ -125,6 +125,7 @@ mod tests {
 
     #[test]
     fn test_returned_data() {
+        #[derive(Clone)]
         struct CustomMiddleware {}
 
         impl<Element, Window> Middleware<Element, Window> for CustomMiddleware {
@@ -155,7 +156,7 @@ mod tests {
                 platform: &PLATFORM,
                 placement: Some(Placement::Top),
                 strategy: None,
-                middleware: Some(vec![&CustomMiddleware {}]),
+                middleware: Some(vec![Box::new(CustomMiddleware {})]),
             },
         );
 
@@ -171,6 +172,7 @@ mod tests {
 
     #[test]
     fn test_middleware() {
+        #[derive(Clone)]
         struct TestMiddleware {}
 
         impl<Element, Window> Middleware<Element, Window> for TestMiddleware {
@@ -209,7 +211,7 @@ mod tests {
                 platform: &PLATFORM,
                 placement: None,
                 strategy: None,
-                middleware: Some(vec![&TestMiddleware {}]),
+                middleware: Some(vec![Box::new(TestMiddleware {})]),
             },
         );
 
@@ -218,6 +220,7 @@ mod tests {
 
     #[test]
     fn test_middleware_data() {
+        #[derive(Clone)]
         struct TestMiddleware {}
 
         impl<Element, Window> Middleware<Element, Window> for TestMiddleware {
@@ -244,7 +247,7 @@ mod tests {
                 platform: &PLATFORM,
                 placement: None,
                 strategy: None,
-                middleware: Some(vec![&TestMiddleware {}]),
+                middleware: Some(vec![Box::new(TestMiddleware {})]),
             },
         );
 

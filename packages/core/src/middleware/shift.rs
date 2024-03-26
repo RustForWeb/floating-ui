@@ -85,7 +85,7 @@ pub struct ShiftData {
 ///
 /// See <https://floating-ui.com/docs/shift> for the original documentation.
 pub struct Shift<'a, Element, Window> {
-    options: Derivable<Element, Window, ShiftOptions<'a, Element, Window>>,
+    options: Derivable<'a, Element, Window, ShiftOptions<'a, Element, Window>>,
 }
 
 impl<'a, Element, Window> Shift<'a, Element, Window> {
@@ -98,10 +98,18 @@ impl<'a, Element, Window> Shift<'a, Element, Window> {
 
     /// Constructs a new instance of this middleware with derivable options.
     pub fn new_derivable(
-        options: DerivableFn<Element, Window, ShiftOptions<'a, Element, Window>>,
+        options: DerivableFn<'a, Element, Window, ShiftOptions<'a, Element, Window>>,
     ) -> Self {
         Shift {
             options: options.into(),
+        }
+    }
+}
+
+impl<'a, Element, Window> Clone for Shift<'a, Element, Window> {
+    fn clone(&self) -> Self {
+        Self {
+            options: self.options.clone(),
         }
     }
 }

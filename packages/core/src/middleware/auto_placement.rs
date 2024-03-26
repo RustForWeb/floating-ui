@@ -135,7 +135,15 @@ pub struct AutoPlacementData {
 ///
 /// See <https://floating-ui.com/docs/autoPlacement> for the original documentation.
 pub struct AutoPlacement<'a, Element, Window> {
-    options: Derivable<Element, Window, AutoPlacementOptions<'a, Element>>,
+    options: Derivable<'a, Element, Window, AutoPlacementOptions<'a, Element>>,
+}
+
+impl<'a, Element, Window> Clone for AutoPlacement<'a, Element, Window> {
+    fn clone(&self) -> Self {
+        Self {
+            options: self.options.clone(),
+        }
+    }
 }
 
 impl<'a, Element, Window> AutoPlacement<'a, Element, Window> {
@@ -148,7 +156,7 @@ impl<'a, Element, Window> AutoPlacement<'a, Element, Window> {
 
     /// Constructs a new instance of this middleware with derivable options.
     pub fn new_derivable(
-        options: DerivableFn<Element, Window, AutoPlacementOptions<'a, Element>>,
+        options: DerivableFn<'a, Element, Window, AutoPlacementOptions<'a, Element>>,
     ) -> Self {
         AutoPlacement {
             options: options.into(),

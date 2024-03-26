@@ -30,7 +30,7 @@ pub type Flip<'a> = CoreFlip<'a, Element, Window>;
 /// Modifies the placement by translating the floating element along the specified axes.
 ///
 /// See <https://floating-ui.com/docs/offset> for the original documentation.
-pub type Offset = CoreOffset<Element, Window>;
+pub type Offset<'a> = CoreOffset<'a, Element, Window>;
 
 /// Optimizes the visibility of the floating element by shifting it in order to keep it in view when it will overflow the clipping boundary.
 ///
