@@ -198,7 +198,7 @@ pub enum ElementOrVirtual<'a, Element> {
 }
 
 impl<'a, Element> ElementOrVirtual<'a, Element> {
-    pub fn unwrap(&self) -> Option<&'a Element> {
+    pub fn resolve(&self) -> Option<&'a Element> {
         match self {
             ElementOrVirtual::Element(element) => Some(element),
             ElementOrVirtual::VirtualElement(virtal_element) => virtal_element.context_element(),

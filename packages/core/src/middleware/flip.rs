@@ -233,7 +233,7 @@ impl<'a, Element, Window> Middleware<Element, Window> for Flip<'a, Element, Wind
                             index: next_index,
                             overflows: overflows_data,
                         })
-                        .unwrap(),
+                        .expect("Data should be valid JSON."),
                     ),
                     reset: Some(Reset::Value(ResetValue {
                         placement: Some(*next_placement),

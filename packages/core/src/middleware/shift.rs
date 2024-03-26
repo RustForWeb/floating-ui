@@ -186,7 +186,7 @@ impl<'a, Element, Window> Middleware<Element, Window> for Shift<'a, Element, Win
                     x: limited_coords.x - x,
                     y: limited_coords.y - y,
                 })
-                .unwrap(),
+                .expect("Data should be valid JSON."),
             ),
             reset: None,
         }

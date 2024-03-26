@@ -181,7 +181,7 @@ impl<Element, Window> Middleware<Element, Window> for Offset<Element, Window> {
                     diff_coords: Some(diff_coords),
                     placement: Some(placement),
                 })
-                .unwrap(),
+                .expect("Data should be valid JSON."),
             ),
             reset: None,
         }

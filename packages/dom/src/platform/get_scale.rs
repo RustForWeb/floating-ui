@@ -6,7 +6,7 @@ use crate::{
 };
 
 pub fn get_scale(element_or_virtual: ElementOrVirtual) -> Coords {
-    let dom_element = element_or_virtual.unwrap();
+    let dom_element = element_or_virtual.resolve();
 
     if let Some(dom_element) = dom_element {
         let rect = dom_element.get_bounding_client_rect();

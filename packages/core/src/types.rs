@@ -122,9 +122,9 @@ impl MiddlewareData {
     }
 
     pub fn get_as<D: DeserializeOwned>(&self, key: &str) -> Option<D> {
-        self.values
-            .get(key)
-            .map(|value| serde_json::from_value::<D>(value.clone()).unwrap())
+        self.values.get(key).map(|value| {
+            serde_json::from_value::<D>(value.clone()).expect("JSON should be valid data.")
+        })
     }
 
     pub fn set(&mut self, key: &str, value: serde_json::Value) {
@@ -132,8 +132,10 @@ impl MiddlewareData {
     }
 
     pub fn set_as<S: Serialize>(&mut self, key: &str, value: S) {
-        self.values
-            .insert(key.into(), serde_json::to_value(value).unwrap());
+        self.values.insert(
+            key.into(),
+            serde_json::to_value(value).expect("Data should be valid JSON."),
+        );
     }
 }
 

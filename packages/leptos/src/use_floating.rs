@@ -3,7 +3,10 @@ use std::ops::Deref;
 use floating_ui_dom::{
     compute_position, ComputePositionConfig, MiddlewareData, Placement, Strategy,
 };
-use leptos::{create_memo, create_signal, html::ElementDescriptor, MaybeSignal, NodeRef, Signal};
+use leptos::{
+    create_effect, create_memo, create_render_effect, create_rw_signal, create_signal,
+    html::ElementDescriptor, watch, MaybeSignal, NodeRef, Signal, SignalGet, SignalUpdate,
+};
 use log::info;
 
 use crate::{
@@ -14,7 +17,7 @@ use crate::{
 pub fn use_floating<Reference, Floating, ReferenceEl, FloatingEl>(
     reference: NodeRef<Reference>,
     floating: NodeRef<Floating>,
-    options: MaybeSignal<UseFloatingOptions>,
+    options: UseFloatingOptions,
 ) -> UseFloatingReturn
 where
     Reference: ElementDescriptor + Deref<Target = ReferenceEl> + Clone + 'static,
@@ -22,13 +25,11 @@ where
     Floating: ElementDescriptor + Deref<Target = FloatingEl> + Clone + 'static,
     FloatingEl: Deref<Target = web_sys::HtmlElement>,
 {
-    let options = Signal::derive(options);
-
-    let open_option = move || options().open.unwrap_or(true);
-    let placement_option = move || options().placement.unwrap_or(Placement::Bottom);
-    let strategy_option = move || options().strategy.unwrap_or(Strategy::Absolute);
-    let middleware_option = move || options().middleware;
-    let transform_option = move || options().transform.unwrap_or(true);
+    let open_option = move || options.open.get().unwrap_or(true);
+    let placement_option = move || options.placement.get().unwrap_or(Placement::Bottom);
+    let strategy_option = move || options.strategy.get().unwrap_or(Strategy::Absolute);
+    let middleware_option = move || options.middleware.get();
+    let transform_option = move || options.transform.get().unwrap_or(true);
 
     let (x, set_x) = create_signal(0.0);
     let (y, set_y) = create_signal(0.0);
@@ -45,11 +46,7 @@ where
             will_change: None,
         };
 
-        info!("floating styles memo");
-
         if let Some(floating_element) = floating.get() {
-            info!("floating element exists");
-
             let x_val = round_by_dpr(&floating_element, x());
             let y_val = round_by_dpr(&floating_element, y());
 
@@ -75,11 +72,8 @@ where
     });
 
     let update = move || {
-        info!("update");
         if let Some(reference_element) = reference.get() {
-            info!("ref");
             if let Some(floating_element) = floating.get() {
-                info!("float");
                 let config = ComputePositionConfig {
                     placement: Some(placement_option()),
                     strategy: Some(strategy_option()),
@@ -89,7 +83,7 @@ where
                 let position =
                     compute_position(&reference_element, &floating_element, Some(config));
                 set_x(position.x);
-                set_y(position.x);
+                set_y(position.y);
                 set_strategy(position.strategy);
                 set_placement(position.placement);
                 set_middleware_data(position.middleware_data);
@@ -115,14 +109,41 @@ where
         }
     };
 
-    // TODO: call attach/reset
+    let remaining_mounts = create_rw_signal::<u32>(2);
+    reference.on_load(move |reference| {
+        _ = reference.on_mount(move |_| {
+            remaining_mounts.update(|count| *count -= 1);
+        });
+    });
+    floating.on_load(move |floating| {
+        _ = floating.on_mount(move |_| {
+            remaining_mounts.update(|count| *count -= 1);
+        });
+    });
 
-    create_memo(move |_| {
-        info!("{} {}", reference.get().is_some(), floating.get().is_some());
+    create_effect(move |_| {
+        if remaining_mounts.get() == 0 {
+            attach();
+        }
+    });
 
-        info!("memo");
-        attach()
-    })();
+    // _ = watch(
+    //     move || (middleware_option(), placement_option(), strategy_option()),
+    //     move |_, _, _| {
+    //         info!("watch update");
+    //         update();
+    //     },
+    //     false,
+    // );
+
+    _ = watch(
+        open_option,
+        move |_, _, _| {
+            info!("watch reset");
+            reset();
+        },
+        false,
+    );
 
     UseFloatingReturn {
         x: x.into(),

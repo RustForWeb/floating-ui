@@ -1,39 +1,40 @@
-use floating_ui_dom::{Middleware, MiddlewareData, Placement, Strategy};
-use leptos::{Attribute, IntoAttribute, Signal};
+#[doc(no_inline)]
+pub use floating_ui_dom::*;
+use leptos::{Attribute, IntoAttribute, MaybeProp, Signal};
 use web_sys::{Element, Window};
 
 /// Options for [`use_floating`].
 #[derive(Clone, Default)]
-pub struct UseFloatingOptions<'a> {
+pub struct UseFloatingOptions {
     /// Represents the open/close state of the floating element.
     ///
     /// Defaults to `true`.
-    pub open: Option<bool>,
+    pub open: MaybeProp<bool>,
 
     /// Where to place the floating element relative to the reference element.
     ///
     /// Defaults to [`Placement::Bottom`].
-    pub placement: Option<Placement>,
+    pub placement: MaybeProp<Placement>,
 
     /// The strategy to use when positioning the floating element.
     ///
     /// Defaults to [`Strategy::Absolute`].
-    pub strategy: Option<Strategy>,
+    pub strategy: MaybeProp<Strategy>,
 
     /// Array of middleware objects to modify the positioning or provide data for rendering.
     ///
     /// Defaults to an empty vector.
-    pub middleware: Option<Vec<&'a dyn Middleware<Element, Window>>>,
+    pub middleware: MaybeProp<Vec<&'static dyn Middleware<Element, Window>>>,
 
     ///  Whether to use `transform` for positioning instead of `top` and `left` in the `floatingStyles` object.
     ///
     /// Defaults to `true`.
-    pub transform: Option<bool>,
+    pub transform: MaybeProp<bool>,
 
     /// Callback to handle mounting/unmounting of the elements.
     ///
     ///Detauls to [`Option::None`].
-    pub while_elements_mounted: Option<bool>, // TODO: type
+    pub while_elements_mounted: MaybeProp<bool>, // TODO: type
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -45,23 +46,31 @@ pub struct FloatingStyles {
     pub will_change: Option<String>,
 }
 
+impl From<FloatingStyles> for String {
+    fn from(value: FloatingStyles) -> Self {
+        format!(
+            "position: {}; top: {}; left: {};{}{}",
+            match value.position {
+                Strategy::Absolute => "absolute",
+                Strategy::Fixed => "fixed",
+            },
+            value.top,
+            value.left,
+            value
+                .transform
+                .map_or("".into(), |transform| format!(" transform: {};", transform),),
+            value.will_change.map_or("".into(), |will_change| format!(
+                " will-change: {};",
+                will_change
+            ))
+        )
+    }
+}
+
 impl IntoAttribute for FloatingStyles {
     fn into_attribute(self) -> Attribute {
-        Attribute::String(
-            format!(
-                "position: {:?}; top: {}; left: {};{}{}",
-                self.position,
-                self.top,
-                self.left,
-                self.transform
-                    .map_or("".into(), |transform| format!(" transform: {};", transform),),
-                self.will_change.map_or("".into(), |will_change| format!(
-                    " will-change: {};",
-                    will_change
-                ))
-            )
-            .into(),
-        )
+        let s: String = self.into();
+        Attribute::String(s.into())
     }
 
     fn into_attribute_boxed(self: Box<Self>) -> Attribute {

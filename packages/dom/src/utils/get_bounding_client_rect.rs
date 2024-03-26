@@ -37,7 +37,7 @@ pub fn get_bounding_client_rect(
             virtual_element.get_bounding_client_rect()
         }
     };
-    let dom_element = element_or_virtual.unwrap();
+    let dom_element = element_or_virtual.resolve();
 
     let scale = match include_scale {
         true => match &offset_parent {

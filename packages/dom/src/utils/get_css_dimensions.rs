@@ -18,13 +18,13 @@ pub fn get_css_dimensions(element: &Element) -> CssDimensions {
         .expect("Computed style should have width.")
         .replace("px", "")
         .parse::<f64>()
-        .expect("Width should be a number.");
+        .unwrap_or(0.0);
     let height = css
         .get_property_value("width")
         .expect("Computed style should have height.")
         .replace("px", "")
         .parse::<f64>()
-        .expect("Height should be a number.");
+        .unwrap_or(0.0);
 
     let offset_width;
     let offset_height;

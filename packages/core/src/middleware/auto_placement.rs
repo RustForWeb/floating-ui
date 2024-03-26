@@ -248,7 +248,7 @@ impl<'a, Element, Window> Middleware<Element, Window> for AutoPlacement<'a, Elem
                             index: current_index + 1,
                             overflows: all_overflows.clone(),
                         })
-                        .unwrap(),
+                        .expect("Data should be valid JSON."),
                     ),
                     reset: Some(Reset::Value(ResetValue {
                         placement: Some(*next_placement),
@@ -306,7 +306,7 @@ impl<'a, Element, Window> Middleware<Element, Window> for AutoPlacement<'a, Elem
                             index: current_index + 1,
                             overflows: all_overflows,
                         })
-                        .unwrap(),
+                        .expect("Data should be valid JSON."),
                     ),
                     reset: Some(Reset::Value(ResetValue {
                         placement: Some(reset_placement),

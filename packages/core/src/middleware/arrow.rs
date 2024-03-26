@@ -180,7 +180,7 @@ impl<'a, Element, Window> Middleware<Element, Window> for Arrow<'a, Element, Win
                         false => None,
                     },
                 })
-                .unwrap(),
+                .expect("Data should be valid JSON."),
             ),
             reset: None,
         }
