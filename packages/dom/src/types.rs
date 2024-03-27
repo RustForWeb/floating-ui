@@ -8,7 +8,7 @@ use floating_ui_core::Boundary as CoreBoundary;
 use floating_ui_utils::ElementOrVirtual as CoreElementOrVirtual;
 use web_sys::Element;
 
-pub type Boundary<'a> = CoreBoundary<'a, Element>;
+pub type Boundary = CoreBoundary<Element>;
 
 // pub type ComputePositionConfig<'a> = CoreComputePositionConfig<'a, Element, Window>;
 

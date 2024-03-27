@@ -12,24 +12,16 @@ use crate::types::{
 pub const ARROW_NAME: &str = "arrow";
 
 /// Options for [`Arrow`].
-pub struct ArrowOptions<'a, Element> {
+#[derive(Clone, Debug)]
+pub struct ArrowOptions<Element: Clone> {
     /// The arrow element to be positioned.
-    pub element: &'a Element,
+    pub element: Element,
 
     /// The padding between the arrow element and the floating element edges.
     /// Useful when the floating element has rounded corners.
     ///
     /// Defaults to `0` on all sides.
     pub padding: Option<Padding>,
-}
-
-impl<'a, Element> Clone for ArrowOptions<'a, Element> {
-    fn clone(&self) -> Self {
-        Self {
-            element: self.element,
-            padding: self.padding.clone(),
-        }
-    }
 }
 
 /// Data stored by [`Arrow`] middleware.
@@ -44,29 +36,27 @@ pub struct ArrowData {
 /// Provides data to position an inner element of the floating element so that it appears centered to the reference element.
 ///
 /// See <https://floating-ui.com/docs/arrow> for the original documentation.
-pub struct Arrow<'a, Element, Window> {
-    options: Derivable<'a, Element, Window, ArrowOptions<'a, Element>>,
+pub struct Arrow<'a, Element: Clone, Window: Clone> {
+    options: Derivable<'a, Element, Window, ArrowOptions<Element>>,
 }
 
-impl<'a, Element, Window> Arrow<'a, Element, Window> {
+impl<'a, Element: Clone, Window: Clone> Arrow<'a, Element, Window> {
     /// Constructs a new instance of this middleware.
-    pub fn new(options: ArrowOptions<'a, Element>) -> Self {
+    pub fn new(options: ArrowOptions<Element>) -> Self {
         Arrow {
             options: options.into(),
         }
     }
 
     /// Constructs a new instance of this middleware with derivable options.
-    pub fn new_derivable(
-        options: DerivableFn<'a, Element, Window, ArrowOptions<'a, Element>>,
-    ) -> Self {
+    pub fn new_derivable(options: DerivableFn<'a, Element, Window, ArrowOptions<Element>>) -> Self {
         Arrow {
             options: options.into(),
         }
     }
 }
 
-impl<'a, Element, Window> Clone for Arrow<'a, Element, Window> {
+impl<'a, Element: Clone, Window: Clone> Clone for Arrow<'a, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             options: self.options.clone(),
@@ -74,7 +64,7 @@ impl<'a, Element, Window> Clone for Arrow<'a, Element, Window> {
     }
 }
 
-impl<'a, Element, Window> Middleware<Element, Window> for Arrow<'a, Element, Window> {
+impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Arrow<'a, Element, Window> {
     fn name(&self) -> &'static str {
         ARROW_NAME
     }
@@ -99,7 +89,7 @@ impl<'a, Element, Window> Middleware<Element, Window> for Arrow<'a, Element, Win
         let coords = Coords { x, y };
         let axis = get_alignment_axis(placement);
         let length = get_axis_length(axis);
-        let arrow_dimensions = platform.get_dimensions(options.element);
+        let arrow_dimensions = platform.get_dimensions(&options.element);
         let min_prop = match axis {
             Axis::X => Side::Left,
             Axis::Y => Side::Top,
@@ -114,7 +104,7 @@ impl<'a, Element, Window> Middleware<Element, Window> for Arrow<'a, Element, Win
             - coords.get_axis(axis)
             - rects.floating.get_length(length);
 
-        let arrow_offset_parent = platform.get_offset_parent(options.element);
+        let arrow_offset_parent = platform.get_offset_parent(&options.element);
         let client_size = arrow_offset_parent
             .and_then(|arrow_offset_parent| match arrow_offset_parent {
                 OwnedElementOrWindow::Element(element) => {
@@ -197,10 +187,10 @@ impl<'a, Element, Window> Middleware<Element, Window> for Arrow<'a, Element, Win
     }
 }
 
-impl<'a, Element, Window> MiddlewareWithOptions<Element, Window, ArrowOptions<'a, Element>>
-    for Arrow<'a, Element, Window>
+impl<'a, Element: Clone, Window: Clone>
+    MiddlewareWithOptions<Element, Window, ArrowOptions<Element>> for Arrow<'a, Element, Window>
 {
-    fn options(&self) -> &Derivable<Element, Window, ArrowOptions<'a, Element>> {
+    fn options(&self) -> &Derivable<Element, Window, ArrowOptions<Element>> {
         &self.options
     }
 }

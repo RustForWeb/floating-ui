@@ -1,3 +1,6 @@
+use std::fmt::Debug;
+
+use dyn_clone::DynClone;
 use floating_ui_utils::{clamp, get_opposite_axis, get_side_axis, Axis, Coords, Side};
 use serde::{Deserialize, Serialize};
 
@@ -13,11 +16,14 @@ use crate::{
 pub const SHIFT_NAME: &str = "shift";
 
 /// Limiter used by [`Shift`] middleware. Limits the shifting done in order to prevent detachment.
-pub trait Limiter<Element, Window> {
+pub trait Limiter<Element, Window>: Debug + DynClone {
     fn compute(&self, state: MiddlewareState<Element, Window>) -> Coords;
 }
 
+dyn_clone::clone_trait_object!(<Element, Window> Limiter<Element, Window>);
+
 /// Default [`Limiter`], which doesn't limit shifting.
+#[derive(Clone, Debug, Default)]
 pub struct DefaultLimiter;
 
 impl<Element, Window> Limiter<Element, Window> for DefaultLimiter {
@@ -30,11 +36,12 @@ impl<Element, Window> Limiter<Element, Window> for DefaultLimiter {
 }
 
 /// Options for [`Shift`] middleware.
-pub struct ShiftOptions<'a, Element, Window> {
+#[derive(Clone, Debug)]
+pub struct ShiftOptions<Element: Clone, Window: Clone> {
     /// Options for [`detect_overflow`].
     ///
     /// Defaults to [`DetectOverflowOptions::default`].
-    pub detect_overflow: Option<DetectOverflowOptions<'a, Element>>,
+    pub detect_overflow: Option<DetectOverflowOptions<Element>>,
 
     /// The axis that runs along the alignment of the floating element. Determines whether overflow along this axis is checked to perform shifting.
     ///
@@ -49,21 +56,10 @@ pub struct ShiftOptions<'a, Element, Window> {
     /// Accepts a limiter that limits the shifting done in order to prevent detachment.
     ///
     /// Defaults to [`DefaultLimiter`].
-    pub limiter: Option<&'a dyn Limiter<Element, Window>>,
+    pub limiter: Option<Box<dyn Limiter<Element, Window>>>,
 }
 
-impl<'a, Element, Window> Clone for ShiftOptions<'a, Element, Window> {
-    fn clone(&self) -> Self {
-        Self {
-            detect_overflow: self.detect_overflow.clone(),
-            main_axis: self.main_axis,
-            cross_axis: self.cross_axis,
-            limiter: self.limiter,
-        }
-    }
-}
-
-impl<'a, Element, Window> Default for ShiftOptions<'a, Element, Window> {
+impl<Element: Clone, Window: Clone> Default for ShiftOptions<Element, Window> {
     fn default() -> Self {
         Self {
             detect_overflow: Default::default(),
@@ -84,13 +80,13 @@ pub struct ShiftData {
 /// Optimizes the visibility of the floating element by shifting it in order to keep it in view when it will overflow the clipping boundary.
 ///
 /// See <https://floating-ui.com/docs/shift> for the original documentation.
-pub struct Shift<'a, Element, Window> {
-    options: Derivable<'a, Element, Window, ShiftOptions<'a, Element, Window>>,
+pub struct Shift<'a, Element: Clone, Window: Clone> {
+    options: Derivable<'a, Element, Window, ShiftOptions<Element, Window>>,
 }
 
-impl<'a, Element, Window> Shift<'a, Element, Window> {
+impl<'a, Element: Clone, Window: Clone> Shift<'a, Element, Window> {
     /// Constructs a new instance of this middleware.
-    pub fn new(options: ShiftOptions<'a, Element, Window>) -> Self {
+    pub fn new(options: ShiftOptions<Element, Window>) -> Self {
         Shift {
             options: options.into(),
         }
@@ -98,7 +94,7 @@ impl<'a, Element, Window> Shift<'a, Element, Window> {
 
     /// Constructs a new instance of this middleware with derivable options.
     pub fn new_derivable(
-        options: DerivableFn<'a, Element, Window, ShiftOptions<'a, Element, Window>>,
+        options: DerivableFn<'a, Element, Window, ShiftOptions<Element, Window>>,
     ) -> Self {
         Shift {
             options: options.into(),
@@ -106,7 +102,7 @@ impl<'a, Element, Window> Shift<'a, Element, Window> {
     }
 }
 
-impl<'a, Element, Window> Clone for Shift<'a, Element, Window> {
+impl<'a, Element: Clone, Window: Clone> Clone for Shift<'a, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             options: self.options.clone(),
@@ -114,7 +110,7 @@ impl<'a, Element, Window> Clone for Shift<'a, Element, Window> {
     }
 }
 
-impl<'a, Element, Window> Middleware<Element, Window> for Shift<'a, Element, Window> {
+impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Shift<'a, Element, Window> {
     fn name(&self) -> &'static str {
         SHIFT_NAME
     }
@@ -128,7 +124,8 @@ impl<'a, Element, Window> Middleware<Element, Window> for Shift<'a, Element, Win
 
         let check_main_axis = options.main_axis.unwrap_or(true);
         let check_cross_axis = options.cross_axis.unwrap_or(false);
-        let limiter = options.limiter.unwrap_or(&DefaultLimiter {});
+        #[allow(clippy::unwrap_or_default)]
+        let limiter = options.limiter.unwrap_or(Box::<DefaultLimiter>::default());
 
         let coords = Coords { x, y };
         let overflow = detect_overflow(
@@ -201,10 +198,11 @@ impl<'a, Element, Window> Middleware<Element, Window> for Shift<'a, Element, Win
     }
 }
 
-impl<'a, Element, Window> MiddlewareWithOptions<Element, Window, ShiftOptions<'a, Element, Window>>
+impl<'a, Element: Clone, Window: Clone>
+    MiddlewareWithOptions<Element, Window, ShiftOptions<Element, Window>>
     for Shift<'a, Element, Window>
 {
-    fn options(&self) -> &Derivable<Element, Window, ShiftOptions<'a, Element, Window>> {
+    fn options(&self) -> &Derivable<Element, Window, ShiftOptions<Element, Window>> {
         &self.options
     }
 }

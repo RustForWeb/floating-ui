@@ -1,13 +1,9 @@
 use std::rc::Rc;
 
-// use floating_ui_dom::{
-//     compute_position, get_opposite_side, get_side, Arrow, ArrowData, ArrowOptions,
-//     ComputePositionConfig, ComputePositionReturn, DetectOverflowOptions, Flip, FlipOptions,
-//     Middleware, Offset, OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side, ARROW_NAME,
-// };
 use floating_ui_dom::{
-    compute_position, get_opposite_side, get_side, ArrowData, ComputePositionConfig,
-    ComputePositionReturn, Flip, FlipOptions, Offset, OffsetOptions, Placement, Side, ARROW_NAME,
+    compute_position, get_opposite_side, get_side, Arrow, ArrowData, ArrowOptions,
+    ComputePositionConfig, ComputePositionReturn, DetectOverflowOptions, Flip, FlipOptions, Offset,
+    OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side, ARROW_NAME,
 };
 use log::Level;
 use wasm_bindgen::prelude::*;
@@ -59,23 +55,22 @@ fn run() -> Result<(), JsValue> {
                 middleware: Some(vec![
                     Box::new(Offset::new(OffsetOptions::Value(6.0))),
                     Box::new(Flip::new(FlipOptions::default())),
-                    // TODO: references/lifetimes don't work
-                    // Box::new(Shift::new(ShiftOptions {
-                    //     detect_overflow: Some(DetectOverflowOptions {
-                    //         boundary: None,
-                    //         root_boundary: None,
-                    //         element_context: None,
-                    //         alt_boundary: None,
-                    //         padding: Some(Padding::All(5.0)),
-                    //     }),
-                    //     main_axis: None,
-                    //     cross_axis: None,
-                    //     limiter: None,
-                    // })),
-                    // Box::new(Arrow::new(ArrowOptions {
-                    //     element: arrow,
-                    //     padding: None,
-                    // })),
+                    Box::new(Shift::new(ShiftOptions {
+                        detect_overflow: Some(DetectOverflowOptions {
+                            boundary: None,
+                            root_boundary: None,
+                            element_context: None,
+                            alt_boundary: None,
+                            padding: Some(Padding::All(5.0)),
+                        }),
+                        main_axis: None,
+                        cross_axis: None,
+                        limiter: None,
+                    })),
+                    Box::new(Arrow::new(ArrowOptions {
+                        element: arrow.clone().into(),
+                        padding: None,
+                    })),
                 ]),
             }),
         );

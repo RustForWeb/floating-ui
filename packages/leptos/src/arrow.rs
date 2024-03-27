@@ -59,8 +59,10 @@ where
         let element = self.options.element.get();
 
         if let Some(element) = element {
+            let element: &web_sys::Element = &element;
+
             CoreArrow::new(CoreArrowOptions {
-                element: &element,
+                element: element.clone(),
                 padding: self.options.padding.clone(),
             })
             .compute(state)

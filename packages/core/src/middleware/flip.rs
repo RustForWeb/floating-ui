@@ -25,12 +25,12 @@ pub enum FallbackStrategy {
 }
 
 /// Options for [`Flip`] middleware.
-#[derive(Debug)]
-pub struct FlipOptions<'a, Element> {
+#[derive(Clone, Debug)]
+pub struct FlipOptions<Element: Clone> {
     /// Options for [`detect_overflow`].
     ///
     /// Defaults to [`DetectOverflowOptions::default`].
-    pub detect_overflow: Option<DetectOverflowOptions<'a, Element>>,
+    pub detect_overflow: Option<DetectOverflowOptions<Element>>,
 
     /// The axis that runs along the side of the floating element. Determines whether overflow along this axis is checked to perform a flip.
     ///
@@ -63,21 +63,7 @@ pub struct FlipOptions<'a, Element> {
     pub flip_alignment: Option<bool>,
 }
 
-impl<'a, Element> Clone for FlipOptions<'a, Element> {
-    fn clone(&self) -> Self {
-        Self {
-            detect_overflow: self.detect_overflow.clone(),
-            main_axis: self.main_axis,
-            cross_axis: self.cross_axis,
-            fallback_placements: self.fallback_placements.clone(),
-            fallback_strategy: self.fallback_strategy,
-            fallback_axis_side_direction: self.fallback_axis_side_direction,
-            flip_alignment: self.flip_alignment,
-        }
-    }
-}
-
-impl<'a, Element> Default for FlipOptions<'a, Element> {
+impl<Element: Clone> Default for FlipOptions<Element> {
     fn default() -> Self {
         Self {
             detect_overflow: Default::default(),
@@ -109,29 +95,27 @@ pub struct FlipData {
 /// Alternative to [`AutoPlacement`][`crate::middleware::AutoPlacement`].
 ///
 /// See <https://floating-ui.com/docs/flip> for the original documentation.
-pub struct Flip<'a, Element, Window> {
-    options: Derivable<'a, Element, Window, FlipOptions<'a, Element>>,
+pub struct Flip<'a, Element: Clone, Window: Clone> {
+    options: Derivable<'a, Element, Window, FlipOptions<Element>>,
 }
 
-impl<'a, Element, Window> Flip<'a, Element, Window> {
+impl<'a, Element: Clone, Window: Clone> Flip<'a, Element, Window> {
     /// Constructs a new instance of this middleware.
-    pub fn new(options: FlipOptions<'a, Element>) -> Self {
+    pub fn new(options: FlipOptions<Element>) -> Self {
         Flip {
             options: options.into(),
         }
     }
 
     /// Constructs a new instance of this middleware with derivable options.
-    pub fn new_derivable(
-        options: DerivableFn<'a, Element, Window, FlipOptions<'a, Element>>,
-    ) -> Self {
+    pub fn new_derivable(options: DerivableFn<'a, Element, Window, FlipOptions<Element>>) -> Self {
         Flip {
             options: options.into(),
         }
     }
 }
 
-impl<'a, Element, Window> Clone for Flip<'a, Element, Window> {
+impl<'a, Element: Clone, Window: Clone> Clone for Flip<'a, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             options: self.options.clone(),
@@ -139,7 +123,7 @@ impl<'a, Element, Window> Clone for Flip<'a, Element, Window> {
     }
 }
 
-impl<'a, Element, Window> Middleware<Element, Window> for Flip<'a, Element, Window> {
+impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Flip<'a, Element, Window> {
     fn name(&self) -> &'static str {
         FLIP_NAME
     }
@@ -313,10 +297,10 @@ impl<'a, Element, Window> Middleware<Element, Window> for Flip<'a, Element, Wind
     }
 }
 
-impl<'a, Element, Window> MiddlewareWithOptions<Element, Window, FlipOptions<'a, Element>>
+impl<'a, Element: Clone, Window: Clone> MiddlewareWithOptions<Element, Window, FlipOptions<Element>>
     for Flip<'a, Element, Window>
 {
-    fn options(&self) -> &Derivable<Element, Window, FlipOptions<'a, Element>> {
+    fn options(&self) -> &Derivable<Element, Window, FlipOptions<Element>> {
         &self.options
     }
 }

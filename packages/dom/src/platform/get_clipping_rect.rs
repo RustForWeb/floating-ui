@@ -19,8 +19,8 @@ use crate::{
 };
 
 #[derive(Clone, Debug)]
-enum ElementOrRootBoundary<'a> {
-    Element(&'a Element),
+enum ElementOrRootBoundary {
+    Element(Element),
     RootBoundary(RootBoundary),
 }
 
@@ -46,7 +46,7 @@ fn get_client_rect_from_clipping_ancestor(
 ) -> ClientRectObject {
     let rect = match clipping_ancestor {
         ElementOrRootBoundary::Element(element) => {
-            get_inner_bounding_client_rect(element, strategy)
+            get_inner_bounding_client_rect(&element, strategy)
         }
         ElementOrRootBoundary::RootBoundary(RootBoundary::Viewport) => {
             get_viewport_rect(&get_document_element(Some(element.into())), strategy)
@@ -176,8 +176,8 @@ pub fn get_clipping_rect(
         _ => vec![],
     };
 
-    let element_clipping_ancestors: Vec<&Element> = clipping_element_ancestors
-        .iter()
+    let element_clipping_ancestors: Vec<Element> = clipping_element_ancestors
+        .into_iter()
         .chain(match boundary {
             Boundary::Element(element) => vec![element],
             Boundary::Elements(elements) => elements,

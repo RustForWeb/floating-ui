@@ -9,12 +9,12 @@ use crate::types::{
 };
 
 /// Options for [`detect_overflow`].
-#[derive(Debug)]
-pub struct DetectOverflowOptions<'a, Element> {
+#[derive(Clone, Debug)]
+pub struct DetectOverflowOptions<Element> {
     /// The clipping element(s) or area in which overflow will be checked.
     ///
     /// Defaults to [`Boundary::ClippingAncestors`].
-    pub boundary: Option<Boundary<'a, Element>>,
+    pub boundary: Option<Boundary<Element>>,
 
     /// The root clipping area in which overflow will be checked.
     ///
@@ -37,19 +37,7 @@ pub struct DetectOverflowOptions<'a, Element> {
     pub padding: Option<Padding>,
 }
 
-impl<'a, Element> Clone for DetectOverflowOptions<'a, Element> {
-    fn clone(&self) -> Self {
-        Self {
-            boundary: self.boundary.clone(),
-            root_boundary: self.root_boundary.clone(),
-            element_context: self.element_context,
-            alt_boundary: self.alt_boundary,
-            padding: self.padding.clone(),
-        }
-    }
-}
-
-impl<'a, Element> Default for DetectOverflowOptions<'a, Element> {
+impl<Element> Default for DetectOverflowOptions<Element> {
     fn default() -> Self {
         Self {
             boundary: Default::default(),

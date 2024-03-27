@@ -58,7 +58,7 @@ pub struct GetElementRectsArgs<'a, Element> {
 /// Arguments for [`Platform::get_clipping_rect`].
 pub struct GetClippingRectArgs<'a, Element> {
     pub element: &'a Element,
-    pub boundary: Boundary<'a, Element>,
+    pub boundary: Boundary<Element>,
     pub root_boundary: RootBoundary,
     pub strategy: Strategy,
 }
@@ -276,21 +276,11 @@ impl<'a, Element, Window> Clone for MiddlewareState<'a, Element, Window> {
     }
 }
 
-#[derive(Debug)]
-pub enum Boundary<'a, Element> {
+#[derive(Clone, Debug)]
+pub enum Boundary<Element> {
     ClippingAncestors,
-    Element(&'a Element),
-    Elements(Vec<&'a Element>),
-}
-
-impl<'a, Element> Clone for Boundary<'a, Element> {
-    fn clone(&self) -> Self {
-        match self {
-            Self::ClippingAncestors => Self::ClippingAncestors,
-            Self::Element(e) => Self::Element(e),
-            Self::Elements(e) => Self::Elements(e.clone()),
-        }
-    }
+    Element(Element),
+    Elements(Vec<Element>),
 }
 
 #[derive(Clone, Debug)]
