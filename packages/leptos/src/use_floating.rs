@@ -13,6 +13,7 @@ use crate::{
     utils::{get_dpr::get_dpr, round_by_dpr::round_by_dpr},
 };
 
+/// Computes the `x` and `y` coordinates that will place the floating element next to a reference element.
 pub fn use_floating<Reference, ReferenceEl, Floating, FloatingEl>(
     reference: NodeRef<Reference>,
     floating: NodeRef<Floating>,

@@ -77,6 +77,7 @@ impl UseFloatingOptions {
     }
 }
 
+/// CSS styles to apply to the floating element to position it.
 #[derive(Clone, Debug, PartialEq)]
 pub struct FloatingStyles {
     pub position: Strategy,
@@ -118,6 +119,7 @@ impl IntoAttribute for FloatingStyles {
     }
 }
 
+/// Return of [`use_floating`][crate::use_floating::use_floating].
 #[derive(Debug)]
 pub struct UseFloatingReturn {
     /// The x-coord of the floating element.

@@ -23,6 +23,9 @@ where
     pub padding: Option<Padding>,
 }
 
+/// Provides data to position an inner element of the floating element so that it appears centered to the reference element.
+///
+/// See <https://floating-ui.com/docs/arrow> for the original documentation.
 #[derive(Clone)]
 pub struct Arrow<Descriptor, Element>
 where
