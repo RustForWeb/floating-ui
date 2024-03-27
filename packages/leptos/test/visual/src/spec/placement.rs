@@ -36,59 +36,59 @@ pub fn Placement() -> impl IntoView {
             <div _ref=floating class="floating" style=move || format!("{} width: {}; height: {};", String::from(floating_styles()), size(), size())>
                 Floating
             </div>
+        </div>
 
-            <div class="controls">
-                <label for="size">Size</label>
-                <input
-                    id="size"
-                    type="range"
-                    min="1"
-                    max="200"
-                    prop:value=size
-                    on:input=move |event| {
-                        set_size(event_target_value(&event).parse().unwrap())
-                    }
-                />
-            </div>
+        <div class="controls">
+            <label for="size">Size</label>
+            <input
+                id="size"
+                type="range"
+                min="1"
+                max="200"
+                prop:value=size
+                on:input=move |event| {
+                    set_size(event_target_value(&event).parse().unwrap())
+                }
+            />
+        </div>
 
-            <div class="controls">
+        <div class="controls">
+            <For
+                each=|| ALL_PLACEMENTS
+                key=|local_placement| format!("{:?}", local_placement)
+                children=move |local_placement| view! {
+                    <button
+                        data-testid=format!("placement-{:?}", local_placement)
+                        style:background-color=move || match placement() == local_placement {
+                            true => "black",
+                            false => ""
+                        }
+                        on:click=move |_| set_placement(local_placement)
+                    >
+                        {format!("{:?}", local_placement)}
+                    </button>
+                }
+            />
+        </div>
+
+        <h2>RTL</h2>
+        <div class="controls">
                 <For
-                    each=|| ALL_PLACEMENTS
-                    key=|local_placement| format!("{:?}", local_placement)
-                    children=move |local_placement| view! {
-                        <button
-                            data-testid=format!("placement-{:?}", local_placement)
-                            style:background-color=move || match placement() == local_placement {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| set_placement(local_placement)
-                        >
-                            {format!("{:?}", local_placement)}
-                        </button>
-                    }
-                />
-            </div>
-
-            <h2>RTL</h2>
-            <div class="controls">
-                 <For
-                    each=|| [true, false]
-                    key=|value| format!("{}", value)
-                    children=move |value| view! {
-                        <button
-                            data-testid=format!("rtl-{}", value)
-                            style:background-color=move || match rtl() == value {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| set_rtl(value)
-                        >
-                            {format!("{}", value)}
-                        </button>
-                    }
-                />
-            </div>
+                each=|| [true, false]
+                key=|value| format!("{}", value)
+                children=move |value| view! {
+                    <button
+                        data-testid=format!("rtl-{}", value)
+                        style:background-color=move || match rtl() == value {
+                            true => "black",
+                            false => ""
+                        }
+                        on:click=move |_| set_rtl(value)
+                    >
+                        {format!("{}", value)}
+                    </button>
+                }
+            />
         </div>
     }
 }
