@@ -199,12 +199,12 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Flip<'a,
         let mut overflows_data = data.overflows;
 
         if check_main_axis {
-            overflows.push(overflow.get_side(side));
+            overflows.push(overflow.side(side));
         }
         if check_cross_axis {
             let sides = get_alignment_sides(placement, rects, rtl);
-            overflows.push(overflow.get_side(sides.0));
-            overflows.push(overflow.get_side(sides.1));
+            overflows.push(overflow.side(sides.0));
+            overflows.push(overflow.side(sides.1));
         }
 
         overflows_data.push(FlipDataOverflow {

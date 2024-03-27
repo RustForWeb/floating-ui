@@ -12,7 +12,7 @@ use crate::{
 };
 
 /// Name of the [`Offset`] middleware.
-const OFFSET_NAME: &str = "offset";
+pub const OFFSET_NAME: &str = "offset";
 
 fn convert_value_to_coords<Element, Window>(
     state: MiddlewareState<Element, Window>,

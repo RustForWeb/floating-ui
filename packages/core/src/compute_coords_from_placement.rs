@@ -20,8 +20,7 @@ pub fn compute_coords_from_placement(
 
     let common_x = reference.x + reference.width / 2.0 - floating.width / 2.0;
     let common_y = reference.y + reference.height / 2.0 - floating.height / 2.0;
-    let common_align =
-        reference.get_length(align_length) / 2.0 - floating.get_length(align_length) / 2.0;
+    let common_align = reference.length(align_length) / 2.0 - floating.length(align_length) / 2.0;
 
     let mut coords = match side {
         Side::Top => Coords {

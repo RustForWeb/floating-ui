@@ -1,9 +1,9 @@
 use std::rc::Rc;
 
 use floating_ui_dom::{
-    compute_position, get_opposite_side, get_side, Arrow, ArrowData, ArrowOptions,
-    ComputePositionConfig, ComputePositionReturn, DetectOverflowOptions, Flip, FlipOptions, Offset,
-    OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side, ARROW_NAME,
+    compute_position, Arrow, ArrowData, ArrowOptions, ComputePositionConfig, ComputePositionReturn,
+    DetectOverflowOptions, Flip, FlipOptions, Offset, OffsetOptions, Padding, Placement, Shift,
+    ShiftOptions, Side, ARROW_NAME,
 };
 use log::Level;
 use wasm_bindgen::prelude::*;
@@ -77,7 +77,7 @@ fn run() -> Result<(), JsValue> {
 
         let arrow_data: Option<ArrowData> = middleware_data.get_as(ARROW_NAME);
         if let Some(arrow_data) = arrow_data {
-            let static_side = get_opposite_side(get_side(placement));
+            let static_side = placement.side().opposite();
 
             let arrow_x = arrow_data.x.map_or(String::new(), |x| format!("{x}px"));
             let arrow_y = arrow_data.y.map_or(String::new(), |y| format!("{y}px"));

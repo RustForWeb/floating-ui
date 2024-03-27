@@ -138,8 +138,8 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Shift<'a
         let cross_axis = get_side_axis(placement);
         let main_axis = get_opposite_axis(cross_axis);
 
-        let mut main_axis_coord = coords.get_axis(main_axis);
-        let mut cross_axis_coord = coords.get_axis(cross_axis);
+        let mut main_axis_coord = coords.axis(main_axis);
+        let mut cross_axis_coord = coords.axis(cross_axis);
 
         if check_main_axis {
             let min_side = match main_axis {
@@ -150,8 +150,8 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Shift<'a
                 Axis::X => Side::Right,
                 Axis::Y => Side::Bottom,
             };
-            let min = main_axis_coord + overflow.get_side(min_side);
-            let max = main_axis_coord + overflow.get_side(max_side);
+            let min = main_axis_coord + overflow.side(min_side);
+            let max = main_axis_coord + overflow.side(max_side);
 
             main_axis_coord = clamp(min, main_axis_coord, max);
         }
@@ -165,8 +165,8 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Shift<'a
                 Axis::X => Side::Right,
                 Axis::Y => Side::Bottom,
             };
-            let min = cross_axis_coord + overflow.get_side(min_side);
-            let max = cross_axis_coord + overflow.get_side(max_side);
+            let min = cross_axis_coord + overflow.side(min_side);
+            let max = cross_axis_coord + overflow.side(max_side);
 
             cross_axis_coord = clamp(min, cross_axis_coord, max);
         }

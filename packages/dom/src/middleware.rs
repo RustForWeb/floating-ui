@@ -7,7 +7,7 @@ use web_sys::{Element, Window};
 pub use floating_ui_core::middleware::{
     ArrowData, ArrowOptions, AutoPlacementData, AutoPlacementDataOverflow, AutoPlacementOptions,
     FlipData, FlipDataOverflow, FlipOptions, OffsetData, OffsetOptions, OffsetOptionsValues,
-    ShiftData, ShiftOptions, ARROW_NAME,
+    ShiftData, ShiftOptions, ARROW_NAME, AUTO_PLACEMENT_NAME, FLIP_NAME, OFFSET_NAME, SHIFT_NAME,
 };
 
 /// Provides data to position an inner element of the floating element so that it appears centered to the reference element.

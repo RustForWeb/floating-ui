@@ -99,10 +99,10 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Arrow<'a
             Axis::Y => Side::Bottom,
         };
 
-        let start_diff = coords.get_axis(axis) - rects.reference.get_axis(axis);
-        let end_diff = rects.reference.get_length(length) + rects.reference.get_axis(axis)
-            - coords.get_axis(axis)
-            - rects.floating.get_length(length);
+        let start_diff = coords.axis(axis) - rects.reference.axis(axis);
+        let end_diff = rects.reference.length(length) + rects.reference.axis(axis)
+            - coords.axis(axis)
+            - rects.floating.length(length);
 
         let arrow_offset_parent = platform.get_offset_parent(&options.element);
         let client_size = arrow_offset_parent
@@ -114,25 +114,21 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Arrow<'a
                     platform.get_client_length(elements.floating, length)
                 }
             })
-            .unwrap_or(rects.floating.get_length(length));
+            .unwrap_or(rects.floating.length(length));
 
         let center_to_reference = end_diff / 2.0 - start_diff / 2.0;
 
         // If the padding is large enough that it causes the arrow to no longer be centered, modify the padding so that it is centered.
         let largest_possible_padding =
-            client_size / 2.0 - arrow_dimensions.get_length(length) / 2.0 - 1.0;
-        let min_padding = padding_object
-            .get_side(min_prop)
-            .min(largest_possible_padding);
-        let max_padding = padding_object
-            .get_side(max_prop)
-            .min(largest_possible_padding);
+            client_size / 2.0 - arrow_dimensions.length(length) / 2.0 - 1.0;
+        let min_padding = padding_object.side(min_prop).min(largest_possible_padding);
+        let max_padding = padding_object.side(max_prop).min(largest_possible_padding);
 
         // Make sure the arrow doesn't overflow the floating element if the center point is outside the floating element's bounds.
         let min = min_padding;
-        let max = client_size - arrow_dimensions.get_length(length) - max_padding;
+        let max = client_size - arrow_dimensions.length(length) - max_padding;
         let center =
-            client_size / 2.0 - arrow_dimensions.get_length(length) / 2.0 + center_to_reference;
+            client_size / 2.0 - arrow_dimensions.length(length) / 2.0 + center_to_reference;
         let offset = clamp(min, center, max);
 
         // If the reference is small enough that the arrow's padding causes it to to point to nothing for an aligned placement, adjust the offset of the floating element itself.
@@ -140,12 +136,12 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Arrow<'a
         let should_add_offset = data.is_none()
             && get_alignment(placement).is_some()
             && center != offset
-            && rects.reference.get_length(length) / 2.0
+            && rects.reference.length(length) / 2.0
                 - (match center < min {
                     true => min_padding,
                     false => max_padding,
                 })
-                - arrow_dimensions.get_length(length) / 2.0
+                - arrow_dimensions.length(length) / 2.0
                 < 0.0;
         let alignment_offset = match should_add_offset {
             true => match center < min {
@@ -157,12 +153,12 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Arrow<'a
 
         MiddlewareReturn {
             x: match axis {
-                Axis::X => Some(coords.get_axis(axis) + alignment_offset),
+                Axis::X => Some(coords.axis(axis) + alignment_offset),
                 Axis::Y => None,
             },
             y: match axis {
                 Axis::X => None,
-                Axis::Y => Some(coords.get_axis(axis) + alignment_offset),
+                Axis::Y => Some(coords.axis(axis) + alignment_offset),
             },
             data: Some(
                 serde_json::to_value(ArrowData {

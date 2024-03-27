@@ -223,9 +223,9 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window>
             }
 
             let current_overflows = vec![
-                overflow.get_side(get_side(current_placement)),
-                overflow.get_side(alignment_sides.0),
-                overflow.get_side(alignment_sides.1),
+                overflow.side(get_side(current_placement)),
+                overflow.side(alignment_sides.0),
+                overflow.side(alignment_sides.1),
             ];
 
             let mut all_overflows = data.overflows.clone();

@@ -13,7 +13,7 @@ pub use floating_ui_dom::{
     AutoPlacementDataOverflow, AutoPlacementOptions, Axis, ClientRectObject, ComputePositionConfig,
     ComputePositionReturn, Coords, DetectOverflowOptions, Dimensions, ElementOrVirtual,
     ElementRects, Flip, FlipData, FlipDataOverflow, FlipOptions, Length, Middleware,
-    MiddlewareData, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions, Offset, OffsetData,
-    OffsetOptions, OffsetOptionsValues, Padding, Placement, Rect, Shift, ShiftData, ShiftOptions,
-    Side, Strategy, VirtualElement,
+    MiddlewareData, MiddlewareReturn, MiddlewareState, MiddlewareVec, MiddlewareWithOptions,
+    Offset, OffsetData, OffsetOptions, OffsetOptionsValues, Padding, Placement, Rect, Shift,
+    ShiftData, ShiftOptions, Side, Strategy, VirtualElement,
 };

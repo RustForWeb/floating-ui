@@ -10,17 +10,22 @@ mod types;
 mod utils;
 
 pub use crate::middleware::*;
+pub use crate::types::*;
 pub use floating_ui_core::{
     ComputePositionReturn, Derivable, DetectOverflowOptions, Middleware, MiddlewareData,
     MiddlewareReturn, MiddlewareState, MiddlewareWithOptions,
 };
 #[doc(no_inline)]
-pub use floating_ui_utils::*;
+pub use floating_ui_utils::{
+    dom, AlignedPlacement, Alignment, Axis, ClientRectObject, Coords, Dimensions, ElementRects,
+    Length, Padding, PartialSideObject, Placement, Rect, Side, SideObject, Strategy,
+    VirtualElement,
+};
 
 use floating_ui_core::{
     compute_position as compute_position_core, ComputePositionConfig as CoreComputePositionConfig,
 };
-use web_sys::{Element, Window};
+use web_sys::Element;
 
 use self::platform::Platform;
 
@@ -39,10 +44,10 @@ pub struct ComputePositionConfig {
     /// Defaults to [`Strategy::Absolute`].
     pub strategy: Option<Strategy>,
 
-    /// Array of middleware objects to modify the positioning or provide data for rendering.
+    /// Vector of middleware objects to modify the positioning or provide data for rendering.
     ///
     /// Defaults to an empty vector.
-    pub middleware: Option<Vec<Box<dyn Middleware<Element, Window>>>>,
+    pub middleware: Option<MiddlewareVec>,
 }
 
 /// Computes the `x` and `y` coordinates that will place the floating element next to a given reference element.

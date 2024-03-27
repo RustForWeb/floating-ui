@@ -1,4 +1,7 @@
-use floating_ui_leptos::{use_floating, Placement, UseFloatingOptions, UseFloatingReturn};
+use floating_ui_leptos::{
+    use_floating, Arrow, ArrowOptions, MiddlewareVec, Offset, OffsetOptions, Placement,
+    UseFloatingOptions, UseFloatingReturn,
+};
 use leptos::{
     html::{Div, Span},
     *,
@@ -13,6 +16,14 @@ pub fn App() -> impl IntoView {
     let floating = create_node_ref::<Div>();
     let floating_arrow = create_node_ref::<Div>();
 
+    let middleware: MiddlewareVec = vec![
+        Box::new(Arrow::new(ArrowOptions {
+            element: floating_arrow,
+            padding: None,
+        })),
+        Box::new(Offset::new(OffsetOptions::Value(4.0))),
+    ];
+
     let UseFloatingReturn {
         floating_styles, ..
     } = use_floating(
@@ -20,13 +31,8 @@ pub fn App() -> impl IntoView {
         floating,
         UseFloatingOptions::default()
             .open(open.into())
-            .placement(placement.into()),
-        // .middleware(Some(MaybeSignal::Static(Some(vec![&Arrow::new(
-        //     ArrowOptions {
-        //         element: floating_arrow,
-        //         padding: None,
-        //     },
-        // )])))),
+            .placement(placement.into())
+            .middleware(middleware.into()),
     );
 
     view! {

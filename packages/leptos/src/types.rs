@@ -2,7 +2,7 @@ use floating_ui_dom::{Middleware, MiddlewareData, Placement, Strategy};
 use leptos::{Attribute, IntoAttribute, MaybeProp, Signal};
 use web_sys::{Element, Window};
 
-/// Options for [`use_floating`].
+/// Options for [`use_floating`][`crate::use_floating::use_floating`].
 #[derive(Clone, Default)]
 pub struct UseFloatingOptions {
     /// Represents the open/close state of the floating element.
