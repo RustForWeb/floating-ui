@@ -15,3 +15,6 @@ log = "0.4.21"
 floating-ui-dom = { path = "../dom", version = "0.0.2" }
 leptos = { version = "0.6.9", features = ["nightly"] }
 web-sys.workspace = true
+
+[dev-dependencies]
+wasm-bindgen-test.workspace = true

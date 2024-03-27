@@ -1,6 +1,3 @@
-// TODO: remove after leptos is fixed
-#![allow(clippy::empty_docs)]
-
 mod app;
 
 use crate::app::App;

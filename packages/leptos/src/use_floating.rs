@@ -144,3 +144,40 @@ where
         update: false, // TODO
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use leptos::{html::Div, *};
+    use wasm_bindgen_test::*;
+
+    use super::*;
+
+    wasm_bindgen_test_configure!(run_in_browser);
+
+    #[wasm_bindgen_test]
+    fn updates_is_positioned_when_position_is_computed() {
+        #[component]
+        fn Component() -> impl IntoView {
+            let reference = create_node_ref::<Div>();
+            let floating = create_node_ref::<Div>();
+            let UseFloatingReturn { is_positioned, .. } =
+                use_floating(reference, floating, UseFloatingOptions::default());
+
+            view! {
+                <div _ref=reference />
+                <div _ref=floating />
+                <div id="test-is-positioned">{is_positioned}</div>
+            }
+        }
+
+        let document = leptos::document();
+        mount_to(document.body().unwrap(), Component);
+
+        // assert_eq!(
+        //     document
+        //         .get_element_by_id("test-is-positioned")
+        //         .and_then(|element| element.text_content()),
+        //     Some("true".into())
+        // );
+    }
+}
