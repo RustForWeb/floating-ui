@@ -1,6 +1,15 @@
-use floating_ui_dom::{Middleware, MiddlewareData, Placement, Strategy};
+use std::rc::Rc;
+
+use floating_ui_dom::{
+    auto_update, AutoUpdateOptions, Middleware, MiddlewareData, Placement, Strategy,
+};
 use leptos::{Attribute, IntoAttribute, MaybeProp, Signal};
 use web_sys::{Element, Window};
+
+pub type WhileElementsMountedFn =
+    dyn Fn(&Element, &Element, Rc<dyn Fn()>) -> WhileElementsMountedCleanupFn;
+
+pub type WhileElementsMountedCleanupFn = Box<dyn Fn()>;
 
 /// Options for [`use_floating`][`crate::use_floating::use_floating`].
 #[derive(Clone, Default)]
@@ -33,7 +42,7 @@ pub struct UseFloatingOptions {
     /// Callback to handle mounting/unmounting of the elements.
     ///
     ///Detauls to [`Option::None`].
-    pub while_elements_mounted: MaybeProp<bool>, // TODO: type
+    pub while_elements_mounted: Option<Rc<WhileElementsMountedFn>>,
 }
 
 impl UseFloatingOptions {
@@ -71,9 +80,20 @@ impl UseFloatingOptions {
     }
 
     /// Set [`Self::while_elements_mounted`] option.
-    pub fn while_elements_mounted(mut self, value: MaybeProp<bool>) -> Self {
-        self.while_elements_mounted = value;
+    pub fn while_elements_mounted(mut self, value: Rc<WhileElementsMountedFn>) -> Self {
+        self.while_elements_mounted = Some(value);
         self
+    }
+
+    pub fn while_elements_mounted_auto_update(self) -> Self {
+        self.while_elements_mounted(Rc::new(|reference, floating, update| {
+            auto_update(
+                reference.into(),
+                floating,
+                update,
+                AutoUpdateOptions::default(),
+            )
+        }))
     }
 }
 
@@ -120,7 +140,6 @@ impl IntoAttribute for FloatingStyles {
 }
 
 /// Return of [`use_floating`][crate::use_floating::use_floating].
-#[derive(Debug)]
 pub struct UseFloatingReturn {
     /// The x-coord of the floating element.
     pub x: Signal<f64>,
@@ -144,5 +163,5 @@ pub struct UseFloatingReturn {
     pub floating_styles: Signal<FloatingStyles>,
 
     /// The function to update floating position manually.
-    pub update: bool, // TODO: type
+    pub update: Rc<dyn Fn()>,
 }

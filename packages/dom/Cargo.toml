@@ -9,6 +9,8 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
+# TODO: remove
+log = "0.4.21"
 floating-ui-core = { path = "../core", version = "0.0.2" }
 floating-ui-utils = { path = "../utils", version = "0.0.2", features = ["dom"] }
 web-sys.workspace = true

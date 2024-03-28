@@ -239,6 +239,12 @@ pub struct ElementRects {
     pub floating: Rect,
 }
 
+pub enum OwnedElementOrVirtual<Element> {
+    Element(Element),
+    VirtualElement(Box<dyn VirtualElement<Element>>),
+}
+
+#[derive(Copy, Clone)]
 pub enum ElementOrVirtual<'a, Element> {
     Element(&'a Element),
     VirtualElement(&'a dyn VirtualElement<Element>),

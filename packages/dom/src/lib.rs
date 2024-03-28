@@ -4,11 +4,13 @@
 //!
 //! See [@floating-ui/dom](https://www.npmjs.com/package/@floating-ui/dom) for the original package.
 
+mod auto_update;
 mod middleware;
 mod platform;
 mod types;
 mod utils;
 
+pub use crate::auto_update::*;
 pub use crate::middleware::*;
 pub use crate::types::*;
 pub use floating_ui_core::{

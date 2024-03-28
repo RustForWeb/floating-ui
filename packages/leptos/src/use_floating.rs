@@ -1,16 +1,18 @@
-use std::ops::Deref;
+use std::{cell::RefCell, ops::Deref, rc::Rc};
 
 use floating_ui_dom::{
     compute_position, ComputePositionConfig, MiddlewareData, Placement, Strategy,
 };
 use leptos::{
-    create_effect, create_memo, create_rw_signal, create_signal, html::ElementDescriptor, NodeRef,
-    SignalGet, SignalUpdate,
+    create_effect, create_memo, create_rw_signal, create_signal, html::ElementDescriptor, watch,
+    NodeRef, SignalGet, SignalGetUntracked, SignalUpdate,
 };
+use log::info;
 
 use crate::{
     types::{FloatingStyles, UseFloatingOptions, UseFloatingReturn},
     utils::{get_dpr::get_dpr, round_by_dpr::round_by_dpr},
+    WhileElementsMountedCleanupFn,
 };
 
 /// Computes the `x` and `y` coordinates that will place the floating element next to a reference element.
@@ -26,9 +28,19 @@ where
     FloatingEl: Deref<Target = web_sys::HtmlElement>,
 {
     let open_option = move || options.open.get().unwrap_or(true);
-    let placement_option = move || options.placement.get().unwrap_or(Placement::Bottom);
-    let strategy_option = move || options.strategy.get().unwrap_or(Strategy::Absolute);
-    let middleware_option = move || options.middleware.get();
+    let placement_option = move || {
+        options
+            .placement
+            .get_untracked()
+            .unwrap_or(Placement::Bottom)
+    };
+    let strategy_option = move || {
+        options
+            .strategy
+            .get_untracked()
+            .unwrap_or(Strategy::Absolute)
+    };
+    let middleware_option = move || options.middleware.get_untracked();
     let transform_option = move || options.transform.get().unwrap_or(true);
 
     let (x, set_x) = create_signal(0.0);
@@ -72,8 +84,10 @@ where
     });
 
     let update = move || {
-        if let Some(reference_element) = reference.get() {
-            if let Some(floating_element) = floating.get() {
+        if let Some(reference_element) = reference.get_untracked() {
+            if let Some(floating_element) = floating.get_untracked() {
+                info!("use floating update");
+
                 let config = ComputePositionConfig {
                     placement: Some(placement_option()),
                     strategy: Some(strategy_option()),
@@ -91,16 +105,37 @@ where
             }
         }
     };
+    let update_rc = Rc::new(update);
 
+    let while_elements_mounted_cleanup: Rc<RefCell<Option<WhileElementsMountedCleanupFn>>> =
+        Rc::new(RefCell::new(None));
+
+    let cleanup_while_elements_mounted_cleanup = while_elements_mounted_cleanup.clone();
     let cleanup = move || {
-        // TODO
+        if let Some(while_elements_mounted_cleanup) = cleanup_while_elements_mounted_cleanup.take()
+        {
+            while_elements_mounted_cleanup();
+        }
     };
 
+    let attach_update_rc = update_rc.clone();
+    let attach_while_elements_mounted_cleanup = while_elements_mounted_cleanup.clone();
     let attach = move || {
         cleanup();
 
-        // TODO: the rest of the function
-        update();
+        if let Some(while_elements_mounted) = &options.while_elements_mounted {
+            if let Some(reference_element) = reference.get() {
+                if let Some(floating_element) = floating.get() {
+                    attach_while_elements_mounted_cleanup.replace(Some(while_elements_mounted(
+                        &reference_element,
+                        &floating_element,
+                        attach_update_rc.clone(),
+                    )));
+                }
+            }
+        } else {
+            attach_update_rc();
+        }
     };
 
     let reset = move || {
@@ -120,7 +155,6 @@ where
             remaining_mounts.update(|count| *count -= 1);
         });
     });
-
     create_effect(move |_| {
         if remaining_mounts.get() == 0 {
             attach();
@@ -131,7 +165,33 @@ where
         reset();
     });
 
-    // TODO: placement_option() is called outside the reactive context in update, probably because on_mount is outside the reactive context
+    let placement_update_rc = update_rc.clone();
+    let strategy_update_rc = update_rc.clone();
+    let middleware_update_rc = update_rc.clone();
+    _ = watch(
+        options.placement,
+        move |_, _, _| {
+            placement_update_rc();
+        },
+        false,
+    );
+    _ = watch(
+        options.strategy,
+        move |_, _, _| {
+            strategy_update_rc();
+        },
+        false,
+    );
+    // TODO
+    // _ = watch(
+    //     options.middleware,
+    //     move |_, _, _| {
+    //         middleware_update_rc();
+    //     },
+    //     false,
+    // );
+
+    // TODO: call cleanup on unmount?
 
     UseFloatingReturn {
         x: x.into(),
@@ -141,7 +201,7 @@ where
         middleware_data: middleware_data.into(),
         is_positioned: is_positioned.into(),
         floating_styles: floating_styles.into(),
-        update: false, // TODO
+        update: update_rc.clone(),
     }
 }
 

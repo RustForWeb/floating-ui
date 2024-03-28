@@ -17,9 +17,19 @@ pub fn Placement() -> impl IntoView {
     } = use_floating(
         reference,
         floating,
-        UseFloatingOptions::default().placement(placement.into()),
+        UseFloatingOptions::default()
+            .placement(placement.into())
+            .while_elements_mounted_auto_update(),
     );
     let (size, set_size) = create_signal(80);
+
+    _ = watch(
+        rtl,
+        move |_, _, _| {
+            update();
+        },
+        false,
+    );
 
     view! {
         <h1>Placement</h1>
@@ -33,7 +43,7 @@ pub fn Placement() -> impl IntoView {
             <div _ref=reference class="reference">
                 Reference
             </div>
-            <div _ref=floating class="floating" style=move || format!("{} width: {}; height: {};", String::from(floating_styles()), size(), size())>
+            <div _ref=floating class="floating" style=move || format!("{} width: {}px; height: {}px;", String::from(floating_styles()), size(), size())>
                 Floating
             </div>
         </div>

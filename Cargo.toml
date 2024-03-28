@@ -19,14 +19,18 @@ wasm-bindgen-test = "0.3.42"
 version = "0.3.69"
 features = [
     "css",
+    "AddEventListenerOptions",
     "CssStyleDeclaration",
     "Document",
     "DomRect",
     "DomRectList",
     "Element",
+    "EventTarget",
     "HtmlElement",
     "HtmlSlotElement",
     "Node",
+    "ResizeObserver",
+    "ResizeObserverEntry",
     "ShadowRoot",
     "Window",
 ]
