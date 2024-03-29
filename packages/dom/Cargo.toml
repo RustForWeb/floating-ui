@@ -9,6 +9,7 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
+dyn-clone.workspace = true
 # TODO: remove
 log = "0.4.21"
 floating-ui-core = { path = "../core", version = "0.0.2" }

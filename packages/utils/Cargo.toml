@@ -9,6 +9,7 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
+dyn-clone.workspace = true
 serde.workspace = true
 web-sys = { workspace = true, optional = true }
 

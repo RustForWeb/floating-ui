@@ -7,6 +7,7 @@
 #[cfg(feature = "dom")]
 pub mod dom;
 
+use dyn_clone::DynClone;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -239,27 +240,39 @@ pub struct ElementRects {
     pub floating: Rect,
 }
 
+#[derive(Clone)]
 pub enum OwnedElementOrVirtual<Element> {
     Element(Element),
     VirtualElement(Box<dyn VirtualElement<Element>>),
 }
 
-#[derive(Copy, Clone)]
-pub enum ElementOrVirtual<'a, Element> {
-    Element(&'a Element),
-    VirtualElement(&'a dyn VirtualElement<Element>),
+impl<Element> OwnedElementOrVirtual<Element> {
+    pub fn resolve(self) -> Option<Element> {
+        match self {
+            OwnedElementOrVirtual::Element(element) => Some(element),
+            OwnedElementOrVirtual::VirtualElement(virtal_element) => {
+                virtal_element.context_element()
+            }
+        }
+    }
 }
 
-impl<'a, Element> ElementOrVirtual<'a, Element> {
-    pub fn resolve(&self) -> Option<&'a Element> {
+#[derive(Clone)]
+pub enum ElementOrVirtual<'a, Element: Clone> {
+    Element(&'a Element),
+    VirtualElement(Box<dyn VirtualElement<Element>>),
+}
+
+impl<'a, Element: Clone> ElementOrVirtual<'a, Element> {
+    pub fn resolve(self) -> Option<Element> {
         match self {
-            ElementOrVirtual::Element(element) => Some(element),
+            ElementOrVirtual::Element(element) => Some(element.clone()),
             ElementOrVirtual::VirtualElement(virtal_element) => virtal_element.context_element(),
         }
     }
 }
 
-impl<'a, Element> From<&'a Element> for ElementOrVirtual<'a, Element> {
+impl<'a, Element: Clone> From<&'a Element> for ElementOrVirtual<'a, Element> {
     fn from(value: &'a Element) -> Self {
         ElementOrVirtual::Element(value)
     }
@@ -268,11 +281,13 @@ impl<'a, Element> From<&'a Element> for ElementOrVirtual<'a, Element> {
 /// Custom positioning reference element.
 ///
 /// See <https://floating-ui.com/docs/virtual-elements> for the original documentation.
-pub trait VirtualElement<Element> {
+pub trait VirtualElement<Element>: DynClone {
     fn get_bounding_client_rect(&self) -> ClientRectObject;
 
-    fn context_element(&self) -> Option<&Element>;
+    fn context_element(&self) -> Option<Element>;
 }
+
+dyn_clone::clone_trait_object!(<Element> VirtualElement<Element>);
 
 #[derive(Clone, Debug)]
 pub enum ElementOrWindow<'a, Element, Window> {

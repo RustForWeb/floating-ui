@@ -29,7 +29,7 @@ pub fn get_bounding_client_rect(
     is_fixed_strategy: bool,
     offset_parent: Option<DomElementOrWindow>,
 ) -> ClientRectObject {
-    let client_rect = match element_or_virtual {
+    let client_rect = match &element_or_virtual {
         ElementOrVirtual::Element(element) => {
             dom_rect_to_client_rect_object(element.get_bounding_client_rect())
         }
@@ -37,7 +37,7 @@ pub fn get_bounding_client_rect(
             virtual_element.get_bounding_client_rect()
         }
     };
-    let dom_element = element_or_virtual.resolve();
+    let dom_element = element_or_virtual.clone().resolve();
 
     let scale = match include_scale {
         true => match &offset_parent {
@@ -50,11 +50,14 @@ pub fn get_bounding_client_rect(
         false => Coords::new(1.0),
     };
 
-    let visual_offsets =
-        match should_add_visual_offsets(dom_element, is_fixed_strategy, offset_parent.clone()) {
-            true => get_visual_offsets(dom_element),
-            false => Coords::new(0.0),
-        };
+    let visual_offsets = match should_add_visual_offsets(
+        dom_element.as_ref(),
+        is_fixed_strategy,
+        offset_parent.clone(),
+    ) {
+        true => get_visual_offsets(dom_element.as_ref()),
+        false => Coords::new(0.0),
+    };
 
     let mut x = (client_rect.left + visual_offsets.x) / scale.x;
     let mut y = (client_rect.top + visual_offsets.y) / scale.y;
@@ -62,7 +65,7 @@ pub fn get_bounding_client_rect(
     let mut height = client_rect.height / scale.y;
 
     if let Some(dom_element) = dom_element {
-        let window = get_window(Some(dom_element));
+        let window = get_window(Some(&dom_element));
         let offset_window = match offset_parent {
             Some(DomElementOrWindow::Element(element)) => Some(get_window(Some(element))),
             Some(DomElementOrWindow::Window(window)) => Some(window.clone()),

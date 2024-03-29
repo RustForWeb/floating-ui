@@ -108,13 +108,13 @@ pub fn auto_update(
     let layout_shift = options.layout_shift.unwrap_or(true);
     let animation_frame = options.animation_frame.unwrap_or(false);
 
-    let reference_element = reference.resolve();
+    let reference_element = reference.clone().resolve();
 
     let ancestors = match ancestor_scoll || ancestor_resize {
         true => {
             let mut ancestors = vec![];
 
-            if let Some(reference) = reference_element {
+            if let Some(reference) = reference_element.as_ref() {
                 ancestors = get_overflow_ancestors(reference, ancestors, true);
             }
 
@@ -152,10 +152,13 @@ pub fn auto_update(
         }
     }
 
-    let cleanup_observe_move = reference_element.and_then(|reference_element| match layout_shift {
-        true => Some(observe_move(reference_element, update.clone())),
-        false => None,
-    });
+    let cleanup_observe_move =
+        reference_element
+            .as_ref()
+            .and_then(|reference_element| match layout_shift {
+                true => Some(observe_move(reference_element, update.clone())),
+                false => None,
+            });
 
     let reobserve_frame = -1;
     let mut resize_observer: Option<ResizeObserver> = None;
@@ -183,7 +186,7 @@ pub fn auto_update(
             ResizeObserver::new(resize_closure.into_js_value().unchecked_ref())
                 .expect("Resize observer should be created.");
 
-        if let Some(reference) = reference_element {
+        if let Some(reference) = reference_element.as_ref() {
             if !animation_frame {
                 local_resize_observer.observe(reference);
             }
@@ -210,8 +213,8 @@ pub fn auto_update(
 
     let owned = match reference {
         ElementOrVirtual::Element(e) => OwnedElementOrVirtual::Element(e.clone()),
-        ElementOrVirtual::VirtualElement(ve) => panic!("virtual element"),
-        // ElementOrVirtual::VirtualElement(ve) => OwnedElementOrVirtual::VirtualElement(ve.clone()),
+        // ElementOrVirtual::VirtualElement(ve) => panic!("virtual element"),
+        ElementOrVirtual::VirtualElement(ve) => OwnedElementOrVirtual::VirtualElement(ve.clone()),
     };
 
     *frame_loop_closure_clone.borrow_mut() = Some(Closure::new(move || {
@@ -221,7 +224,7 @@ pub fn auto_update(
             match &owned {
                 OwnedElementOrVirtual::Element(e) => ElementOrVirtual::Element(e),
                 OwnedElementOrVirtual::VirtualElement(ve) => {
-                    ElementOrVirtual::VirtualElement(&**ve)
+                    ElementOrVirtual::VirtualElement(ve.clone())
                 }
             },
             false,

@@ -9,7 +9,7 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-dyn-clone = "1.0.17"
+dyn-clone.workspace = true
 floating-ui-utils = { path = "../utils", version = "0.0.2" }
 serde.workspace = true
 serde_json.workspace = true

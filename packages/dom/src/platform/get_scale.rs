@@ -13,7 +13,7 @@ pub fn get_scale(element_or_virtual: ElementOrVirtual) -> Coords {
         let CssDimensions {
             dimensions,
             should_fallback,
-        } = get_css_dimensions(dom_element);
+        } = get_css_dimensions(&dom_element);
         let x = match should_fallback {
             true => rect.width().round(),
             false => rect.width(),
