@@ -240,22 +240,16 @@ pub struct ElementRects {
     pub floating: Rect,
 }
 
-#[derive(Clone)]
-pub enum OwnedElementOrVirtual<Element> {
-    Element(Element),
-    VirtualElement(Box<dyn VirtualElement<Element>>),
+/// Custom positioning reference element.
+///
+/// See <https://floating-ui.com/docs/virtual-elements> for the original documentation.
+pub trait VirtualElement<Element>: DynClone {
+    fn get_bounding_client_rect(&self) -> ClientRectObject;
+
+    fn context_element(&self) -> Option<Element>;
 }
 
-impl<Element> OwnedElementOrVirtual<Element> {
-    pub fn resolve(self) -> Option<Element> {
-        match self {
-            OwnedElementOrVirtual::Element(element) => Some(element),
-            OwnedElementOrVirtual::VirtualElement(virtal_element) => {
-                virtal_element.context_element()
-            }
-        }
-    }
-}
+dyn_clone::clone_trait_object!(<Element> VirtualElement<Element>);
 
 #[derive(Clone)]
 pub enum ElementOrVirtual<'a, Element: Clone> {
@@ -278,16 +272,35 @@ impl<'a, Element: Clone> From<&'a Element> for ElementOrVirtual<'a, Element> {
     }
 }
 
-/// Custom positioning reference element.
-///
-/// See <https://floating-ui.com/docs/virtual-elements> for the original documentation.
-pub trait VirtualElement<Element>: DynClone {
-    fn get_bounding_client_rect(&self) -> ClientRectObject;
-
-    fn context_element(&self) -> Option<Element>;
+impl<'a, Element: Clone> From<&'a OwnedElementOrVirtual<Element>>
+    for ElementOrVirtual<'a, Element>
+{
+    fn from(value: &'a OwnedElementOrVirtual<Element>) -> Self {
+        match value {
+            OwnedElementOrVirtual::Element(element) => ElementOrVirtual::Element(element),
+            OwnedElementOrVirtual::VirtualElement(virtual_element) => {
+                ElementOrVirtual::VirtualElement(virtual_element.clone())
+            }
+        }
+    }
 }
 
-dyn_clone::clone_trait_object!(<Element> VirtualElement<Element>);
+#[derive(Clone)]
+pub enum OwnedElementOrVirtual<Element> {
+    Element(Element),
+    VirtualElement(Box<dyn VirtualElement<Element>>),
+}
+
+impl<Element> OwnedElementOrVirtual<Element> {
+    pub fn resolve(self) -> Option<Element> {
+        match self {
+            OwnedElementOrVirtual::Element(element) => Some(element),
+            OwnedElementOrVirtual::VirtualElement(virtal_element) => {
+                virtal_element.context_element()
+            }
+        }
+    }
+}
 
 #[derive(Clone, Debug)]
 pub enum ElementOrWindow<'a, Element, Window> {

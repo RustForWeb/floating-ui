@@ -7,7 +7,6 @@ use leptos::{
     create_effect, create_memo, create_rw_signal, create_signal, html::ElementDescriptor, watch,
     NodeRef, SignalGet, SignalGetUntracked, SignalUpdate,
 };
-use log::info;
 
 use crate::{
     types::{FloatingStyles, UseFloatingOptions, UseFloatingReturn},
@@ -28,25 +27,26 @@ where
     FloatingEl: Deref<Target = web_sys::HtmlElement>,
 {
     let open_option = move || options.open.get().unwrap_or(true);
-    let placement_option = move || {
+    let placement_option_untracked = move || {
         options
             .placement
             .get_untracked()
             .unwrap_or(Placement::Bottom)
     };
-    let strategy_option = move || {
+    let strategy_option_untracked = move || {
         options
             .strategy
             .get_untracked()
             .unwrap_or(Strategy::Absolute)
     };
-    let middleware_option = move || options.middleware.get_untracked();
+    let options_middleware = options.middleware.clone();
+    let middleware_option_untracked = move || options_middleware.get_untracked();
     let transform_option = move || options.transform.get().unwrap_or(true);
 
     let (x, set_x) = create_signal(0.0);
     let (y, set_y) = create_signal(0.0);
-    let (strategy, set_strategy) = create_signal(strategy_option());
-    let (placement, set_placement) = create_signal(placement_option());
+    let (strategy, set_strategy) = create_signal(strategy_option_untracked());
+    let (placement, set_placement) = create_signal(placement_option_untracked());
     let (middleware_data, set_middleware_data) = create_signal(MiddlewareData::default());
     let (is_positioned, set_is_positioned) = create_signal(false);
     let floating_styles = create_memo(move |_| {
@@ -86,12 +86,10 @@ where
     let update = move || {
         if let Some(reference_element) = reference.get_untracked() {
             if let Some(floating_element) = floating.get_untracked() {
-                info!("use floating update");
-
                 let config = ComputePositionConfig {
-                    placement: Some(placement_option()),
-                    strategy: Some(strategy_option()),
-                    middleware: middleware_option(),
+                    placement: Some(placement_option_untracked()),
+                    strategy: Some(strategy_option_untracked()),
+                    middleware: middleware_option_untracked(),
                 };
 
                 let position =
@@ -182,14 +180,13 @@ where
         },
         false,
     );
-    // TODO
-    // _ = watch(
-    //     options.middleware,
-    //     move |_, _, _| {
-    //         middleware_update_rc();
-    //     },
-    //     false,
-    // );
+    _ = watch(
+        options.middleware,
+        move |_, _, _| {
+            middleware_update_rc();
+        },
+        false,
+    );
 
     // TODO: call cleanup on unmount?
 
