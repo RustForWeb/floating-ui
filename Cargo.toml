@@ -26,6 +26,7 @@ features = [
     "DomRect",
     "DomRectList",
     "Element",
+    "Event",
     "EventTarget",
     "HtmlElement",
     "HtmlSlotElement",

@@ -18,3 +18,4 @@ floating-ui-leptos = { path = "../.." }
 wasm-bindgen.workspace = true
 web-sys.workspace = true
 leptos_router = { version = "0.6.9", features = ["csr", "nightly"] }
+convert_case = "0.6.0"

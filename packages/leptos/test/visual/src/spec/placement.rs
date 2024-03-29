@@ -1,7 +1,8 @@
+use convert_case::{Case, Casing};
 use floating_ui_leptos::{use_floating, Placement, UseFloatingOptions, UseFloatingReturn};
 use leptos::{html::Div, *};
 
-use crate::utils::all_placements::ALL_PLACEMENTS;
+use crate::utils::{all_placements::ALL_PLACEMENTS, use_size::use_size};
 
 #[component]
 pub fn Placement() -> impl IntoView {
@@ -21,25 +22,20 @@ pub fn Placement() -> impl IntoView {
             .placement(placement.into())
             .while_elements_mounted_auto_update(),
     );
-    let (size, set_size) = create_signal(80);
-
-    _ = watch(
-        rtl,
-        move |_, _, _| {
-            update();
-        },
-        false,
-    );
+    let (size, set_size) = use_size(None, None);
 
     view! {
         <h1>Placement</h1>
         <p>
             The floating element should be correctly positioned when given each of the 12 placements.
         </p>
-        <div class="container" style=move || match rtl() {
-            true => "direction: rtl;",
-            false => "direction: ltr;",
-        }>
+        <div class="container" style=move || {
+                log::info!("rtl {}", rtl());
+                match rtl() {
+                    true => "direction: rtl;",
+                    false => "direction: ltr;",
+                }
+            }>
             <div _ref=reference class="reference">
                 Reference
             </div>
@@ -68,14 +64,14 @@ pub fn Placement() -> impl IntoView {
                 key=|local_placement| format!("{:?}", local_placement)
                 children=move |local_placement| view! {
                     <button
-                        data-testid=format!("placement-{:?}", local_placement)
+                        data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
                         style:background-color=move || match placement() == local_placement {
                             true => "black",
                             false => ""
                         }
                         on:click=move |_| set_placement(local_placement)
                     >
-                        {format!("{:?}", local_placement)}
+                        {format!("{:?}", local_placement).to_case(Case::Kebab)}
                     </button>
                 }
             />
@@ -86,17 +82,24 @@ pub fn Placement() -> impl IntoView {
                 <For
                 each=|| [true, false]
                 key=|value| format!("{}", value)
-                children=move |value| view! {
-                    <button
-                        data-testid=format!("rtl-{}", value)
-                        style:background-color=move || match rtl() == value {
-                            true => "black",
-                            false => ""
-                        }
-                        on:click=move |_| set_rtl(value)
-                    >
-                        {format!("{}", value)}
-                    </button>
+                children=move |value| {
+                    let rtl_update = update.clone();
+
+                    view! {
+                        <button
+                            data-testid=format!("rtl-{}", value)
+                            style:background-color=move || match rtl() == value {
+                                true => "black",
+                                false => ""
+                            }
+                            on:click=move |_| {
+                                set_rtl(value);
+                                rtl_update();
+                            }
+                        >
+                            {format!("{}", value)}
+                        </button>
+                    }
                 }
             />
         </div>
