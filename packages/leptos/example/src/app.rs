@@ -17,10 +17,7 @@ pub fn App() -> impl IntoView {
     let floating_arrow = create_node_ref::<Div>();
 
     let middleware: MiddlewareVec = vec![
-        Box::new(Arrow::new(ArrowOptions {
-            element: floating_arrow,
-            padding: None,
-        })),
+        Box::new(Arrow::new(ArrowOptions::new(floating_arrow))),
         Box::new(Offset::new(OffsetOptions::Value(4.0))),
     ];
 

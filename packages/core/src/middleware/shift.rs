@@ -59,6 +59,32 @@ pub struct ShiftOptions<Element: Clone, Window: Clone> {
     pub limiter: Option<Box<dyn Limiter<Element, Window>>>,
 }
 
+impl<Element: Clone, Window: Clone> ShiftOptions<Element, Window> {
+    /// Set `detect_overflow` option.
+    pub fn detect_overflow(mut self, value: DetectOverflowOptions<Element>) -> Self {
+        self.detect_overflow = Some(value);
+        self
+    }
+
+    /// Set `main_axis` option.
+    pub fn main_axis(mut self, value: bool) -> Self {
+        self.main_axis = Some(value);
+        self
+    }
+
+    /// Set `cross_axis` option.
+    pub fn cross_axis(mut self, value: bool) -> Self {
+        self.cross_axis = Some(value);
+        self
+    }
+
+    /// Set `limiter` option.
+    pub fn limiter(mut self, value: Box<dyn Limiter<Element, Window>>) -> Self {
+        self.limiter = Some(value);
+        self
+    }
+}
+
 impl<Element: Clone, Window: Clone> Default for ShiftOptions<Element, Window> {
     fn default() -> Self {
         Self {

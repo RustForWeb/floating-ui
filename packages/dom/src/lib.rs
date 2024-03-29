@@ -52,6 +52,26 @@ pub struct ComputePositionConfig {
     pub middleware: Option<MiddlewareVec>,
 }
 
+impl ComputePositionConfig {
+    /// Set `placement` option.
+    pub fn placement(mut self, value: Placement) -> Self {
+        self.placement = Some(value);
+        self
+    }
+
+    /// Set `strategy` option.
+    pub fn strategy(mut self, value: Strategy) -> Self {
+        self.strategy = Some(value);
+        self
+    }
+
+    /// Set `middleware` option.
+    pub fn middleware(mut self, value: MiddlewareVec) -> Self {
+        self.middleware = Some(value);
+        self
+    }
+}
+
 /// Computes the `x` and `y` coordinates that will place the floating element next to a given reference element.
 pub fn compute_position(
     reference: &Element,

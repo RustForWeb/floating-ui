@@ -171,6 +171,41 @@ pub struct ComputePositionConfig<'a, Element, Window> {
     pub middleware: Option<Vec<Box<dyn Middleware<Element, Window>>>>,
 }
 
+impl<'a, Element, Window> ComputePositionConfig<'a, Element, Window> {
+    pub fn new(platform: &'a dyn Platform<Element, Window>) -> Self {
+        ComputePositionConfig {
+            platform,
+            placement: None,
+            strategy: None,
+            middleware: None,
+        }
+    }
+
+    /// Set `platform` option.
+    pub fn platform(mut self, value: &'a dyn Platform<Element, Window>) -> Self {
+        self.platform = value;
+        self
+    }
+
+    /// Set `placement` option.
+    pub fn placement(mut self, value: Placement) -> Self {
+        self.placement = Some(value);
+        self
+    }
+
+    /// Set `strategy` option.
+    pub fn strategy(mut self, value: Strategy) -> Self {
+        self.strategy = Some(value);
+        self
+    }
+
+    /// Set `middleware` option.
+    pub fn middleware(mut self, value: Vec<Box<dyn Middleware<Element, Window>>>) -> Self {
+        self.middleware = Some(value);
+        self
+    }
+}
+
 /// Return of [`compute_position`][crate::compute_position::compute_position].
 #[derive(Clone, Debug)]
 pub struct ComputePositionReturn {

@@ -23,6 +23,31 @@ where
     pub padding: Option<Padding>,
 }
 
+impl<Descriptor, Element> ArrowOptions<Descriptor, Element>
+where
+    Descriptor: ElementDescriptor + Deref<Target = Element> + Clone + 'static,
+    Element: Deref<Target = web_sys::HtmlElement>,
+{
+    pub fn new(element: NodeRef<Descriptor>) -> Self {
+        ArrowOptions {
+            element,
+            padding: None,
+        }
+    }
+
+    /// Set `element` option.
+    pub fn element(mut self, value: NodeRef<Descriptor>) -> Self {
+        self.element = value;
+        self
+    }
+
+    /// Set `padding` option.
+    pub fn padding(mut self, value: Padding) -> Self {
+        self.padding = Some(value);
+        self
+    }
+}
+
 /// Provides data to position an inner element of the floating element so that it appears centered to the reference element.
 ///
 /// See <https://floating-ui.com/docs/arrow> for the original documentation.

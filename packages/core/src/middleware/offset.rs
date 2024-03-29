@@ -90,6 +90,26 @@ pub struct OffsetOptionsValues {
     pub alignment_axis: Option<f64>,
 }
 
+impl OffsetOptionsValues {
+    /// Set `main_axis` option.
+    pub fn main_axis(mut self, value: f64) -> Self {
+        self.main_axis = Some(value);
+        self
+    }
+
+    /// Set `cross_axis` option.
+    pub fn cross_axis(mut self, value: f64) -> Self {
+        self.cross_axis = Some(value);
+        self
+    }
+
+    /// Set `alignment_axis` option.
+    pub fn alignment_axis(mut self, value: f64) -> Self {
+        self.alignment_axis = Some(value);
+        self
+    }
+}
+
 /// Options for [`Offset`] middleware.
 ///
 /// A number (shorthand for [`main_axis`][`OffsetOptionsValues::main_axis`] or distance) or an axes configuration ([`OffsetOptionsValues`]).

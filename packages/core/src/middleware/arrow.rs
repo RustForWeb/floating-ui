@@ -24,6 +24,27 @@ pub struct ArrowOptions<Element: Clone> {
     pub padding: Option<Padding>,
 }
 
+impl<Element: Clone> ArrowOptions<Element> {
+    pub fn new(element: Element) -> Self {
+        ArrowOptions {
+            element,
+            padding: None,
+        }
+    }
+
+    /// Set `element` option.
+    pub fn element(mut self, value: Element) -> Self {
+        self.element = value;
+        self
+    }
+
+    /// Set `padding` option.
+    pub fn padding(mut self, value: Padding) -> Self {
+        self.padding = Some(value);
+        self
+    }
+}
+
 /// Data stored by [`Arrow`] middleware.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ArrowData {

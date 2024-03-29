@@ -31,7 +31,7 @@ fn observe_move(_element: &Element, _on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
     Box::new(|| {})
 }
 
-/// Options for [`auto_update``].
+/// Options for [`auto_update`].
 #[derive(Clone, Debug, Default)]
 pub struct AutoUpdateOptions {
     /// Whether to update the position when an overflow ancestor is scrolled.
@@ -62,31 +62,31 @@ pub struct AutoUpdateOptions {
 }
 
 impl AutoUpdateOptions {
-    /// Set [`Self::ancestor_scroll`] option.
+    /// Set `ancestor_scroll` option.
     pub fn ancestor_scroll(mut self, value: bool) -> Self {
         self.ancestor_scroll = Some(value);
         self
     }
 
-    /// Set [`Self::ancestor_resize`] option.
+    /// Set `ancestor_resize` option.
     pub fn ancestor_resize(mut self, value: bool) -> Self {
         self.ancestor_resize = Some(value);
         self
     }
 
-    /// Set [`Self::element_resize`] option.
+    /// Set `element_resize` option.
     pub fn element_resize(mut self, value: bool) -> Self {
         self.element_resize = Some(value);
         self
     }
 
-    /// Set [`Self::layout_shift`] option.
+    /// Set `layout_shift` option.
     pub fn layout_shift(mut self, value: bool) -> Self {
         self.layout_shift = Some(value);
         self
     }
 
-    /// Set [`Self::animation_frame`] option.
+    /// Set `animation_frame` option.
     pub fn animation_frame(mut self, value: bool) -> Self {
         self.animation_frame = Some(value);
         self

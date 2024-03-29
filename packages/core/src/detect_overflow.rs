@@ -37,6 +37,38 @@ pub struct DetectOverflowOptions<Element> {
     pub padding: Option<Padding>,
 }
 
+impl<Element> DetectOverflowOptions<Element> {
+    /// Set `boundary` option.
+    pub fn boundary(mut self, value: Boundary<Element>) -> Self {
+        self.boundary = Some(value);
+        self
+    }
+
+    /// Set `root_boundary` option.
+    pub fn root_boundary(mut self, value: RootBoundary) -> Self {
+        self.root_boundary = Some(value);
+        self
+    }
+
+    /// Set `element_context` option.
+    pub fn element_context(mut self, value: ElementContext) -> Self {
+        self.element_context = Some(value);
+        self
+    }
+
+    /// Set `alt_boundary` option.
+    pub fn alt_boundary(mut self, value: bool) -> Self {
+        self.alt_boundary = Some(value);
+        self
+    }
+
+    /// Set `padding` option.
+    pub fn padding(mut self, value: Padding) -> Self {
+        self.padding = Some(value);
+        self
+    }
+}
+
 impl<Element> Default for DetectOverflowOptions<Element> {
     fn default() -> Self {
         Self {

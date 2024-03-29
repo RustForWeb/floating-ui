@@ -63,6 +63,50 @@ pub struct FlipOptions<Element: Clone> {
     pub flip_alignment: Option<bool>,
 }
 
+impl<Element: Clone> FlipOptions<Element> {
+    /// Set `detect_overflow` option.
+    pub fn detect_overflow(mut self, value: DetectOverflowOptions<Element>) -> Self {
+        self.detect_overflow = Some(value);
+        self
+    }
+
+    /// Set `main_axis` option.
+    pub fn main_axis(mut self, value: bool) -> Self {
+        self.main_axis = Some(value);
+        self
+    }
+
+    /// Set `cross_axis` option.
+    pub fn cross_axis(mut self, value: bool) -> Self {
+        self.cross_axis = Some(value);
+        self
+    }
+
+    /// Set `fallback_placements` option.
+    pub fn fallback_placements(mut self, value: Vec<Placement>) -> Self {
+        self.fallback_placements = Some(value);
+        self
+    }
+
+    /// Set `cross_axis` option.
+    pub fn fallback_strategy(mut self, value: FallbackStrategy) -> Self {
+        self.fallback_strategy = Some(value);
+        self
+    }
+
+    /// Set `fallback_axis_side_direction` option.
+    pub fn fallback_axis_side_direction(mut self, value: Alignment) -> Self {
+        self.fallback_axis_side_direction = Some(value);
+        self
+    }
+
+    /// Set `flip_alignment` option.
+    pub fn flip_alignment(mut self, value: bool) -> Self {
+        self.flip_alignment = Some(value);
+        self
+    }
+}
+
 impl<Element: Clone> Default for FlipOptions<Element> {
     fn default() -> Self {
         Self {

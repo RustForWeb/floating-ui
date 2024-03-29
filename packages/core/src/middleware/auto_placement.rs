@@ -92,6 +92,38 @@ pub struct AutoPlacementOptions<Element: Clone> {
     pub allowed_placements: Option<Vec<Placement>>,
 }
 
+impl<Element: Clone> AutoPlacementOptions<Element> {
+    /// Set `detect_overflow` option.
+    pub fn detect_overflow(mut self, value: DetectOverflowOptions<Element>) -> Self {
+        self.detect_overflow = Some(value);
+        self
+    }
+
+    /// Set `cross_axis` option.
+    pub fn cross_axis(mut self, value: bool) -> Self {
+        self.cross_axis = Some(value);
+        self
+    }
+
+    /// Set `alignment` option.
+    pub fn alignment(mut self, value: Alignment) -> Self {
+        self.alignment = Some(value);
+        self
+    }
+
+    /// Set `auto_alignment` option.
+    pub fn auto_alignment(mut self, value: bool) -> Self {
+        self.auto_alignment = Some(value);
+        self
+    }
+
+    /// Set `alignment` option.
+    pub fn allowed_placements(mut self, value: Vec<Placement>) -> Self {
+        self.allowed_placements = Some(value);
+        self
+    }
+}
+
 impl<Element: Clone> Default for AutoPlacementOptions<Element> {
     fn default() -> Self {
         Self {

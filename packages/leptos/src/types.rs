@@ -46,25 +46,25 @@ pub struct UseFloatingOptions {
 }
 
 impl UseFloatingOptions {
-    /// Set [`Self::open`] option.
+    /// Set `open` option.
     pub fn open(mut self, value: MaybeProp<bool>) -> Self {
         self.open = value;
         self
     }
 
-    /// Set [`Self::placement`] option.
+    /// Set `placement` option.
     pub fn placement(mut self, value: MaybeProp<Placement>) -> Self {
         self.placement = value;
         self
     }
 
-    /// Set [`Self::strategy`] option.
+    /// Set `strategy` option.
     pub fn strategy(mut self, value: MaybeProp<Strategy>) -> Self {
         self.strategy = value;
         self
     }
 
-    /// Set [`Self::middleware`] option.
+    /// Set `middleware` option.
     pub fn middleware(
         mut self,
         value: MaybeProp<Vec<Box<dyn Middleware<Element, Window>>>>,
@@ -73,18 +73,19 @@ impl UseFloatingOptions {
         self
     }
 
-    /// Set [`Self::transform`] option.
+    /// Set `transform` option.
     pub fn transform(mut self, value: MaybeProp<bool>) -> Self {
         self.transform = value;
         self
     }
 
-    /// Set [`Self::while_elements_mounted`] option.
+    /// Set `while_elements_mounted` option.
     pub fn while_elements_mounted(mut self, value: Rc<WhileElementsMountedFn>) -> Self {
         self.while_elements_mounted = Some(value);
         self
     }
 
+    /// Set `while_elements_mounted` option to [`auto_update`] with [`AutoUpdateOptions::default`].
     pub fn while_elements_mounted_auto_update(self) -> Self {
         self.while_elements_mounted(Rc::new(|reference, floating, update| {
             auto_update(
