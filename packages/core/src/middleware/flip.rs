@@ -88,7 +88,7 @@ impl<Element: Clone> FlipOptions<Element> {
         self
     }
 
-    /// Set `cross_axis` option.
+    /// Set `fallback_strategy` option.
     pub fn fallback_strategy(mut self, value: FallbackStrategy) -> Self {
         self.fallback_strategy = Some(value);
         self

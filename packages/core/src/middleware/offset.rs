@@ -11,9 +11,6 @@ use crate::{
     },
 };
 
-/// Name of the [`Offset`] middleware.
-pub const OFFSET_NAME: &str = "offset";
-
 fn convert_value_to_coords<Element, Window>(
     state: MiddlewareState<Element, Window>,
     options: &OffsetOptions,
@@ -67,6 +64,9 @@ fn convert_value_to_coords<Element, Window>(
         },
     }
 }
+
+/// Name of the [`Offset`] middleware.
+pub const OFFSET_NAME: &str = "offset";
 
 /// Axes configuration for [`OffsetOptions`].
 #[derive(Clone, Default, Debug)]

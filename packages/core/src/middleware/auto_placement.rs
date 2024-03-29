@@ -12,9 +12,6 @@ use crate::{
     },
 };
 
-/// Name of the [`AutoPlacement`] middleware.
-pub const AUTO_PLACEMENT_NAME: &str = "autoPlacement";
-
 fn get_placement_list(
     alignment: Option<Alignment>,
     auto_alignment: bool,
@@ -62,6 +59,9 @@ fn get_placement_list(
         })
         .collect()
 }
+
+/// Name of the [`AutoPlacement`] middleware.
+pub const AUTO_PLACEMENT_NAME: &str = "autoPlacement";
 
 /// Options for [`AutoPlacement`] middleware.
 #[derive(Clone, Debug)]

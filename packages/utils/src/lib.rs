@@ -165,7 +165,7 @@ impl Dimensions {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SideObject {
     pub top: f64,
     pub right: f64,
@@ -339,6 +339,8 @@ pub const ALL_PLACEMENTS: [Placement; 12] = [
     Placement::LeftStart,
     Placement::LeftEnd,
 ];
+
+pub const ALL_SIDES: [Side; 4] = [Side::Top, Side::Right, Side::Bottom, Side::Left];
 
 pub fn clamp(start: f64, value: f64, end: f64) -> f64 {
     value.min(end).max(start)
