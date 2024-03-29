@@ -4,8 +4,8 @@ use floating_ui_dom::{
     compute_position, ComputePositionConfig, MiddlewareData, Placement, Strategy,
 };
 use leptos::{
-    create_effect, create_memo, create_rw_signal, create_signal, html::ElementDescriptor, watch,
-    NodeRef, SignalGet, SignalGetUntracked, SignalUpdate,
+    create_effect, create_memo, create_rw_signal, create_signal, html::ElementDescriptor,
+    on_cleanup, watch, NodeRef, SignalGet, SignalGetUntracked, SignalUpdate,
 };
 
 use crate::{
@@ -115,11 +115,13 @@ where
             while_elements_mounted_cleanup();
         }
     };
+    let cleanup_rc = Rc::new(cleanup);
 
     let attach_update_rc = update_rc.clone();
+    let attach_cleanup_rc = cleanup_rc.clone();
     let attach_while_elements_mounted_cleanup = while_elements_mounted_cleanup.clone();
     let attach = move || {
-        cleanup();
+        attach_cleanup_rc();
 
         if let Some(while_elements_mounted) = &options.while_elements_mounted {
             if let Some(reference_element) = reference.get() {
@@ -188,7 +190,9 @@ where
         false,
     );
 
-    // TODO: call cleanup on unmount?
+    on_cleanup(move || {
+        cleanup_rc();
+    });
 
     UseFloatingReturn {
         x: x.into(),
