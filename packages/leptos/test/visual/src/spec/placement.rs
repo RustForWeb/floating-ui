@@ -29,12 +29,9 @@ pub fn Placement() -> impl IntoView {
         <p>
             The floating element should be correctly positioned when given each of the 12 placements.
         </p>
-        <div class="container" style=move || {
-                log::info!("rtl {}", rtl());
-                match rtl() {
-                    true => "direction: rtl;",
-                    false => "direction: ltr;",
-                }
+        <div class="container" style=move || match rtl() {
+                true => "direction: rtl;",
+                false => "direction: ltr;",
             }>
             <div _ref=reference class="reference">
                 Reference
