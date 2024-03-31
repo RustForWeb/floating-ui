@@ -16,12 +16,14 @@ jobs:
         runs-on: ${{ matrix.os}}
 
         steps:
-            - uses: actions/checkout@v4
+            - name: Checkout
+              uses: actions/checkout@v4
 
-            - name: Setup Rust toolchain
+            - name: Set up Rust toolchain
               run: rustup toolchain install nightly --no-self-update --profile default --target wasm32-unknown-unknown
 
-            - uses: swatinem/rust-cache@v2
+            - name: Set up Rust cache
+              uses: swatinem/rust-cache@v2
               with:
                   save-if: ${{ github.ref == 'refs/heads/main' }}
 
@@ -30,6 +32,14 @@ jobs:
 
             - name: Lint
               run: cargo clippy --all-features
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 'lts/*'
+
+            - name: Set up pnpm
+              uses: pnpm/action-setup@v3
 
             - name: Test
               run: cargo test --all-features
