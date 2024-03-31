@@ -209,12 +209,16 @@ pub fn auto_update(
                 resize_observer
                     .borrow()
                     .as_ref()
-                    .unwrap()
+                    .expect("Resize observer should exist.")
                     .observe(reference);
             }
         }
 
-        resize_observer.borrow().as_ref().unwrap().observe(floating);
+        resize_observer
+            .borrow()
+            .as_ref()
+            .expect("Resize observer should exist.")
+            .observe(floating);
     }
 
     let frame_id: Rc<RefCell<Option<i32>>> = Rc::new(RefCell::new(None));
@@ -242,12 +246,20 @@ pub fn auto_update(
 
         prev_ref_rect = Some(next_ref_rect);
         frame_loop_frame_id.replace(Some(request_animation_frame(
-            frame_loop_closure.borrow().as_ref().unwrap(),
+            frame_loop_closure
+                .borrow()
+                .as_ref()
+                .expect("Frame loop closure should exist."),
         )));
     }));
 
     if animation_frame {
-        request_animation_frame(frame_loop_closure_clone.borrow().as_ref().unwrap());
+        request_animation_frame(
+            frame_loop_closure_clone
+                .borrow()
+                .as_ref()
+                .expect("Frame loop closure should exist."),
+        );
     }
 
     Box::new(move || {

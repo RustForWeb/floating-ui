@@ -18,7 +18,7 @@ pub struct UseScrollOptions {
 
 pub struct UseScrollReturn {
     pub scroll_ref: NodeRef<Div>,
-    pub indicator: Box<dyn Fn() -> HtmlElement<Div>>,
+    pub indicator: Rc<dyn Fn() -> HtmlElement<Div>>,
 }
 
 pub fn use_scroll(
@@ -128,17 +128,17 @@ pub fn use_scroll(
             <div
                 _ref=indicator_floating_ref
                 class="scroll-indicator"
-                style:position=move || format!("{:?}", strategy())
-                style:top=move || format!("{}px", y())
-                style:left=move || format!("{}px", x())
+                style:position=format!("{:?}", strategy())
+                style:top=format!("{}px", y())
+                style:left=format!("{}px", x())
             >
-                {move || scroll().map_or("x: null, y: null".into(), |scroll| format!("x: {}, y: {}", scroll.0, scroll.1))}
+                {scroll().map_or("x: null, y: null".into(), |scroll| format!("x: {}, y: {}", scroll.0, scroll.1))}
             </div>
         }
     };
 
     UseScrollReturn {
         scroll_ref,
-        indicator: Box::new(indicator),
+        indicator: Rc::new(indicator),
     }
 }

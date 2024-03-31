@@ -4,7 +4,7 @@ use floating_ui_leptos::{
     OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side, UseFloatingOptions,
     UseFloatingReturn, ARROW_NAME,
 };
-use leptos::{html::Div, svg::Svg, *};
+use leptos::{html::Div, *};
 
 use crate::utils::{
     all_placements::ALL_PLACEMENTS,

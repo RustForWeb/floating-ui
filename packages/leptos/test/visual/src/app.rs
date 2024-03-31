@@ -4,6 +4,7 @@ use leptos_router::{Outlet, Route, Router, Routes, A};
 use crate::spec::arrow::Arrow;
 use crate::spec::placement::Placement;
 use crate::spec::relative::Relative;
+use crate::spec::scroll::Scroll;
 use crate::utils::new::New;
 
 const ROUTES: [&str; 23] = [
@@ -55,7 +56,7 @@ pub fn AppWrapper() -> impl IntoView {
                         children=move |path| {
                             view! {
                                 <A href=format!("/{path}") class="nav-link">
-                                    {path.replace('-', "")}
+                                    {path.replace('-', " ")}
                                 </A>
                             }
                         }
@@ -90,6 +91,9 @@ pub fn App() -> impl IntoView {
                     <Route path="new" view=New />
                     <Route path="placement" view=Placement />
                     <Route path="relative" view=Relative />
+                    // <Route path="transform" view=Transform />
+                    // <Route path="border" view=Border />
+                    <Route path="scroll" view=Scroll />
 
                     <Route path="arrow" view=Arrow />
                 </Route>
