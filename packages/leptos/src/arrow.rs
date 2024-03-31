@@ -84,7 +84,7 @@ where
         &self,
         state: MiddlewareState<web_sys::Element, web_sys::Window>,
     ) -> MiddlewareReturn {
-        let element = self.options.element.get();
+        let element = self.options.element.get_untracked();
 
         if let Some(element) = element {
             let element: &web_sys::Element = &element;

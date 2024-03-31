@@ -6,8 +6,8 @@ use crate::utils::{all_placements::ALL_PLACEMENTS, use_size::use_size};
 
 #[component]
 pub fn Placement() -> impl IntoView {
-    let reference = create_node_ref::<Div>();
-    let floating = create_node_ref::<Div>();
+    let reference_ref = create_node_ref::<Div>();
+    let floating_ref = create_node_ref::<Div>();
 
     let (rtl, set_rtl) = create_signal(false);
     let (placement, set_placement) = create_signal(Placement::Bottom);
@@ -16,8 +16,8 @@ pub fn Placement() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference,
-        floating,
+        reference_ref,
+        floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())
             .while_elements_mounted_auto_update(),
@@ -30,13 +30,13 @@ pub fn Placement() -> impl IntoView {
             The floating element should be correctly positioned when given each of the 12 placements.
         </p>
         <div class="container" style=move || match rtl() {
-                true => "direction: rtl;",
-                false => "direction: ltr;",
-            }>
-            <div _ref=reference class="reference">
+            true => "direction: rtl;",
+            false => "direction: ltr;",
+        }>
+            <div _ref=reference_ref class="reference">
                 Reference
             </div>
-            <div _ref=floating class="floating" style=move || format!("{} width: {}px; height: {}px;", String::from(floating_styles()), size(), size())>
+            <div _ref=floating_ref class="floating" style=move || format!("{} width: {}px; height: {}px;", String::from(floating_styles()), size(), size())>
                 Floating
             </div>
         </div>
@@ -76,7 +76,7 @@ pub fn Placement() -> impl IntoView {
 
         <h2>RTL</h2>
         <div class="controls">
-                <For
+            <For
                 each=|| [true, false]
                 key=|value| format!("{}", value)
                 children=move |value| {

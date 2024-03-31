@@ -1,11 +1,36 @@
 use leptos::*;
 use leptos_router::{Outlet, Route, Router, Routes, A};
 
+use crate::spec::arrow::Arrow;
 use crate::spec::placement::Placement;
 use crate::spec::relative::Relative;
 use crate::utils::new::New;
 
-const ROUTES: [&str; 2] = ["placement", "relative"];
+const ROUTES: [&str; 23] = [
+    "placement",
+    "relative",
+    "transform",
+    "border",
+    "scroll",
+    "decimal-size",
+    "table",
+    "scrollbars",
+    "shift",
+    "flip",
+    "size",
+    "arrow",
+    "offset",
+    "hide",
+    "autoPlacement",
+    "inline",
+    "AutoUpdate",
+    "shadom-DOM",
+    "containing-block",
+    "virtual-element",
+    "perf",
+    "iframe",
+    "top-layer",
+];
 
 #[component]
 pub fn AppWrapper() -> impl IntoView {
@@ -65,6 +90,8 @@ pub fn App() -> impl IntoView {
                     <Route path="new" view=New />
                     <Route path="placement" view=Placement />
                     <Route path="relative" view=Relative />
+
+                    <Route path="arrow" view=Arrow />
                 </Route>
             </Routes>
         </Router>
