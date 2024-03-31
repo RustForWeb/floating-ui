@@ -40,6 +40,10 @@ jobs:
               with:
                   version: 'latest'
 
+            - name: Install Playwright
+              run: npx playwright install --with-deps chromium
+              shell: sh
+
             - name: Check formatting
               run: cargo fmt --all --check
 
@@ -48,3 +52,10 @@ jobs:
 
             - name: Test
               run: cargo test --all-features
+
+            - name: Upload visual snapshot diffs
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: visual-snapshots-diff
+                  path: target/tmp/floating-ui/packages/dom/test-results
