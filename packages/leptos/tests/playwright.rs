@@ -5,8 +5,7 @@ pub fn playwright() {
     let repository_url = "https://github.com/floating-ui/floating-ui";
     let repository_path = Path::new(env!("CARGO_TARGET_TMPDIR")).join("floating-ui");
     let repository_dom_path = repository_path.join("packages/dom");
-    let repository_playwright_config_path =
-        repository_dom_path.join("packages/dom/playwright.config.ts");
+    let repository_playwright_config_path = repository_dom_path.join("playwright.config.ts");
 
     let visual_test_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("test/visual");
 
