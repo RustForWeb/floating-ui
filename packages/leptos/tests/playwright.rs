@@ -7,7 +7,7 @@ pub fn playwright() {
     let repository_dom_path = repository_path.join("packages/dom");
     let repository_playwright_config_path = repository_dom_path.join("playwright.config.ts");
 
-    let visual_test_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("test/visual");
+    let visual_test_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/visual");
 
     if !repository_path.exists() {
         let status = Command::new("git")
