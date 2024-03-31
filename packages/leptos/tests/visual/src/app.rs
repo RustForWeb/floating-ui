@@ -2,6 +2,7 @@ use leptos::*;
 use leptos_router::{Outlet, Route, Router, Routes, A};
 
 use crate::spec::arrow::Arrow;
+use crate::spec::auto_placement::AutoPlacement;
 use crate::spec::placement::Placement;
 use crate::spec::relative::Relative;
 use crate::spec::scroll::Scroll;
@@ -96,6 +97,7 @@ pub fn App() -> impl IntoView {
                     <Route path="scroll" view=Scroll />
 
                     <Route path="arrow" view=Arrow />
+                    <Route path="autoPlacement" view=AutoPlacement />
                 </Route>
             </Routes>
         </Router>
