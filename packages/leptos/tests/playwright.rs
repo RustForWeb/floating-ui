@@ -16,16 +16,31 @@ pub fn playwright() {
             .arg(repository_path.clone())
             .status()
             .expect("Cloning Git repository failed.");
-
         assert!(status.success(), "Cloning Git repository failed.");
+    } else {
+        let status = Command::new("git")
+            .arg("reset")
+            .arg("--hard")
+            .current_dir(repository_path.clone())
+            .status()
+            .expect("Git reset failed.");
+        assert!(status.success(), "Git reset failed.");
 
-        let config_path = repository_path.join("packages/dom/playwright.config.ts");
-        let mut config_content = fs::read_to_string(config_path.clone())
-            .expect("Reading Playwright config file failed.");
+        let status = Command::new("git")
+            .arg("pull")
+            .current_dir(repository_path.clone())
+            .status()
+            .expect("Git pull failed.");
+        assert!(status.success(), "Git pull failed.");
+    }
 
-        config_content = config_content.replace("retries: 3,", "retries: 0,");
+    let config_path = repository_path.join("packages/dom/playwright.config.ts");
+    let mut config_content =
+        fs::read_to_string(config_path.clone()).expect("Reading Playwright config file failed.");
 
-        config_content = config_content.replace(
+    config_content = config_content
+        .replace("retries: 3,", "retries: 0,")
+        .replace(
             "command: 'pnpm run dev',",
             &format!(
                 "command: 'trunk serve --port 1234',\n    cwd: '{}',\n    stdout: 'pipe',",
@@ -36,16 +51,7 @@ pub fn playwright() {
             ),
         );
 
-        // let start = config_content
-        //     .find("webServer")
-        //     .expect("Playwright config does not contain `webServer` section.");
-        // let end = config_content[start..]
-        //     .find("},")
-        //     .expect("Playwright config doest not contain end of `webServer` section.");
-        // config_content.replace_range(start..start + end + 2, "");
-
-        fs::write(config_path, config_content).expect("Writing Playwright config file failed.");
-    }
+    fs::write(config_path, config_content).expect("Writing Playwright config file failed.");
 
     let status = Command::new("pnpm")
         .arg("install")
@@ -63,6 +69,20 @@ pub fn playwright() {
         .status()
         .expect("Build failed.");
     assert!(status.success(), "Build failed.");
+
+    if env::var("CI")
+        .unwrap_or("false".into())
+        .parse::<bool>()
+        .unwrap_or(false)
+    {
+        let status = Command::new("npx")
+            .arg("playwright")
+            .arg("install")
+            .current_dir(dom_path.clone())
+            .status()
+            .expect("Playwright install failed.");
+        assert!(status.success(), "Playwright install failed.");
+    }
 
     let status = Command::new("pnpm")
         .arg("run")

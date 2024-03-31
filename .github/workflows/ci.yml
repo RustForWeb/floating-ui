@@ -40,10 +40,6 @@ jobs:
               with:
                   version: 'latest'
 
-            - name: Install Playwright
-              run: npx playwright install --with-deps chromium
-              shell: sh
-
             - name: Check formatting
               run: cargo fmt --all --check
 
