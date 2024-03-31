@@ -5,18 +5,18 @@ use leptos::{html::Div, *};
 use crate::utils::use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
-enum NodeType {
+enum Node {
     ReferenceScrollParent,
     FloatingScrollParent,
     SameScrollParent,
     Body,
 }
 
-const ALL_NODE_TYPES: [NodeType; 4] = [
-    NodeType::ReferenceScrollParent,
-    NodeType::FloatingScrollParent,
-    NodeType::SameScrollParent,
-    NodeType::Body,
+const ALL_NODES: [Node; 4] = [
+    Node::ReferenceScrollParent,
+    Node::FloatingScrollParent,
+    Node::SameScrollParent,
+    Node::Body,
 ];
 const ALL_STRATEGIES: [Strategy; 2] = [Strategy::Absolute, Strategy::Fixed];
 
@@ -26,7 +26,7 @@ pub fn Scroll() -> impl IntoView {
     let floating_ref = create_node_ref::<Div>();
 
     let (strategy, set_strategy) = create_signal(Strategy::Absolute);
-    let (node_type, set_node_type) = create_signal(NodeType::ReferenceScrollParent);
+    let (node, set_node) = create_signal(Node::ReferenceScrollParent);
 
     let UseFloatingReturn { x, y, update, .. } = use_floating(
         reference_ref,
@@ -49,8 +49,8 @@ pub fn Scroll() -> impl IntoView {
             <div
                 _ref=reference_ref
                 class="reference"
-                style=move || match node_type() {
-                    NodeType::FloatingScrollParent => "position: relative; top: -350px;",
+                style=move || match node() {
+                    Node::FloatingScrollParent => "position: relative; top: -350px;",
                     _ => ""
                 }
             >
@@ -80,7 +80,7 @@ pub fn Scroll() -> impl IntoView {
         </p>
         <div class="container">
             <Show
-                when=move || node_type() != NodeType::Body
+                when=move || node() != Node::Body
                 fallback=move || view! {
                     {reference_view}
                     {floating_view}
@@ -89,18 +89,18 @@ pub fn Scroll() -> impl IntoView {
                 <div
                     _ref=scroll_ref
                     class="scroll"
-                    style:position=move || match node_type() {
-                        NodeType::FloatingScrollParent | NodeType::SameScrollParent => "relative",
+                    style:position=move || match node() {
+                        Node::FloatingScrollParent | Node::SameScrollParent => "relative",
                         _ => "",
                     }
                 >
                     {indicator.clone()}
-                    <Show when=move || node_type() != NodeType::FloatingScrollParent>
+                    <Show when=move || node() != Node::FloatingScrollParent>
                         {reference_view}
                     </Show>
                     {floating_view}
                 </div>
-                <Show when=move || node_type() == NodeType::FloatingScrollParent>
+                <Show when=move || node() == Node::FloatingScrollParent>
                     {reference_view}
                 </Show>
             </Show>
@@ -129,24 +129,24 @@ pub fn Scroll() -> impl IntoView {
         <h3>Node</h3>
         <div class="controls">
             <For
-                each=|| ALL_NODE_TYPES
-                key=|local_node_type| format!("{:?}", local_node_type)
-                children=move |local_node_type| view! {
+                each=|| ALL_NODES
+                key=|local_node| format!("{:?}", local_node)
+                children=move |local_node| view! {
                     <button
-                        data-testid=move || format!("Scroll{:?}", local_node_type).to_case(Case::Camel)
-                        style:background-color=move || match node_type() == local_node_type {
+                        data-testid=move || format!("Scroll{:?}", local_node).to_case(Case::Camel)
+                        style:background-color=move || match node() == local_node {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_node_type(local_node_type)
+                        on:click=move |_| set_node(local_node)
                     >
-                        {format!("{:?}", local_node_type).to_case(Case::Camel)}
+                        {format!("{:?}", local_node).to_case(Case::Camel)}
                     </button>
                 }
             />
         </div>
 
-        <Show when=move || node_type() == NodeType::Body>
+        <Show when=move || node() == Node::Body>
             <div style:width="1px" style:height="1500px" />
         </Show>
     }
