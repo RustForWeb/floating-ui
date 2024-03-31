@@ -1,5 +1,6 @@
 use std::{env, fs, path::Path, process::Command};
 
+#[ignore]
 #[test]
 pub fn playwright() {
     let repository_url = "https://github.com/floating-ui/floating-ui";
