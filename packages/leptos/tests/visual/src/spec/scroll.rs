@@ -113,7 +113,7 @@ pub fn Scroll() -> impl IntoView {
                 key=|local_strategy| format!("{:?}", local_strategy)
                 children=move |local_strategy| view! {
                     <button
-                        data-testid=move || format!("Stategy{:?}", local_strategy).to_case(Case::Kebab)
+                        data-testid=move || format!("Strategy{:?}", local_strategy).to_case(Case::Kebab)
                         style:background-color=move || match strategy() == local_strategy {
                             true => "black",
                             false => ""
@@ -133,7 +133,7 @@ pub fn Scroll() -> impl IntoView {
                 key=|local_node| format!("{:?}", local_node)
                 children=move |local_node| view! {
                     <button
-                        data-testid=move || format!("Scroll{:?}", local_node).to_case(Case::Camel)
+                        data-testid=move || format!("scroll-{}", format!("{:?}", local_node).to_case(Case::Camel))
                         style:background-color=move || match node() == local_node {
                             true => "black",
                             false => ""
