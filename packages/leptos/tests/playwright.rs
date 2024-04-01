@@ -96,6 +96,8 @@ pub fn playwright() {
         let status = Command::new("npx")
             .arg("playwright")
             .arg("install")
+            .arg("--with-deps")
+            .arg("chromium")
             .current_dir(repository_dom_path.clone())
             .status()
             .expect("Playwright install failed.");
