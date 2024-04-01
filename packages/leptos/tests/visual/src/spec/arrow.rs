@@ -69,12 +69,24 @@ pub fn Arrow() -> impl IntoView {
     let arrow_y = move || arrow_data().and_then(|arrow_data| arrow_data.y);
     let center_offset_value = move || arrow_data().map(|arrow_data| arrow_data.center_offset);
 
-    let UseScrollReturn { scroll_ref, .. } = use_scroll(UseScrollOptions {
+    let UseScrollReturn {
+        scroll_ref,
+        update_scroll,
+        ..
+    } = use_scroll(UseScrollOptions {
         reference_ref,
         floating_ref,
         update,
         rtl: None,
     });
+
+    // Match React test behaviour
+    let placement_update_scroll = update_scroll.clone();
+    let padding_update_scroll = update_scroll.clone();
+    let add_offset_update_scroll = update_scroll.clone();
+    _ = watch(placement, move |_, _, _| placement_update_scroll(), false);
+    _ = watch(padding, move |_, _, _| padding_update_scroll(), false);
+    _ = watch(add_offset, move |_, _, _| add_offset_update_scroll(), false);
 
     view! {
         <h1>Arrow</h1>

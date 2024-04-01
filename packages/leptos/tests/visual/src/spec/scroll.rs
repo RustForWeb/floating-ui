@@ -37,6 +37,7 @@ pub fn Scroll() -> impl IntoView {
     let UseScrollReturn {
         scroll_ref,
         indicator,
+        ..
     } = use_scroll(UseScrollOptions {
         reference_ref,
         floating_ref,

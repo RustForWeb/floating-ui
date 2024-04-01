@@ -19,6 +19,7 @@ pub struct UseScrollOptions {
 pub struct UseScrollReturn {
     pub scroll_ref: NodeRef<Div>,
     pub indicator: Rc<dyn Fn() -> HtmlElement<Div>>,
+    pub update_scroll: Rc<dyn Fn()>,
 }
 
 pub fn use_scroll(
@@ -60,6 +61,7 @@ pub fn use_scroll(
 
     let (ancestors, set_ancestors) = create_signal::<Vec<OverflowAncestor>>(vec![]);
     let (scroll, set_scroll) = create_signal::<Option<(i32, i32)>>(None);
+    let is_update_required = create_rw_signal(false);
 
     let local_update_update = update.clone();
     let local_update_indicator_update = indicator_update_rc.clone();
@@ -74,6 +76,10 @@ pub fn use_scroll(
 
     let effect_local_update = local_update.clone();
     create_effect(move |_| {
+        if is_update_required.get() {
+            is_update_required.set_untracked(false);
+        }
+
         if let Some(reference) = reference_ref() {
             let mut ancestors = get_overflow_ancestors(&reference, vec![], true);
 
@@ -137,8 +143,13 @@ pub fn use_scroll(
         }
     };
 
+    let update_scroll = move || {
+        is_update_required.set(true);
+    };
+
     UseScrollReturn {
         scroll_ref,
         indicator: Rc::new(indicator),
+        update_scroll: Rc::new(update_scroll),
     }
 }
