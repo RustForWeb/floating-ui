@@ -3,6 +3,7 @@ pub mod auto_placement;
 pub mod auto_update;
 pub mod border;
 pub mod containing_block;
+pub mod offset;
 pub mod placement;
 pub mod relative;
 pub mod scroll;

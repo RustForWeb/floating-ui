@@ -148,7 +148,12 @@ impl<'a, Element: Clone, Window: Clone> Offset<'a, Element, Window> {
     }
 
     /// Constructs a new instance of this middleware with derivable options.
-    pub fn new_derivable(options: DerivableFn<'a, Element, Window, OffsetOptions>) -> Self {
+    pub fn new_derivable(options: Derivable<'a, Element, Window, OffsetOptions>) -> Self {
+        Offset { options }
+    }
+
+    /// Constructs a new instance of this middleware with derivable options function.
+    pub fn new_derivable_fn(options: DerivableFn<'a, Element, Window, OffsetOptions>) -> Self {
         Offset {
             options: options.into(),
         }

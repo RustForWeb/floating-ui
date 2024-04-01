@@ -70,7 +70,14 @@ impl<'a, Element: Clone, Window: Clone> Arrow<'a, Element, Window> {
     }
 
     /// Constructs a new instance of this middleware with derivable options.
-    pub fn new_derivable(options: DerivableFn<'a, Element, Window, ArrowOptions<Element>>) -> Self {
+    pub fn new_derivable(options: Derivable<'a, Element, Window, ArrowOptions<Element>>) -> Self {
+        Arrow { options }
+    }
+
+    /// Constructs a new instance of this middleware with derivable options function.
+    pub fn new_derivable_fn(
+        options: DerivableFn<'a, Element, Window, ArrowOptions<Element>>,
+    ) -> Self {
         Arrow {
             options: options.into(),
         }

@@ -109,7 +109,14 @@ impl<'a, Element: Clone, Window: Clone> Hide<'a, Element, Window> {
     }
 
     /// Constructs a new instance of this middleware with derivable options.
-    pub fn new_derivable(options: DerivableFn<'a, Element, Window, HideOptions<Element>>) -> Self {
+    pub fn new_derivable(options: Derivable<'a, Element, Window, HideOptions<Element>>) -> Self {
+        Hide { options }
+    }
+
+    /// Constructs a new instance of this middleware with derivable options function.
+    pub fn new_derivable_fn(
+        options: DerivableFn<'a, Element, Window, HideOptions<Element>>,
+    ) -> Self {
         Hide {
             options: options.into(),
         }

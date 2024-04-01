@@ -120,6 +120,13 @@ impl<'a, Element: Clone, Window: Clone> Shift<'a, Element, Window> {
 
     /// Constructs a new instance of this middleware with derivable options.
     pub fn new_derivable(
+        options: Derivable<'a, Element, Window, ShiftOptions<Element, Window>>,
+    ) -> Self {
+        Shift { options }
+    }
+
+    /// Constructs a new instance of this middleware with derivable options function.
+    pub fn new_derivable_fn(
         options: DerivableFn<'a, Element, Window, ShiftOptions<Element, Window>>,
     ) -> Self {
         Shift {

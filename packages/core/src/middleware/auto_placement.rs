@@ -176,6 +176,13 @@ impl<'a, Element: Clone, Window: Clone> AutoPlacement<'a, Element, Window> {
 
     /// Constructs a new instance of this middleware with derivable options.
     pub fn new_derivable(
+        options: Derivable<'a, Element, Window, AutoPlacementOptions<Element>>,
+    ) -> Self {
+        AutoPlacement { options }
+    }
+
+    /// Constructs a new instance of this middleware with derivable options function.
+    pub fn new_derivable_fn(
         options: DerivableFn<'a, Element, Window, AutoPlacementOptions<Element>>,
     ) -> Self {
         AutoPlacement {

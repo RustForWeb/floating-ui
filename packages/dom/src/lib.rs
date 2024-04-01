@@ -14,8 +14,8 @@ pub use crate::auto_update::*;
 pub use crate::middleware::*;
 pub use crate::types::*;
 pub use floating_ui_core::{
-    ComputePositionReturn, Derivable, DetectOverflowOptions, Middleware, MiddlewareData,
-    MiddlewareReturn, MiddlewareState, MiddlewareWithOptions,
+    ComputePositionReturn, Derivable, DerivableFn, DetectOverflowOptions, Middleware,
+    MiddlewareData, MiddlewareReturn, MiddlewareState, MiddlewareWithOptions,
 };
 #[doc(no_inline)]
 pub use floating_ui_utils::{

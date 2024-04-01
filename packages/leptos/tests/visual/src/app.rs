@@ -6,6 +6,7 @@ use crate::spec::auto_placement::AutoPlacement;
 use crate::spec::auto_update::AutoUpdate;
 use crate::spec::border::Border;
 use crate::spec::containing_block::ContainingBlock;
+use crate::spec::offset::Offset;
 use crate::spec::placement::Placement;
 use crate::spec::relative::Relative;
 use crate::spec::scroll::Scroll;
@@ -103,6 +104,7 @@ pub fn App() -> impl IntoView {
                     <Route path="table" view=Table />
 
                     <Route path="arrow" view=Arrow />
+                    <Route path="offset" view=Offset />
                     <Route path="autoPlacement" view=AutoPlacement />
 
                     <Route path="autoUpdate" view=AutoUpdate />
