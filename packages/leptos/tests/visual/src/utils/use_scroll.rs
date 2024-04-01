@@ -128,11 +128,11 @@ pub fn use_scroll(
             <div
                 _ref=indicator_floating_ref
                 class="scroll-indicator"
-                style:position=format!("{:?}", strategy())
-                style:top=format!("{}px", y())
-                style:left=format!("{}px", x())
+                style:position=move || format!("{:?}", strategy())
+                style:top=move || format!("{}px", y())
+                style:left=move || format!("{}px", x())
             >
-                {scroll().map_or("x: null, y: null".into(), |scroll| format!("x: {}, y: {}", scroll.0, scroll.1))}
+                {move || scroll().map_or("x: null, y: null".into(), |scroll| format!("x: {}, y: {}", scroll.0, scroll.1))}
             </div>
         }
     };
