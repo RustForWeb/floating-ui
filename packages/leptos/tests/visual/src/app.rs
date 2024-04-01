@@ -3,6 +3,7 @@ use leptos_router::{Outlet, Route, Router, Routes, A};
 
 use crate::spec::arrow::Arrow;
 use crate::spec::auto_placement::AutoPlacement;
+use crate::spec::border::Border;
 use crate::spec::placement::Placement;
 use crate::spec::relative::Relative;
 use crate::spec::scroll::Scroll;
@@ -93,11 +94,13 @@ pub fn App() -> impl IntoView {
                     <Route path="placement" view=Placement />
                     <Route path="relative" view=Relative />
                     // <Route path="transform" view=Transform />
-                    // <Route path="border" view=Border />
+                    <Route path="border" view=Border />
                     <Route path="scroll" view=Scroll />
 
                     <Route path="arrow" view=Arrow />
                     <Route path="autoPlacement" view=AutoPlacement />
+
+                    <Route path="/*any" view=|| view! { <h1>"Not Found"</h1> }/>
                 </Route>
             </Routes>
         </Router>
