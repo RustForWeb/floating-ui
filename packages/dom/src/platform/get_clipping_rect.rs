@@ -199,8 +199,8 @@ pub fn get_clipping_rect(
             let rect = get_client_rect_from_clipping_ancestor(element, clipping_ancestor, strategy);
 
             acc.top = acc.top.max(rect.top);
-            acc.right = acc.right.max(rect.right);
-            acc.bottom = acc.bottom.max(rect.bottom);
+            acc.right = acc.right.min(rect.right);
+            acc.bottom = acc.bottom.min(rect.bottom);
             acc.left = acc.left.max(rect.left);
 
             acc
