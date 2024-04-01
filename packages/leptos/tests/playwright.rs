@@ -1,13 +1,15 @@
 use std::{env, fs, path::Path, process::Command};
 
-const IMPLEMENTED_TESTS: [&str; 7] = [
+const IMPLEMENTED_TESTS: [&str; 9] = [
     "arrow",
     "autoPlacement",
     "autoUpdate",
     "border",
+    "containing-block",
     "placement",
     "relative",
     "scroll",
+    "table",
 ];
 
 #[test]
@@ -45,6 +47,52 @@ pub fn playwright() {
         assert!(status.success(), "Git pull failed.");
     }
 
+    let status = Command::new("pnpm")
+        .arg("install")
+        .current_dir(repository_path.clone())
+        .status()
+        .expect("pnpm install failed.");
+    assert!(status.success(), "pnpm install failed");
+
+    if env::var("CI")
+        .unwrap_or("false".into())
+        .parse::<bool>()
+        .unwrap_or(false)
+    {
+        let status = Command::new("npx")
+            .arg("playwright")
+            .arg("install")
+            .arg("--with-deps")
+            .arg("chromium")
+            .current_dir(repository_dom_path.clone())
+            .status()
+            .expect("Playwright install failed.");
+        assert!(status.success(), "Playwright install failed.");
+    }
+
+    let status = Command::new("pnpm")
+        .arg("run")
+        .arg("build")
+        .current_dir(repository_path.clone())
+        .status()
+        .expect("Build failed.");
+    assert!(status.success(), "Build failed.");
+
+    if env::var("UPDATE_SNAPSHOTS")
+        .unwrap_or("false".into())
+        .parse::<bool>()
+        .unwrap_or(false)
+    {
+        let status = Command::new("pnpm")
+            .arg("run")
+            .arg("playwright")
+            .arg("--update-snapshots")
+            .current_dir(repository_dom_path.clone())
+            .status()
+            .expect("Playwright update snapshot tests failed.");
+        assert!(status.success(), "Playwright update snapshot tests failed.");
+    }
+
     // TODO: remove when all tests are implemented
     let package_json_content = fs::read_to_string(repository_package_json_path.clone())
         .expect("Reading package.json file failed.")
@@ -72,37 +120,6 @@ pub fn playwright() {
         );
     fs::write(repository_playwright_config_path, config_content)
         .expect("Writing Playwright config file failed.");
-
-    let status = Command::new("pnpm")
-        .arg("install")
-        .current_dir(repository_path.clone())
-        .status()
-        .expect("pnpm install failed.");
-    assert!(status.success(), "pnpm install failed");
-
-    let status = Command::new("pnpm")
-        .arg("run")
-        .arg("build")
-        .current_dir(repository_path.clone())
-        .status()
-        .expect("Build failed.");
-    assert!(status.success(), "Build failed.");
-
-    if env::var("CI")
-        .unwrap_or("false".into())
-        .parse::<bool>()
-        .unwrap_or(false)
-    {
-        let status = Command::new("npx")
-            .arg("playwright")
-            .arg("install")
-            .arg("--with-deps")
-            .arg("chromium")
-            .current_dir(repository_dom_path.clone())
-            .status()
-            .expect("Playwright install failed.");
-        assert!(status.success(), "Playwright install failed.");
-    }
 
     let status = Command::new("pnpm")
         .arg("run")
