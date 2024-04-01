@@ -11,6 +11,7 @@ pub fn Placement() -> impl IntoView {
 
     let (rtl, set_rtl) = create_signal(false);
     let (placement, set_placement) = create_signal(Placement::Bottom);
+
     let UseFloatingReturn {
         floating_styles,
         update,
@@ -22,6 +23,7 @@ pub fn Placement() -> impl IntoView {
             .placement(placement.into())
             .while_elements_mounted_auto_update(),
     );
+
     let (size, set_size) = use_size(None, None);
 
     view! {

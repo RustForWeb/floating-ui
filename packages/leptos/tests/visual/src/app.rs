@@ -5,9 +5,11 @@ use crate::spec::arrow::Arrow;
 use crate::spec::auto_placement::AutoPlacement;
 use crate::spec::auto_update::AutoUpdate;
 use crate::spec::border::Border;
+use crate::spec::containing_block::ContainingBlock;
 use crate::spec::placement::Placement;
 use crate::spec::relative::Relative;
 use crate::spec::scroll::Scroll;
+use crate::spec::table::Table;
 use crate::utils::new::New;
 
 const ROUTES: [&str; 23] = [
@@ -98,10 +100,14 @@ pub fn App() -> impl IntoView {
                     <Route path="border" view=Border />
                     <Route path="scroll" view=Scroll />
 
+                    <Route path="table" view=Table />
+
                     <Route path="arrow" view=Arrow />
                     <Route path="autoPlacement" view=AutoPlacement />
 
                     <Route path="autoUpdate" view=AutoUpdate />
+
+                    <Route path="containing-block" view=ContainingBlock />
 
                     <Route path="/*any" view=|| view! { <h1>"Not Found"</h1> }/>
                 </Route>

@@ -84,9 +84,9 @@ pub fn Arrow() -> impl IntoView {
     let placement_update_scroll = update_scroll.clone();
     let padding_update_scroll = update_scroll.clone();
     let add_offset_update_scroll = update_scroll.clone();
-    _ = watch(placement, move |_, _, _| placement_update_scroll(), false);
-    _ = watch(padding, move |_, _, _| padding_update_scroll(), false);
-    _ = watch(add_offset, move |_, _, _| add_offset_update_scroll(), false);
+    // _ = watch(placement, move |_, _, _| placement_update_scroll(), false);
+    // _ = watch(padding, move |_, _, _| padding_update_scroll(), false);
+    // _ = watch(add_offset, move |_, _, _| add_offset_update_scroll(), false);
 
     view! {
         <h1>Arrow</h1>
@@ -208,17 +208,24 @@ pub fn Arrow() -> impl IntoView {
             <For
                 each=|| [0, 20, 200]
                 key=|size| format!("{:?}", size)
-                children=move |size| view! {
-                    <button
-                        data-testid=format!("arrow-padding-{size}")
-                        style:background-color=move || match padding() == size {
-                            true => "black",
-                            false => ""
-                        }
-                        on:click=move |_| set_padding(size)
-                    >
-                        {format!("{size}")}
-                    </button>
+                children=move |size| {
+                    let padding_update_scroll = padding_update_scroll.clone();
+                    view! {
+                        <button
+                            data-testid=format!("arrow-padding-{size}")
+                            style:background-color=move || match padding() == size {
+                                true => "black",
+                                false => ""
+                            }
+                            on:click=move |_| {
+                                set_padding(size);
+                                // Match React test behaviour
+                                padding_update_scroll();
+                            }
+                        >
+                            {format!("{size}")}
+                        </button>
+                    }
                 }
             />
         </div>
@@ -229,6 +236,7 @@ pub fn Arrow() -> impl IntoView {
                 each=|| [true, false]
                 key=|value| format!("{}", value)
                 children=move |value| {
+                    let add_offset_update_scroll = add_offset_update_scroll.clone();
                     view! {
                         <button
                             data-testid=format!("add-offset-{}", value)
@@ -236,7 +244,11 @@ pub fn Arrow() -> impl IntoView {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_add_offset(value)
+                            on:click=move |_| {
+                                set_add_offset(value);
+                                // Match React test behaviour
+                                add_offset_update_scroll();
+                            }
                         >
                             {format!("{}", value)}
                         </button>
@@ -250,17 +262,24 @@ pub fn Arrow() -> impl IntoView {
             <For
                 each=|| ALL_PLACEMENTS
                 key=|local_placement| format!("{:?}", local_placement)
-                children=move |local_placement| view! {
-                    <button
-                        data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement() == local_placement {
-                            true => "black",
-                            false => ""
-                        }
-                        on:click=move |_| set_placement(local_placement)
-                    >
-                        {format!("{:?}", local_placement).to_case(Case::Kebab)}
-                    </button>
+                children=move |local_placement| {
+                    let placement_update_scroll = placement_update_scroll.clone();
+                    view! {
+                        <button
+                            data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
+                            style:background-color=move || match placement() == local_placement {
+                                true => "black",
+                                false => ""
+                            }
+                            on:click=move |_| {
+                                set_placement(local_placement);
+                                // Match React test behaviour
+                                placement_update_scroll();
+                            }
+                        >
+                            {format!("{:?}", local_placement).to_case(Case::Kebab)}
+                        </button>
+                    }
                 }
             />
         </div>
