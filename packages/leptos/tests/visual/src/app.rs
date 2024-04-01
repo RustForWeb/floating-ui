@@ -3,6 +3,7 @@ use leptos_router::{Outlet, Route, Router, Routes, A};
 
 use crate::spec::arrow::Arrow;
 use crate::spec::auto_placement::AutoPlacement;
+use crate::spec::auto_update::AutoUpdate;
 use crate::spec::border::Border;
 use crate::spec::placement::Placement;
 use crate::spec::relative::Relative;
@@ -99,6 +100,8 @@ pub fn App() -> impl IntoView {
 
                     <Route path="arrow" view=Arrow />
                     <Route path="autoPlacement" view=AutoPlacement />
+
+                    <Route path="AutoUpdate" view=AutoUpdate />
 
                     <Route path="/*any" view=|| view! { <h1>"Not Found"</h1> }/>
                 </Route>

@@ -123,7 +123,7 @@ where
     let attach = move || {
         attach_cleanup_rc();
 
-        if let Some(while_elements_mounted) = &options.while_elements_mounted {
+        if let Some(while_elements_mounted) = options.while_elements_mounted.get() {
             if let Some(reference_element) = reference.get() {
                 if let Some(floating_element) = floating.get() {
                     attach_while_elements_mounted_cleanup.replace(Some(while_elements_mounted(
