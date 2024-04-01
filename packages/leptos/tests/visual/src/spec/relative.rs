@@ -28,7 +28,7 @@ pub fn Relative() -> impl IntoView {
         ..
     } = use_floating(reference_ref, floating_ref, UseFloatingOptions::default());
 
-    create_render_effect(move |_| {
+    create_effect(move |_| {
         let element = match node() {
             Node::Html => document()
                 .document_element()
