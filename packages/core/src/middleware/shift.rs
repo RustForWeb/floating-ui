@@ -177,7 +177,7 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Shift<'a
                 Axis::Y => Side::Bottom,
             };
             let min = main_axis_coord + overflow.side(min_side);
-            let max = main_axis_coord + overflow.side(max_side);
+            let max = main_axis_coord - overflow.side(max_side);
 
             main_axis_coord = clamp(min, main_axis_coord, max);
         }
@@ -192,7 +192,7 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Shift<'a
                 Axis::Y => Side::Bottom,
             };
             let min = cross_axis_coord + overflow.side(min_side);
-            let max = cross_axis_coord + overflow.side(max_side);
+            let max = cross_axis_coord - overflow.side(max_side);
 
             cross_axis_coord = clamp(min, cross_axis_coord, max);
         }
