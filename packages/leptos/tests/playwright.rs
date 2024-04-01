@@ -1,11 +1,21 @@
 use std::{env, fs, path::Path, process::Command};
 
-#[ignore]
+const IMPLEMENTED_TESTS: [&str; 7] = [
+    "arrow",
+    "autoPlacement",
+    "autoUpdate",
+    "border",
+    "placement",
+    "relative",
+    "scroll",
+];
+
 #[test]
 pub fn playwright() {
     let repository_url = "https://github.com/floating-ui/floating-ui";
     let repository_path = Path::new(env!("CARGO_TARGET_TMPDIR")).join("floating-ui");
     let repository_dom_path = repository_path.join("packages/dom");
+    let repository_package_json_path = repository_dom_path.join("package.json");
     let repository_playwright_config_path = repository_dom_path.join("playwright.config.ts");
 
     let visual_test_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/visual");
@@ -35,10 +45,23 @@ pub fn playwright() {
         assert!(status.success(), "Git pull failed.");
     }
 
-    let mut config_content = fs::read_to_string(repository_playwright_config_path.clone())
-        .expect("Reading Playwright config file failed.");
+    // TODO: remove when all tests are implemented
+    let package_json_content = fs::read_to_string(repository_package_json_path.clone())
+        .expect("Reading package.json file failed.")
+        .replace(
+            "playwright test ./test/functional",
+            &format!(
+                "playwright test {}",
+                IMPLEMENTED_TESTS
+                    .map(|name| format!("./test/functional/{name}.test.ts"))
+                    .join(" ")
+            ),
+        );
+    fs::write(repository_package_json_path, package_json_content)
+        .expect("Writing package.json file failed.");
 
-    config_content = config_content
+    let config_content = fs::read_to_string(repository_playwright_config_path.clone())
+        .expect("Reading Playwright config file failed.")
         .replace("retries: 3,", "retries: 0,")
         .replace(
             "command: 'pnpm run dev',",
@@ -47,7 +70,6 @@ pub fn playwright() {
                 visual_test_path.to_str().expect("Path should be valid.")
             ),
         );
-
     fs::write(repository_playwright_config_path, config_content)
         .expect("Writing Playwright config file failed.");
 
@@ -83,6 +105,7 @@ pub fn playwright() {
     let status = Command::new("pnpm")
         .arg("run")
         .arg("playwright")
+        // .arg("--debug")
         .current_dir(repository_dom_path.clone())
         .status()
         .expect("Playwright tests failed.");

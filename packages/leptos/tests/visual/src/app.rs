@@ -27,7 +27,7 @@ const ROUTES: [&str; 23] = [
     "hide",
     "autoPlacement",
     "inline",
-    "AutoUpdate",
+    "autoUpdate",
     "shadom-DOM",
     "containing-block",
     "virtual-element",
@@ -101,7 +101,7 @@ pub fn App() -> impl IntoView {
                     <Route path="arrow" view=Arrow />
                     <Route path="autoPlacement" view=AutoPlacement />
 
-                    <Route path="AutoUpdate" view=AutoUpdate />
+                    <Route path="autoUpdate" view=AutoUpdate />
 
                     <Route path="/*any" view=|| view! { <h1>"Not Found"</h1> }/>
                 </Route>
