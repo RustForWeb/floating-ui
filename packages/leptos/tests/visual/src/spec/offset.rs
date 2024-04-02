@@ -63,7 +63,9 @@ pub fn Offset() -> impl IntoView {
     let (offset_options, set_offset_options) = create_signal("0");
 
     let UseFloatingReturn {
-        floating_styles, ..
+        floating_styles,
+        update,
+        ..
     } = use_floating(
         reference_ref,
         floating_ref,
@@ -145,7 +147,7 @@ pub fn Offset() -> impl IntoView {
                 each=|| [true, false]
                 key=|value| format!("{}", value)
                 children=move |value| {
-                    // let rtl_update = update.clone();
+                    let rtl_update = update.clone();
 
                     view! {
                         <button
@@ -156,7 +158,7 @@ pub fn Offset() -> impl IntoView {
                             }
                             on:click=move |_| {
                                 set_rtl(value);
-                                // rtl_update();
+                                rtl_update();
                             }
                         >
                             {format!("{}", value)}
