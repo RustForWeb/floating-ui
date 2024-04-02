@@ -35,7 +35,7 @@ fn values() -> Vec<(
             }),
         ),
         (
-            "() => cA: -f.width / 2",
+            "() => cA: -f.width/2",
             DerivableFn::into(&|MiddlewareState { rects, .. }| {
                 OffsetOptions::Values(
                     OffsetOptionsValues::default().cross_axis(-rects.floating.width / 2.0),
@@ -68,6 +68,7 @@ pub fn Offset() -> impl IntoView {
         reference_ref,
         floating_ref,
         UseFloatingOptions::default()
+            .placement(placement.into())
             .while_elements_mounted_auto_update()
             .middleware(MaybeProp::derive(move || {
                 let options = values()
