@@ -11,6 +11,7 @@ use crate::spec::placement::Placement;
 use crate::spec::relative::Relative;
 use crate::spec::scroll::Scroll;
 use crate::spec::table::Table;
+use crate::spec::transform::Transform;
 use crate::utils::new::New;
 
 const ROUTES: [&str; 23] = [
@@ -97,19 +98,27 @@ pub fn App() -> impl IntoView {
                     <Route path="new" view=New />
                     <Route path="placement" view=Placement />
                     <Route path="relative" view=Relative />
-                    // <Route path="transform" view=Transform />
+                    <Route path="transform" view=Transform />
                     <Route path="border" view=Border />
                     <Route path="scroll" view=Scroll />
-
+                    // <Route path="decimal-size" view=DecimalSize />
                     <Route path="table" view=Table />
-
+                    // <Route path="scrollbars" view=Scrollbars />
+                    // <Route path="shift" view=Shift />
+                    // <Route path="flip" view=Flip />
+                    // <Route path="size" view=Size />
                     <Route path="arrow" view=Arrow />
                     <Route path="offset" view=Offset />
+                    // <Route path="hide" view=Hide />
                     <Route path="autoPlacement" view=AutoPlacement />
-
+                    // <Route path="inline" view=Inline />
                     <Route path="autoUpdate" view=AutoUpdate />
-
+                    // <Route path="shadow-DOM" view=ShadowDom />
                     <Route path="containing-block" view=ContainingBlock />
+                    // <Route path="virtual-element" view=VirtualElement />
+                    // <Route path="perf" view=Perf />
+                    // <Route path="iframe" view=Iframe />
+                    // <Route path="top-layer" view=TopLayer />
 
                     <Route path="/*any" view=|| view! { <h1>"Not Found"</h1> }/>
                 </Route>

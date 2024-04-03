@@ -1,6 +1,6 @@
 use std::{env, fs, path::Path, process::Command};
 
-const IMPLEMENTED_TESTS: [&str; 10] = [
+const IMPLEMENTED_TESTS: [&str; 11] = [
     "arrow",
     "autoPlacement",
     "autoUpdate",
@@ -11,6 +11,7 @@ const IMPLEMENTED_TESTS: [&str; 10] = [
     "relative",
     "scroll",
     "table",
+    "transform",
 ];
 
 #[test]
@@ -111,7 +112,7 @@ pub fn playwright() {
 
     let config_content = fs::read_to_string(repository_playwright_config_path.clone())
         .expect("Reading Playwright config file failed.")
-        .replace("retries: 3,", "retries: 0,")
+        .replace("retries: 3,", "retries: 0,\n  timeout: 10 * 1000,")
         .replace(
             "command: 'pnpm run dev',",
             &format!(
