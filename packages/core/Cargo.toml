@@ -11,6 +11,5 @@ version.workspace = true
 [dependencies]
 dyn-clone.workspace = true
 floating-ui-utils = { path = "../utils", version = "0.0.2" }
-log = "0.4.21"                                               # TODO: remove
 serde.workspace = true
 serde_json.workspace = true

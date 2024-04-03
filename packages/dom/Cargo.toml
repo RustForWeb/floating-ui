@@ -12,5 +12,4 @@ version.workspace = true
 dyn-clone.workspace = true
 floating-ui-core = { path = "../core", version = "0.0.2" }
 floating-ui-utils = { path = "../utils", version = "0.0.2", features = ["dom"] }
-log = "0.4.21"                                                                   # TODO: remove
 web-sys.workspace = true
