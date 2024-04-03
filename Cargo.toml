@@ -7,7 +7,7 @@ authors = ["Nixy <info@nixy.software>"]
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/NixySoftware/floating-ui"
-version = "0.0.3"
+version = "0.0.4"
 
 [workspace.dependencies]
 dyn-clone = "1.0.17"
