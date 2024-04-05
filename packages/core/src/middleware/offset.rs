@@ -128,8 +128,8 @@ impl Default for OffsetOptions {
 /// Data stored by [`Offset`] middleware.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct OffsetData {
-    pub diff_coords: Option<Coords>,
-    pub placement: Option<Placement>,
+    pub diff_coords: Coords,
+    pub placement: Placement,
 }
 
 /// Modifies the placement by translating the floating element along the specified axes.
@@ -186,15 +186,12 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window>
             ..
         } = state;
 
-        let data: OffsetData = middleware_data.get_as(self.name()).unwrap_or(OffsetData {
-            diff_coords: None,
-            placement: None,
-        });
+        let data: Option<OffsetData> = middleware_data.get_as(self.name());
 
         let diff_coords = convert_value_to_coords(state, &options);
 
         // If the placement is the same and the arrow caused an alignment offset then we don't need to change the positioning coordinates.
-        if let Some(data_placement) = data.placement {
+        if let Some(data_placement) = data.map(|data| data.placement) {
             if placement == data_placement {
                 let arrow_data: Option<ArrowData> = middleware_data.get_as(ARROW_NAME);
                 if arrow_data.map_or(false, |arrow_data| arrow_data.alignment_offset.is_some()) {
@@ -213,8 +210,8 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window>
             y: Some(y + diff_coords.y),
             data: Some(
                 serde_json::to_value(OffsetData {
-                    diff_coords: Some(diff_coords),
-                    placement: Some(placement),
+                    diff_coords,
+                    placement,
                 })
                 .expect("Data should be valid JSON."),
             ),

@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     detect_overflow::{detect_overflow, DetectOverflowOptions},
+    middleware::{OffsetData, OFFSET_NAME},
     types::{
         Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
         MiddlewareWithOptions,
@@ -16,27 +17,14 @@ use crate::{
 pub const SHIFT_NAME: &str = "shift";
 
 /// Limiter used by [`Shift`] middleware. Limits the shifting done in order to prevent detachment.
-pub trait Limiter<Element, Window>: Debug + DynClone {
+pub trait Limiter<Element, Window>: DynClone {
     fn compute(&self, state: MiddlewareState<Element, Window>) -> Coords;
 }
 
 dyn_clone::clone_trait_object!(<Element, Window> Limiter<Element, Window>);
 
-/// Default [`Limiter`], which doesn't limit shifting.
-#[derive(Clone, Debug, Default)]
-pub struct DefaultLimiter;
-
-impl<Element, Window> Limiter<Element, Window> for DefaultLimiter {
-    fn compute(&self, state: MiddlewareState<Element, Window>) -> Coords {
-        Coords {
-            x: state.x,
-            y: state.y,
-        }
-    }
-}
-
 /// Options for [`Shift`] middleware.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct ShiftOptions<Element: Clone, Window: Clone> {
     /// Options for [`detect_overflow`].
     ///
@@ -237,5 +225,216 @@ impl<'a, Element: Clone, Window: Clone>
 {
     fn options(&self) -> &Derivable<Element, Window, ShiftOptions<Element, Window>> {
         &self.options
+    }
+}
+
+/// Default [`Limiter`], which doesn't limit shifting.
+#[derive(Clone, Debug, Default)]
+pub struct DefaultLimiter;
+
+impl<Element, Window> Limiter<Element, Window> for DefaultLimiter {
+    fn compute(&self, state: MiddlewareState<Element, Window>) -> Coords {
+        Coords {
+            x: state.x,
+            y: state.y,
+        }
+    }
+}
+
+/// Axes configuration for [`LimitShiftOffset`].
+#[derive(Clone, Default, Debug)]
+pub struct LimitShiftOffsetValues {
+    pub main_axis: Option<f64>,
+
+    pub cross_axis: Option<f64>,
+}
+
+impl LimitShiftOffsetValues {
+    /// Set `main_axis` option.
+    pub fn main_axis(mut self, value: f64) -> Self {
+        self.main_axis = Some(value);
+        self
+    }
+
+    /// Set `cross_axis` option.
+    pub fn cross_axis(mut self, value: f64) -> Self {
+        self.cross_axis = Some(value);
+        self
+    }
+}
+
+/// Offset configuration for [`LimitShiftOptions`].
+#[derive(Clone, Debug)]
+pub enum LimitShiftOffset {
+    Value(f64),
+    Values(LimitShiftOffsetValues),
+}
+
+impl Default for LimitShiftOffset {
+    fn default() -> Self {
+        LimitShiftOffset::Value(0.0)
+    }
+}
+
+/// Options for [`LimitShift`] limiter.
+#[derive(Clone)]
+pub struct LimitShiftOptions<'a, Element, Window> {
+    pub offset: Option<Derivable<'a, Element, Window, LimitShiftOffset>>,
+
+    pub main_axis: Option<bool>,
+
+    pub cross_axis: Option<bool>,
+}
+
+impl<'a, Element: Clone, Window: Clone> LimitShiftOptions<'a, Element, Window> {
+    /// Set `offset` option.
+    pub fn offset(mut self, value: LimitShiftOffset) -> Self {
+        self.offset = Some(value.into());
+        self
+    }
+
+    /// Set `offset` option with derivable offset.
+    pub fn offset_derivable(
+        mut self,
+        value: Derivable<'a, Element, Window, LimitShiftOffset>,
+    ) -> Self {
+        self.offset = Some(value);
+        self
+    }
+
+    /// Set `offset` option with derivable offset function.
+    pub fn offset_derivable_fn(
+        mut self,
+        value: DerivableFn<'a, Element, Window, LimitShiftOffset>,
+    ) -> Self {
+        self.offset = Some(value.into());
+        self
+    }
+
+    /// Set `main_axis` option.
+    pub fn main_axis(mut self, value: bool) -> Self {
+        self.main_axis = Some(value);
+        self
+    }
+
+    /// Set `cross_axis` option.
+    pub fn cross_axis(mut self, value: bool) -> Self {
+        self.cross_axis = Some(value);
+        self
+    }
+}
+
+impl<'a, Element: Clone, Window: Clone> Default for LimitShiftOptions<'a, Element, Window> {
+    fn default() -> Self {
+        Self {
+            offset: Default::default(),
+            main_axis: Default::default(),
+            cross_axis: Default::default(),
+        }
+    }
+}
+
+/// Built-in [`Limiter`], that will stop [`Shift`] at a certain point.
+#[derive(Clone, Default)]
+pub struct LimitShift<'a, Element: Clone, Window: Clone> {
+    options: LimitShiftOptions<'a, Element, Window>,
+}
+
+impl<'a, Element: Clone, Window: Clone> LimitShift<'a, Element, Window> {
+    pub fn new(options: LimitShiftOptions<'a, Element, Window>) -> Self {
+        LimitShift { options }
+    }
+}
+
+impl<'a, Element: Clone, Window: Clone> Limiter<Element, Window>
+    for LimitShift<'a, Element, Window>
+{
+    fn compute(&self, state: MiddlewareState<Element, Window>) -> Coords {
+        let MiddlewareState {
+            x,
+            y,
+            placement,
+            rects,
+            middleware_data,
+            ..
+        } = state;
+
+        let offset = self
+            .options
+            .offset
+            .clone()
+            .unwrap_or(Derivable::Value(LimitShiftOffset::default()));
+        let check_main_axis = self.options.main_axis.unwrap_or(true);
+        let check_cross_axis = self.options.cross_axis.unwrap_or(true);
+
+        let coords = Coords { x, y };
+        let cross_axis = get_side_axis(placement);
+        let main_axis = get_opposite_axis(cross_axis);
+
+        let mut main_axis_coord = coords.axis(main_axis);
+        let mut cross_axis_coord = coords.axis(cross_axis);
+
+        let raw_offset = offset.evaluate(state.clone());
+        let (computed_main_axis, computed_cross_axis) = match raw_offset {
+            LimitShiftOffset::Value(value) => (value, 0.0),
+            LimitShiftOffset::Values(values) => (
+                values.main_axis.unwrap_or(0.0),
+                values.cross_axis.unwrap_or(0.0),
+            ),
+        };
+
+        if check_main_axis {
+            let len = main_axis.length();
+            let limit_min =
+                rects.reference.axis(main_axis) - rects.floating.length(len) + computed_main_axis;
+            let limit_max =
+                rects.reference.axis(main_axis) + rects.reference.length(len) - computed_main_axis;
+
+            main_axis_coord = clamp(limit_min, main_axis_coord, limit_max);
+        }
+
+        if check_cross_axis {
+            let len = main_axis.length();
+            let is_origin_side = match placement.side() {
+                Side::Top | Side::Left => true,
+                Side::Bottom | Side::Right => false,
+            };
+
+            let data: Option<OffsetData> = middleware_data.get_as(OFFSET_NAME);
+            let data_cross_axis = data.map_or(0.0, |data| data.diff_coords.axis(cross_axis));
+
+            let limit_min = rects.reference.axis(cross_axis) - rects.floating.length(len)
+                + match is_origin_side {
+                    true => data_cross_axis,
+                    false => 0.0,
+                }
+                + match is_origin_side {
+                    true => 0.0,
+                    false => computed_cross_axis,
+                };
+            let limit_max = rects.reference.axis(cross_axis)
+                + rects.reference.length(len)
+                + match is_origin_side {
+                    true => 0.0,
+                    false => data_cross_axis,
+                }
+                - match is_origin_side {
+                    true => computed_cross_axis,
+                    false => 0.0,
+                };
+
+            cross_axis_coord = clamp(limit_min, cross_axis_coord, limit_max);
+        }
+
+        Coords {
+            x: match main_axis {
+                Axis::X => main_axis_coord,
+                Axis::Y => cross_axis_coord,
+            },
+            y: match main_axis {
+                Axis::X => cross_axis_coord,
+                Axis::Y => main_axis_coord,
+            },
+        }
     }
 }

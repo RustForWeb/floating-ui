@@ -111,6 +111,15 @@ pub enum Axis {
     Y,
 }
 
+impl Axis {
+    pub fn length(&self) -> Length {
+        match self {
+            Axis::X => Length::Width,
+            Axis::Y => Length::Height,
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Coords {
     pub x: f64,
