@@ -1,16 +1,25 @@
 use convert_case::{Case, Casing};
-use floating_ui_leptos::{use_floating, Placement, UseFloatingOptions, UseFloatingReturn};
+use floating_ui_leptos::{
+    use_floating, DetectOverflowOptions, MiddlewareVec, Placement, Shift, ShiftOptions,
+    UseFloatingOptions, UseFloatingReturn,
+};
 use leptos::{html::Div, *};
 
 use crate::utils::{all_placements::ALL_PLACEMENTS, use_size::use_size};
 
 #[component]
-pub fn Placement() -> impl IntoView {
+pub fn Scrollbars() -> impl IntoView {
     let reference_ref = create_node_ref::<Div>();
     let floating_ref = create_node_ref::<Div>();
 
     let (rtl, set_rtl) = create_signal(false);
     let (placement, set_placement) = create_signal(Placement::Bottom);
+
+    let middleware: MiddlewareVec = vec![Box::new(Shift::new(
+        ShiftOptions::default()
+            .detect_overflow(DetectOverflowOptions::default().alt_boundary(true))
+            .cross_axis(true),
+    ))];
 
     let UseFloatingReturn {
         floating_styles,
@@ -21,20 +30,23 @@ pub fn Placement() -> impl IntoView {
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())
+            .middleware(middleware.into())
             .while_elements_mounted_auto_update(),
     );
 
-    let (size, set_size) = use_size(None, None);
+    let (size, set_size) = use_size(Some(300), None);
 
     view! {
-        <h1>Placement</h1>
-        <p>
-            The floating element should be correctly positioned when given each of the 12 placements.
-        </p>
-        <div class="container" style:direction=move || match rtl() {
-            true => "rtl",
-            false => "ltr",
-        }>
+        <h1>Scrollbars</h1>
+        <p>The floating element should avoid scrollbars.</p>
+        <div
+            class="container"
+            style:overflow="scroll"
+            style:direction=move || match rtl() {
+                true => "rtl",
+                false => "ltr",
+            }
+        >
             <div _ref=reference_ref class="reference">
                 Reference
             </div>
@@ -49,7 +61,7 @@ pub fn Placement() -> impl IntoView {
                 id="size"
                 type="range"
                 min="1"
-                max="200"
+                max="400"
                 prop:value=size
                 on:input=move |event| {
                     set_size(event_target_value(&event).parse().unwrap())

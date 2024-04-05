@@ -7,5 +7,6 @@ pub mod offset;
 pub mod placement;
 pub mod relative;
 pub mod scroll;
+pub mod scrollbars;
 pub mod table;
 pub mod transform;

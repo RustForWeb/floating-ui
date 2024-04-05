@@ -10,6 +10,7 @@ use crate::spec::offset::Offset;
 use crate::spec::placement::Placement;
 use crate::spec::relative::Relative;
 use crate::spec::scroll::Scroll;
+use crate::spec::scrollbars::Scrollbars;
 use crate::spec::table::Table;
 use crate::spec::transform::Transform;
 use crate::utils::new::New;
@@ -103,7 +104,7 @@ pub fn App() -> impl IntoView {
                     <Route path="scroll" view=Scroll />
                     // <Route path="decimal-size" view=DecimalSize />
                     <Route path="table" view=Table />
-                    // <Route path="scrollbars" view=Scrollbars />
+                    <Route path="scrollbars" view=Scrollbars />
                     // <Route path="shift" view=Shift />
                     // <Route path="flip" view=Flip />
                     // <Route path="size" view=Size />

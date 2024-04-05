@@ -190,11 +190,11 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Shift<'a
         }
 
         if check_cross_axis {
-            let min_side = match main_axis {
+            let min_side = match cross_axis {
                 Axis::X => Side::Left,
                 Axis::Y => Side::Top,
             };
-            let max_side = match main_axis {
+            let max_side = match cross_axis {
                 Axis::X => Side::Right,
                 Axis::Y => Side::Bottom,
             };

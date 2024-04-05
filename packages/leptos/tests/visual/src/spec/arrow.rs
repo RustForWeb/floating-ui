@@ -91,8 +91,8 @@ pub fn Arrow() -> impl IntoView {
     view! {
         <h1>Arrow</h1>
         <p></p>
-        <div class="container" style=move || match svg() {
-            true => "will-change: transform;",
+        <div class="container" style:will-change=move || match svg() {
+            true => "transform",
             false => "",
         }>
             <div _ref=scroll_ref class="scroll" data-x="" style:position="relative">

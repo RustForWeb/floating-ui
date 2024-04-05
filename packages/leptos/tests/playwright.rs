@@ -1,6 +1,6 @@
 use std::{env, fs, path::Path, process::Command};
 
-const IMPLEMENTED_TESTS: [&str; 11] = [
+const IMPLEMENTED_TESTS: [&str; 12] = [
     "arrow",
     "autoPlacement",
     "autoUpdate",
@@ -10,6 +10,7 @@ const IMPLEMENTED_TESTS: [&str; 11] = [
     "placement",
     "relative",
     "scroll",
+    "scrollbars",
     "table",
     "transform",
 ];

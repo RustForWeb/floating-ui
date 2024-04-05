@@ -89,9 +89,9 @@ pub fn Offset() -> impl IntoView {
     view! {
         <h1>Offset</h1>
         <p></p>
-        <div class="container" style=move || match rtl() {
-            true => "direction: rtl;",
-            false => "direction: ltr;",
+        <div class="container" style:direction=move || match rtl() {
+            true => "rtl",
+            false => "ltr",
         }>
             <div _ref=reference_ref class="reference">
                 Reference
