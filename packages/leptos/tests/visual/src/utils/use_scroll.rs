@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{ops::Deref, rc::Rc};
 
 use floating_ui_leptos::{
     dom::{get_overflow_ancestors, OverflowAncestor},
@@ -61,7 +61,6 @@ pub fn use_scroll(
 
     let (ancestors, set_ancestors) = create_signal::<Vec<OverflowAncestor>>(vec![]);
     let (scroll, set_scroll) = create_signal::<Option<(i32, i32)>>(None);
-    let is_update_required = create_rw_signal(false);
 
     let local_update_update = update.clone();
     let local_update_indicator_update = indicator_update_rc.clone();
@@ -75,11 +74,7 @@ pub fn use_scroll(
     }));
 
     let effect_local_update = local_update.clone();
-    create_effect(move |_| {
-        if is_update_required.get() {
-            is_update_required.set_untracked(false);
-        }
-
+    let effect = move || {
         if let Some(reference) = reference_ref() {
             let mut ancestors = get_overflow_ancestors(&reference, vec![], true);
 
@@ -102,8 +97,11 @@ pub fn use_scroll(
             set_ancestors(ancestors);
 
             if let Some(scroll) = scroll_ref() {
+                let h: &web_sys::HtmlDivElement = scroll.deref();
+                log::info!("{:?}", h);
                 let x = scroll.scroll_width() / 2 - scroll.offset_width() / 2;
                 let y = scroll.scroll_height() / 2 - scroll.offset_height() / 2;
+                log::info!("x {x} | y {y}");
                 scroll.set_scroll_top(y);
                 scroll.set_scroll_left(match rtl {
                     Some(true) => -x,
@@ -113,6 +111,12 @@ pub fn use_scroll(
 
             update();
         }
+    };
+    let effect_rc = Rc::new(effect);
+
+    let effect_effect = effect_rc.clone();
+    create_effect(move |_| {
+        effect_effect();
     });
 
     on_cleanup(move || {
@@ -144,7 +148,7 @@ pub fn use_scroll(
     };
 
     let update_scroll = move || {
-        is_update_required.set(true);
+        effect_rc();
     };
 
     UseScrollReturn {

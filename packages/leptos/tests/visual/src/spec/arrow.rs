@@ -80,13 +80,10 @@ pub fn Arrow() -> impl IntoView {
         rtl: None,
     });
 
-    // Match React test behaviour
     let placement_update_scroll = update_scroll.clone();
     let padding_update_scroll = update_scroll.clone();
     let add_offset_update_scroll = update_scroll.clone();
-    // _ = watch(placement, move |_, _, _| placement_update_scroll(), false);
-    // _ = watch(padding, move |_, _, _| padding_update_scroll(), false);
-    // _ = watch(add_offset, move |_, _, _| add_offset_update_scroll(), false);
+    let center_offset_update_scroll = update_scroll.clone();
 
     view! {
         <h1>Arrow</h1>
@@ -312,6 +309,7 @@ pub fn Arrow() -> impl IntoView {
                 each=|| [true, false]
                 key=|value| format!("{}", value)
                 children=move |value| {
+                    let center_offset_update_scroll = center_offset_update_scroll.clone();
                     view! {
                         <button
                             data-testid=format!("centerOffset-{}", value)
@@ -332,6 +330,8 @@ pub fn Arrow() -> impl IntoView {
                                     set_placement(Placement::Bottom);
                                     set_padding(0);
                                 }
+                                // Match React test behaviour
+                                center_offset_update_scroll();
                             }
                         >
                             {format!("{}", value)}
