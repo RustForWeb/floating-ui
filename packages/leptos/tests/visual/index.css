@@ -78,13 +78,13 @@ nav button {
     text-transform: capitalize;
 }
 
+.nav-link:visited {
+    color: #646870;
+}
+
 .nav-link[aria-current='page'] {
     color: black;
     font-weight: bold;
-}
-
-.nav-link:visited {
-    color: #646870;
 }
 
 h1 {

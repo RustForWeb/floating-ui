@@ -6,6 +6,7 @@ use crate::spec::auto_placement::AutoPlacement;
 use crate::spec::auto_update::AutoUpdate;
 use crate::spec::border::Border;
 use crate::spec::containing_block::ContainingBlock;
+use crate::spec::decimal_size::DecimalSize;
 use crate::spec::offset::Offset;
 use crate::spec::placement::Placement;
 use crate::spec::relative::Relative;
@@ -34,7 +35,7 @@ const ROUTES: [&str; 23] = [
     "autoPlacement",
     "inline",
     "autoUpdate",
-    "shadom-DOM",
+    "shadow-DOM",
     "containing-block",
     "virtual-element",
     "perf",
@@ -103,7 +104,7 @@ pub fn App() -> impl IntoView {
                     <Route path="transform" view=Transform />
                     <Route path="border" view=Border />
                     <Route path="scroll" view=Scroll />
-                    // <Route path="decimal-size" view=DecimalSize />
+                    <Route path="decimal-size" view=DecimalSize />
                     <Route path="table" view=Table />
                     <Route path="scrollbars" view=Scrollbars />
                     <Route path="shift" view=Shift />
