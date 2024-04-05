@@ -1,6 +1,6 @@
 use std::{env, fs, path::Path, process::Command};
 
-const IMPLEMENTED_TESTS: [&str; 1] = [
+const IMPLEMENTED_TESTS: [&str; 14] = [
     "arrow",
     "autoPlacement",
     "autoUpdate",
