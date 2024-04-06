@@ -13,6 +13,7 @@ use crate::spec::relative::Relative;
 use crate::spec::scroll::Scroll;
 use crate::spec::scrollbars::Scrollbars;
 use crate::spec::shift::Shift;
+use crate::spec::size::Size;
 use crate::spec::table::Table;
 use crate::spec::transform::Transform;
 use crate::utils::new::New;
@@ -109,7 +110,7 @@ pub fn App() -> impl IntoView {
                     <Route path="scrollbars" view=Scrollbars />
                     <Route path="shift" view=Shift />
                     // <Route path="flip" view=Flip />
-                    // <Route path="size" view=Size />
+                    <Route path="size" view=Size />
                     <Route path="arrow" view=Arrow />
                     <Route path="offset" view=Offset />
                     // <Route path="hide" view=Hide />

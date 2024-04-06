@@ -10,5 +10,6 @@ pub mod relative;
 pub mod scroll;
 pub mod scrollbars;
 pub mod shift;
+pub mod size;
 pub mod table;
 pub mod transform;
