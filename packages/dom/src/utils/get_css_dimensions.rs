@@ -20,7 +20,7 @@ pub fn get_css_dimensions(element: &Element) -> CssDimensions {
         .parse::<f64>()
         .unwrap_or(0.0);
     let height = css
-        .get_property_value("width")
+        .get_property_value("height")
         .expect("Computed style should have height.")
         .replace("px", "")
         .parse::<f64>()

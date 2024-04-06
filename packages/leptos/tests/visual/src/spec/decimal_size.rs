@@ -1,5 +1,9 @@
-use floating_ui_leptos::{use_floating, MiddlewareVec, UseFloatingOptions, UseFloatingReturn};
+use floating_ui_leptos::{
+    use_floating, ApplyState, MiddlewareState, MiddlewareVec, Size, SizeOptions,
+    UseFloatingOptions, UseFloatingReturn,
+};
 use leptos::{html::Div, *};
+use wasm_bindgen::JsCast;
 
 const SIZES: [f64; 4] = [0.0, 0.25, 0.5, 0.75];
 const INTEGER: f64 = 80.0;
@@ -12,8 +16,22 @@ pub fn DecimalSize() -> impl IntoView {
     let (size, set_size) = create_signal(INTEGER);
     let (truncate, set_truncate) = create_signal(false);
 
-    // TODO: add size middleware
-    let middleware: MiddlewareVec = vec![];
+    let middleware: MiddlewareVec = vec![Box::new(Size::new(SizeOptions::new(
+        &|ApplyState { state, .. }| {
+            let MiddlewareState {
+                elements, rects, ..
+            } = state;
+
+            let floating = (*elements.floating)
+                .clone()
+                .unchecked_into::<web_sys::HtmlElement>();
+
+            floating
+                .style()
+                .set_property("width", &format!("{}px", rects.floating.width))
+                .expect("Style should be updated.");
+        },
+    )))];
 
     let UseFloatingReturn {
         x,
@@ -31,7 +49,7 @@ pub fn DecimalSize() -> impl IntoView {
     let truncate_update = update.clone();
 
     view! {
-        <h1>Decimal size</h1>
+        <h1>Decimal Size</h1>
         <p>
             The floating element should be positioned correctly on the bottom when
             the reference and floating elements have a non-integer size (width/height).
