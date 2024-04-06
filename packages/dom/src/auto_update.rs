@@ -230,6 +230,7 @@ pub fn auto_update(
     let frame_loop_frame_id = frame_id.clone();
     let frame_loop_closure = Rc::new(RefCell::new(None));
     let frame_loop_closure_clone = frame_loop_closure.clone();
+    let frame_loop_closure_update = update.clone();
 
     *frame_loop_closure_clone.borrow_mut() = Some(Closure::new(move || {
         let next_ref_rect = get_bounding_client_rect((&owned_reference).into(), false, false, None);
@@ -240,7 +241,7 @@ pub fn auto_update(
                 || next_ref_rect.width != prev_ref_rect.width
                 || next_ref_rect.height != prev_ref_rect.height
             {
-                update();
+                frame_loop_closure_update();
             }
         }
 
@@ -261,6 +262,8 @@ pub fn auto_update(
                 .expect("Frame loop closure should exist."),
         );
     }
+
+    update();
 
     Box::new(move || {
         for ancestor in &ancestors {

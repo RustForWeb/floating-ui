@@ -67,6 +67,24 @@ pub fn AutoUpdate() -> impl IntoView {
                     cleanup();
                 }
 
+                let size_factor = match layout_shift() {
+                    LayoutShift::Move => 0.9,
+                    _ => 1.0,
+                };
+
+                // Match React test behaviour by moving the size change from style attributes to here.
+                // The style attributes update after this effect, so `auto_update` would not use the correct size.
+                _ = reference
+                    .clone()
+                    .style(
+                        "width",
+                        format!("{}px", reference_size() as f64 * size_factor),
+                    )
+                    .style(
+                        "height",
+                        format!("{}px", reference_size() as f64 * size_factor),
+                    );
+
                 let reference: &Element = &reference;
                 effect_cleanup.replace(Some(auto_update(
                     reference.into(),
@@ -96,7 +114,7 @@ pub fn AutoUpdate() -> impl IntoView {
 
     view! {
         <h1>AutoUpdate</h1>
-        <Show when=move || layout_shift() == LayoutShift::Delete>
+        <Show when=move || layout_shift() != LayoutShift::Delete>
             <p>The floating element should update when required.</p>
         </Show>
         <Show when=move || layout_shift() == LayoutShift::Insert>
