@@ -71,11 +71,11 @@ pub fn Size() -> impl IntoView {
 
                         floating
                             .style()
-                            .set_property("width", &format!("{}px", available_width))
+                            .set_property("max-width", &format!("{}px", available_width))
                             .expect("Style should be updated.");
                         floating
                             .style()
-                            .set_property("height", &format!("{}px", available_height))
+                            .set_property("max-height", &format!("{}px", available_height))
                             .expect("Style should be updated.");
                     })
                     .detect_overflow(detect_overflow_options.clone()),

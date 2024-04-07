@@ -1,4 +1,4 @@
-use std::{ops::Deref, rc::Rc};
+use std::rc::Rc;
 
 use floating_ui_leptos::{
     dom::{get_overflow_ancestors, OverflowAncestor},
@@ -97,11 +97,8 @@ pub fn use_scroll(
             set_ancestors(ancestors);
 
             if let Some(scroll) = scroll_ref() {
-                let h: &web_sys::HtmlDivElement = scroll.deref();
-                log::info!("{:?}", h);
                 let x = scroll.scroll_width() / 2 - scroll.offset_width() / 2;
                 let y = scroll.scroll_height() / 2 - scroll.offset_height() / 2;
-                log::info!("x {x} | y {y}");
                 scroll.set_scroll_top(y);
                 scroll.set_scroll_left(match rtl() {
                     Some(true) => -x,

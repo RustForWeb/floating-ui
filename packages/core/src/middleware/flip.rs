@@ -17,7 +17,7 @@ use crate::{
 pub const FLIP_NAME: &str = "flip";
 
 /// Fallback strategy used by [`Flip`] middleware.
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub enum FallbackStrategy {
     #[default]
     BestFit,

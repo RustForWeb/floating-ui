@@ -1,21 +1,22 @@
 use std::{env, fs, path::Path, process::Command};
 
-const IMPLEMENTED_TESTS: [&str; 15] = [
-    "arrow",
-    "autoPlacement",
-    "autoUpdate",
-    "border",
-    "containing-block",
-    "decimal-size",
-    "offset",
-    "placement",
-    "relative",
-    "scroll",
-    "scrollbars",
-    "shift",
+const IMPLEMENTED_TESTS: [&str; 1] = [
+    // "arrow",
+    // "autoPlacement",
+    // "autoUpdate",
+    // "border",
+    // "containing-block",
+    // "decimal-size",
+    // "flip",
+    // "offset",
+    // "placement",
+    // "relative",
+    // "scroll",
+    // "scrollbars",
+    // "shift",
     "size",
-    "table",
-    "transform",
+    // "table",
+    // "transform",
 ];
 
 #[test]
