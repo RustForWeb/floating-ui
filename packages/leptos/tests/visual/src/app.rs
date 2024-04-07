@@ -8,6 +8,7 @@ use crate::spec::border::Border;
 use crate::spec::containing_block::ContainingBlock;
 use crate::spec::decimal_size::DecimalSize;
 use crate::spec::flip::Flip;
+use crate::spec::hide::Hide;
 use crate::spec::offset::Offset;
 use crate::spec::placement::Placement;
 use crate::spec::relative::Relative;
@@ -114,7 +115,7 @@ pub fn App() -> impl IntoView {
                     <Route path="size" view=Size />
                     <Route path="arrow" view=Arrow />
                     <Route path="offset" view=Offset />
-                    // <Route path="hide" view=Hide />
+                    <Route path="hide" view=Hide />
                     <Route path="autoPlacement" view=AutoPlacement />
                     // <Route path="inline" view=Inline />
                     <Route path="autoUpdate" view=AutoUpdate />

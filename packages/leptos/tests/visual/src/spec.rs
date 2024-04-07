@@ -5,6 +5,7 @@ pub mod border;
 pub mod containing_block;
 pub mod decimal_size;
 pub mod flip;
+pub mod hide;
 pub mod offset;
 pub mod placement;
 pub mod relative;

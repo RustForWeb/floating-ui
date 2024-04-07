@@ -1,6 +1,6 @@
 use std::{env, fs, path::Path, process::Command};
 
-const IMPLEMENTED_TESTS: [&str; 16] = [
+const IMPLEMENTED_TESTS: [&str; 17] = [
     "arrow",
     "autoPlacement",
     "autoUpdate",
@@ -8,6 +8,7 @@ const IMPLEMENTED_TESTS: [&str; 16] = [
     "containing-block",
     "decimal-size",
     "flip",
+    "hide",
     "offset",
     "placement",
     "relative",
