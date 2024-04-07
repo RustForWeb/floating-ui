@@ -11,7 +11,7 @@ use crate::types::{
 /// This export does not have any `platform` interface logic. You will need to write one for the platform you are using Floating UI with.
 ///
 /// See [`Platform`][`crate::types::Platform`].
-pub fn compute_position<Element, Window>(
+pub fn compute_position<Element: Clone, Window: Clone>(
     reference: &Element,
     floating: &Element,
     config: ComputePositionConfig<Element, Window>,
@@ -24,7 +24,7 @@ pub fn compute_position<Element, Window>(
     let rtl = platform.is_rtl(floating);
 
     let mut rects = platform.get_element_rects(GetElementRectsArgs {
-        reference,
+        reference: reference.into(),
         floating,
         strategy,
     });
@@ -79,7 +79,7 @@ pub fn compute_position<Element, Window>(
                             rects = match reset_rects {
                                 ResetRects::True => {
                                     platform.get_element_rects(GetElementRectsArgs {
-                                        reference,
+                                        reference: reference.into(),
                                         floating,
                                         strategy,
                                     })

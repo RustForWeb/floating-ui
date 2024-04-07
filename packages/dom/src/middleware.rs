@@ -1,16 +1,16 @@
 use floating_ui_core::middleware::{
     Arrow as CoreArrow, AutoPlacement as CoreAutoPlacement, Flip as CoreFlip, Hide as CoreHide,
-    Offset as CoreOffset, Shift as CoreShift, Size as CoreSize,
+    Inline as CoreInline, Offset as CoreOffset, Shift as CoreShift, Size as CoreSize,
 };
 use web_sys::{Element, Window};
 
 pub use floating_ui_core::middleware::{
     ApplyState, ArrowData, ArrowOptions, AutoPlacementData, AutoPlacementDataOverflow,
     AutoPlacementOptions, DefaultLimiter, FallbackStrategy, FlipData, FlipDataOverflow,
-    FlipOptions, HideData, HideOptions, HideStrategy, LimitShift, LimitShiftOffset,
+    FlipOptions, HideData, HideOptions, HideStrategy, InlineOptions, LimitShift, LimitShiftOffset,
     LimitShiftOffsetValues, LimitShiftOptions, OffsetData, OffsetOptions, OffsetOptionsValues,
     ShiftData, ShiftOptions, SizeOptions, ARROW_NAME, AUTO_PLACEMENT_NAME, FLIP_NAME, HIDE_NAME,
-    OFFSET_NAME, SHIFT_NAME, SIZE_NAME,
+    INLINE_NAME, OFFSET_NAME, SHIFT_NAME, SIZE_NAME,
 };
 
 /// Provides data to position an inner element of the floating element so that it appears centered to the reference element.
@@ -35,6 +35,11 @@ pub type Flip<'a> = CoreFlip<'a, Element, Window>;
 ///
 /// See <https://floating-ui.com/docs/hide> for the original documentation.
 pub type Hide<'a> = CoreHide<'a, Element, Window>;
+
+/// Provides improved positioning for inline reference elements that can span over multiple lines, such as hyperlinks or range selections.
+///
+/// See <https://floating-ui.com/docs/inline> for the original documentation.
+pub type Inline<'a> = CoreInline<'a, Element, Window>;
 
 /// Modifies the placement by translating the floating element along the specified axes.
 ///

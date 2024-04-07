@@ -313,7 +313,7 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window>
                 })
                 .collect();
 
-            placements_sorted_by_most_space.sort_by_key(|v| v.1 as i64);
+            placements_sorted_by_most_space.sort_by(|a, b| a.1.total_cmp(&b.1));
 
             let placements_that_fit_on_each_side: Vec<_> = placements_sorted_by_most_space
                 .clone()

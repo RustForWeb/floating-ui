@@ -17,7 +17,7 @@ pub fn get_element_rects(platform: &Platform, args: GetElementRectsArgs<Element>
 
     ElementRects {
         reference: get_rect_relative_to_offset_parent(
-            args.reference.into(),
+            args.reference,
             offset_parent_ref.into(),
             args.strategy,
         ),

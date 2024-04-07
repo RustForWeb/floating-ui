@@ -55,30 +55,31 @@ pub fn Size() -> impl IntoView {
                 }
 
                 middleware.push(Box::new(Size::new(
-                    SizeOptions::new(&|ApplyState {
-                                           state,
-                                           available_width,
-                                           available_height,
-                                       }: ApplyState<
-                        web_sys::Element,
-                        web_sys::Window,
-                    >| {
-                        let MiddlewareState { elements, .. } = state;
+                    SizeOptions::default()
+                        .apply(&|ApplyState {
+                                     state,
+                                     available_width,
+                                     available_height,
+                                 }: ApplyState<
+                            web_sys::Element,
+                            web_sys::Window,
+                        >| {
+                            let MiddlewareState { elements, .. } = state;
 
-                        let floating = (*elements.floating)
-                            .clone()
-                            .unchecked_into::<web_sys::HtmlElement>();
+                            let floating = (*elements.floating)
+                                .clone()
+                                .unchecked_into::<web_sys::HtmlElement>();
 
-                        floating
-                            .style()
-                            .set_property("max-width", &format!("{}px", available_width))
-                            .expect("Style should be updated.");
-                        floating
-                            .style()
-                            .set_property("max-height", &format!("{}px", available_height))
-                            .expect("Style should be updated.");
-                    })
-                    .detect_overflow(detect_overflow_options.clone()),
+                            floating
+                                .style()
+                                .set_property("max-width", &format!("{}px", available_width))
+                                .expect("Style should be updated.");
+                            floating
+                                .style()
+                                .set_property("max-height", &format!("{}px", available_height))
+                                .expect("Style should be updated.");
+                        })
+                        .detect_overflow(detect_overflow_options.clone()),
                 )));
 
                 if add_flip_shift() && has_edge_alignment() {

@@ -260,6 +260,68 @@ pub trait VirtualElement<Element>: DynClone {
 
 dyn_clone::clone_trait_object!(<Element> VirtualElement<Element>);
 
+pub trait GetBoundingClientRectCloneable: DynClone {
+    fn call(&self) -> ClientRectObject;
+}
+
+impl<F> GetBoundingClientRectCloneable for F
+where
+    F: Fn() -> ClientRectObject + Clone,
+{
+    fn call(&self) -> ClientRectObject {
+        self()
+    }
+}
+
+dyn_clone::clone_trait_object!(GetBoundingClientRectCloneable);
+
+#[derive(Clone)]
+pub struct DefaultVirtualElement<Element: Clone> {
+    pub get_bounding_client_rect: Box<dyn GetBoundingClientRectCloneable>,
+    pub context_element: Option<Element>,
+}
+
+impl<Element: Clone> DefaultVirtualElement<Element> {
+    pub fn new(get_bounding_client_rect: Box<dyn GetBoundingClientRectCloneable>) -> Self {
+        DefaultVirtualElement {
+            get_bounding_client_rect,
+            context_element: None,
+        }
+    }
+
+    pub fn get_bounding_client_rect(
+        mut self,
+        get_bounding_client_rect: Box<dyn GetBoundingClientRectCloneable>,
+    ) -> Self {
+        self.get_bounding_client_rect = get_bounding_client_rect;
+        self
+    }
+
+    pub fn context_element(mut self, context_element: Element) -> Self {
+        self.context_element = Some(context_element);
+        self
+    }
+}
+
+// impl<Element: Clone> Clone for DefaultVirtualElement<Element> {
+//     fn clone(&self) -> Self {
+//         Self {
+//             get_bounding_client_rect: dyn_clone::clone_box(&*self.get_bounding_client_rect),
+//             context_element: self.context_element.clone(),
+//         }
+//     }
+// }
+
+impl<Element: Clone> VirtualElement<Element> for DefaultVirtualElement<Element> {
+    fn get_bounding_client_rect(&self) -> ClientRectObject {
+        (self.get_bounding_client_rect).call()
+    }
+
+    fn context_element(&self) -> Option<Element> {
+        self.context_element.clone()
+    }
+}
+
 #[derive(Clone)]
 pub enum ElementOrVirtual<'a, Element: Clone> {
     Element(&'a Element),
@@ -278,6 +340,12 @@ impl<'a, Element: Clone> ElementOrVirtual<'a, Element> {
 impl<'a, Element: Clone> From<&'a Element> for ElementOrVirtual<'a, Element> {
     fn from(value: &'a Element) -> Self {
         ElementOrVirtual::Element(value)
+    }
+}
+
+impl<'a, Element: Clone> From<Box<dyn VirtualElement<Element>>> for ElementOrVirtual<'a, Element> {
+    fn from(value: Box<dyn VirtualElement<Element>>) -> Self {
+        ElementOrVirtual::VirtualElement(value)
     }
 }
 

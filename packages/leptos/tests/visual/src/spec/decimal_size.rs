@@ -16,7 +16,7 @@ pub fn DecimalSize() -> impl IntoView {
     let (size, set_size) = create_signal(INTEGER);
     let (truncate, set_truncate) = create_signal(false);
 
-    let middleware: MiddlewareVec = vec![Box::new(Size::new(SizeOptions::new(
+    let middleware: MiddlewareVec = vec![Box::new(Size::new(SizeOptions::default().apply(
         &|ApplyState { state, .. }| {
             let MiddlewareState {
                 elements, rects, ..

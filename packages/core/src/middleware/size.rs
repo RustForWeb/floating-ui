@@ -14,12 +14,15 @@ use super::SHIFT_NAME;
 /// Name of the [`Size`] middleware.
 pub const SIZE_NAME: &str = "size";
 
+/// State passed to [`SizeOptions::apply`].
 #[derive(Clone)]
 pub struct ApplyState<'a, Element: Clone, Window: Clone> {
     pub state: MiddlewareState<'a, Element, Window>,
     pub available_width: f64,
     pub available_height: f64,
 }
+
+pub type ApplyFn<Element, Window> = dyn Fn(ApplyState<Element, Window>);
 
 /// Options for [`Size`] middleware.
 #[derive(Clone)]
@@ -30,14 +33,14 @@ pub struct SizeOptions<'a, Element: Clone, Window: Clone> {
     pub detect_overflow: Option<DetectOverflowOptions<Element>>,
 
     /// Function that is called to perform style mutations to the floating element to change its size.
-    pub apply: &'a dyn Fn(ApplyState<Element, Window>),
+    pub apply: Option<&'a ApplyFn<Element, Window>>,
 }
 
 impl<'a, Element: Clone, Window: Clone> SizeOptions<'a, Element, Window> {
-    pub fn new(value: &'a dyn Fn(ApplyState<Element, Window>)) -> Self {
+    pub fn new() -> Self {
         SizeOptions {
             detect_overflow: None,
-            apply: value,
+            apply: None,
         }
     }
 
@@ -48,9 +51,18 @@ impl<'a, Element: Clone, Window: Clone> SizeOptions<'a, Element, Window> {
     }
 
     /// Set `apply` option.
-    pub fn apply(mut self, value: &'a dyn Fn(ApplyState<Element, Window>)) -> Self {
-        self.apply = value;
+    pub fn apply(mut self, value: &'a ApplyFn<Element, Window>) -> Self {
+        self.apply = Some(value);
         self
+    }
+}
+
+impl<'a, Element: Clone, Window: Clone> Default for SizeOptions<'a, Element, Window> {
+    fn default() -> Self {
+        Self {
+            detect_overflow: Default::default(),
+            apply: Default::default(),
+        }
     }
 }
 
@@ -195,14 +207,16 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Size<'a,
             }
         }
 
-        (options.apply)(ApplyState {
-            state: MiddlewareState {
-                elements: elements.clone(),
-                ..state
-            },
-            available_width,
-            available_height,
-        });
+        if let Some(apply) = options.apply {
+            apply(ApplyState {
+                state: MiddlewareState {
+                    elements: elements.clone(),
+                    ..state
+                },
+                available_width,
+                available_height,
+            });
+        }
 
         let next_dimensions = platform.get_dimensions(elements.floating);
 

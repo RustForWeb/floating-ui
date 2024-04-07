@@ -54,7 +54,7 @@ pub fn Hide() -> impl IntoView {
                     middleware.push(Box::new(Shift::new(ShiftOptions::default())));
                 }
 
-                middleware.push(Box::new(Size::new(SizeOptions::new(
+                middleware.push(Box::new(Size::new(SizeOptions::default().apply(
                     match is_fixed_strategy() {
                         true => &|ApplyState {
                                       state,

@@ -87,7 +87,7 @@ impl<Element> Default for DetectOverflowOptions<Element> {
 /// - `0` = lies flush with the boundary
 ///
 /// See <https://floating-ui.com/docs/detectOverflow> for the original documentation.
-pub fn detect_overflow<Element, Window>(
+pub fn detect_overflow<Element: Clone, Window: Clone>(
     state: MiddlewareState<Element, Window>,
     options: DetectOverflowOptions<Element>,
 ) -> SideObject {

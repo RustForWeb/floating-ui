@@ -292,7 +292,7 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Flip<'a,
                 .iter()
                 .filter(|overflow| overflow.overflows[0] <= 0.0)
                 .collect();
-            reset_placement.sort_by_key(|overflow| overflow.overflows[1] as i64);
+            reset_placement.sort_by(|a, b| a.overflows[1].total_cmp(&b.overflows[1]));
 
             let mut reset_placement = reset_placement.first().map(|overflow| overflow.placement);
 
@@ -313,7 +313,7 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Flip<'a,
                                 )
                             })
                             .collect();
-                        placement.sort_by_key(|v| v.1 as i64);
+                        placement.sort_by(|a, b| a.1.total_cmp(&b.1));
 
                         let placement = placement.first().map(|v| v.0);
                         if placement.is_some() {

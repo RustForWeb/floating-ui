@@ -5,7 +5,7 @@ use dyn_clone::DynClone;
 use serde::{de::DeserializeOwned, Serialize};
 
 use floating_ui_utils::{
-    ClientRectObject, Coords, Dimensions, ElementOrWindow, ElementRects, Length,
+    ClientRectObject, Coords, Dimensions, ElementOrVirtual, ElementOrWindow, ElementRects, Length,
     OwnedElementOrWindow, Placement, Rect, Strategy,
 };
 
@@ -49,8 +49,8 @@ impl<'a, Element, Window, T: Clone> From<DerivableFn<'a, Element, Window, T>>
 }
 
 /// Arguments for [`Platform::get_element_rects`].
-pub struct GetElementRectsArgs<'a, Element> {
-    pub reference: &'a Element,
+pub struct GetElementRectsArgs<'a, Element: Clone> {
+    pub reference: ElementOrVirtual<'a, Element>,
     pub floating: &'a Element,
     pub strategy: Strategy,
 }
@@ -74,7 +74,7 @@ pub struct ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<'a, Element
 /// Platform interface methods to work with the current platform.
 ///
 /// See <https://floating-ui.com/docs/platform> for the original documentation.
-pub trait Platform<Element, Window>: Debug {
+pub trait Platform<Element: Clone, Window: Clone>: Debug {
     fn get_element_rects(&self, args: GetElementRectsArgs<Element>) -> ElementRects;
 
     fn get_clipping_rect(&self, args: GetClippingRectArgs<Element>) -> Rect;

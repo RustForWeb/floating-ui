@@ -11,7 +11,7 @@ use crate::{
     },
 };
 
-fn convert_value_to_coords<Element, Window>(
+fn convert_value_to_coords<Element: Clone, Window: Clone>(
     state: MiddlewareState<Element, Window>,
     options: &OffsetOptions,
 ) -> Coords {
