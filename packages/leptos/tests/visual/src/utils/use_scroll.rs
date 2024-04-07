@@ -13,7 +13,7 @@ pub struct UseScrollOptions {
     pub reference_ref: NodeRef<Div>,
     pub floating_ref: NodeRef<Div>,
     pub update: Rc<dyn Fn()>,
-    pub rtl: Option<bool>,
+    pub rtl: MaybeProp<bool>,
 }
 
 pub struct UseScrollReturn {
@@ -103,7 +103,7 @@ pub fn use_scroll(
                 let y = scroll.scroll_height() / 2 - scroll.offset_height() / 2;
                 log::info!("x {x} | y {y}");
                 scroll.set_scroll_top(y);
-                scroll.set_scroll_left(match rtl {
+                scroll.set_scroll_left(match rtl() {
                     Some(true) => -x,
                     _ => x,
                 })

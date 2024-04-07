@@ -89,7 +89,7 @@ pub fn AutoPlacement() -> impl IntoView {
         reference_ref,
         floating_ref,
         update,
-        rtl: None,
+        rtl: None::<bool>.into(),
     });
 
     view! {

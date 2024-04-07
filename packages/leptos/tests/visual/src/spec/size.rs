@@ -95,8 +95,7 @@ pub fn Size() -> impl IntoView {
         reference_ref,
         floating_ref,
         update,
-        // TODO: reactive?
-        rtl: Some(rtl()),
+        rtl: rtl.into(),
     });
 
     view! {

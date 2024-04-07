@@ -77,7 +77,7 @@ pub fn Arrow() -> impl IntoView {
         reference_ref,
         floating_ref,
         update,
-        rtl: None,
+        rtl: None::<bool>.into(),
     });
 
     let placement_update_scroll = update_scroll.clone();
