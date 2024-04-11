@@ -1,42 +1,47 @@
-use std::ops::Deref;
+use std::marker::PhantomData;
 
 use floating_ui_dom::{
     Arrow as CoreArrow, ArrowOptions as CoreArrowOptions, Middleware, MiddlewareReturn,
     MiddlewareState, Padding, ARROW_NAME,
 };
-use leptos::{html::ElementDescriptor, NodeRef};
+use leptos::html::ElementDescriptor;
+
+use crate::node_ref::NodeRefAsElement;
 
 /// Options for [`Arrow`].
 #[derive(Clone)]
-pub struct ArrowOptions<Descriptor, Element>
+pub struct ArrowOptions<Ref, RefEl>
 where
-    Descriptor: ElementDescriptor + Deref<Target = Element> + Clone + 'static,
-    Element: Deref<Target = web_sys::HtmlElement>,
+    Ref: NodeRefAsElement<RefEl> + Copy + 'static,
+    RefEl: ElementDescriptor + Clone + 'static,
 {
     /// The arrow element to be positioned.
-    pub element: NodeRef<Descriptor>,
+    pub element: Ref,
 
     /// The padding between the arrow element and the floating element edges.
     /// Useful when the floating element has rounded corners.
     ///
     /// Defaults to `0` on all sides.
     pub padding: Option<Padding>,
+
+    phantom: PhantomData<RefEl>,
 }
 
-impl<Descriptor, Element> ArrowOptions<Descriptor, Element>
+impl<Ref, RefEl> ArrowOptions<Ref, RefEl>
 where
-    Descriptor: ElementDescriptor + Deref<Target = Element> + Clone + 'static,
-    Element: Deref<Target = web_sys::HtmlElement>,
+    Ref: NodeRefAsElement<RefEl> + Copy + 'static,
+    RefEl: ElementDescriptor + Clone + 'static,
 {
-    pub fn new(element: NodeRef<Descriptor>) -> Self {
+    pub fn new(element: Ref) -> Self {
         ArrowOptions {
             element,
             padding: None,
+            phantom: PhantomData,
         }
     }
 
     /// Set `element` option.
-    pub fn element(mut self, value: NodeRef<Descriptor>) -> Self {
+    pub fn element(mut self, value: Ref) -> Self {
         self.element = value;
         self
     }
@@ -52,29 +57,28 @@ where
 ///
 /// See <https://floating-ui.com/docs/arrow> for the original documentation.
 #[derive(Clone)]
-pub struct Arrow<Descriptor, Element>
+pub struct Arrow<Ref, RefEl>
 where
-    Descriptor: ElementDescriptor + Deref<Target = Element> + Clone + 'static,
-    Element: Deref<Target = web_sys::HtmlElement> + Clone,
+    Ref: NodeRefAsElement<RefEl> + Copy + 'static,
+    RefEl: ElementDescriptor + Clone + 'static,
 {
-    options: ArrowOptions<Descriptor, Element>,
+    options: ArrowOptions<Ref, RefEl>,
 }
 
-impl<Descriptor, Element> Arrow<Descriptor, Element>
+impl<Ref, RefEl> Arrow<Ref, RefEl>
 where
-    Descriptor: ElementDescriptor + Deref<Target = Element> + Clone + 'static,
-    Element: Deref<Target = web_sys::HtmlElement> + Clone,
+    Ref: NodeRefAsElement<RefEl> + Copy + 'static,
+    RefEl: ElementDescriptor + Clone + 'static,
 {
-    pub fn new(options: ArrowOptions<Descriptor, Element>) -> Self {
+    pub fn new(options: ArrowOptions<Ref, RefEl>) -> Self {
         Arrow { options }
     }
 }
 
-impl<Descriptor, Element> Middleware<web_sys::Element, web_sys::Window>
-    for Arrow<Descriptor, Element>
+impl<Ref, RefEl> Middleware<web_sys::Element, web_sys::Window> for Arrow<Ref, RefEl>
 where
-    Descriptor: ElementDescriptor + Deref<Target = Element> + Clone + 'static,
-    Element: Deref<Target = web_sys::HtmlElement> + Clone,
+    Ref: NodeRefAsElement<RefEl> + Copy + 'static,
+    RefEl: ElementDescriptor + Clone + 'static,
 {
     fn name(&self) -> &'static str {
         ARROW_NAME
@@ -84,7 +88,7 @@ where
         &self,
         state: MiddlewareState<web_sys::Element, web_sys::Window>,
     ) -> MiddlewareReturn {
-        let element = self.options.element.get_untracked();
+        let element = self.options.element.get_untracked_as_element();
 
         if let Some(element) = element {
             let element: &web_sys::Element = &element;

@@ -4,7 +4,10 @@ use floating_ui_leptos::{
     OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side, UseFloatingOptions,
     UseFloatingReturn, ARROW_NAME,
 };
-use leptos::{html::Div, *};
+use leptos::{
+    html::{AnyElement, Div},
+    *,
+};
 
 use crate::utils::{
     all_placements::ALL_PLACEMENTS,
@@ -15,8 +18,7 @@ use crate::utils::{
 pub fn Arrow() -> impl IntoView {
     let reference_ref = create_node_ref::<Div>();
     let floating_ref = create_node_ref::<Div>();
-    let arrow_div_ref = create_node_ref::<Div>();
-    // let arrow_svg_ref = create_node_ref::<Svg>();
+    let arrow_ref = create_node_ref::<AnyElement>();
 
     let (placement, set_placement) = create_signal(Placement::Bottom);
     let (padding, set_padding) = create_signal(0);
@@ -51,7 +53,7 @@ pub fn Arrow() -> impl IntoView {
                         DetectOverflowOptions::default().padding(Padding::All(10.0)),
                     ))),
                     Box::new(Arrow::new(
-                        ArrowOptions::new(arrow_div_ref).padding(Padding::All(padding() as f64)),
+                        ArrowOptions::new(arrow_ref).padding(Padding::All(padding() as f64)),
                     )),
                 ]);
 
@@ -115,47 +117,64 @@ pub fn Arrow() -> impl IntoView {
                         false => "Floating".into()
                     }}
 
-                    <div
-                        _ref=arrow_div_ref
-                        class="arrow"
-                        style:position="absolute"
-                        style:top=move || match static_side() {
-                            Side::Top => "-15px".into(),
-                            _ => match arrow_y() {
-                                Some(arrow_y) => format!("{}px", arrow_y),
-                                None => "".into()
-                            }
-                        }
-                        style:right=move || match static_side() {
-                            Side::Right => "-15px",
-                            _ => ""
-                        }
-                        style:bottom=move || match static_side() {
-                            Side::Bottom => "-15px",
-                            _ => ""
-                        }
-                        style:left=move || match static_side() {
-                            Side::Left => "-15px".into(),
-                            _ => match arrow_x() {
-                                Some(arrow_x) => format!("{}px", arrow_x),
-                                None => "".into()
-                            }
-                        }
-                    />
-
-                    // TODO: replace this with Show
-                    // match svg() {
-                    //     // TODO: copy attributes to SVG
-                    //     true => view!{
-                    //         <svg
-                    //             _ref=arrow_svg_ref
-                    //             class="arrow"
-                    //         />
-                    //     }.into_any(),
-                    //     false => view! {
-
-                    //     }.into_any()
-                    // }
+                    {move || match svg() {
+                        true => view!{
+                            <svg
+                                class="arrow"
+                                style:position="absolute"
+                                style:top=move || match static_side() {
+                                    Side::Top => "-15px".into(),
+                                    _ => match arrow_y() {
+                                        Some(arrow_y) => format!("{}px", arrow_y),
+                                        None => "".into()
+                                    }
+                                }
+                                style:right=move || match static_side() {
+                                    Side::Right => "-15px",
+                                    _ => ""
+                                }
+                                style:bottom=move || match static_side() {
+                                    Side::Bottom => "-15px",
+                                    _ => ""
+                                }
+                                style:left=move || match static_side() {
+                                    Side::Left => "-15px".into(),
+                                    _ => match arrow_x() {
+                                        Some(arrow_x) => format!("{}px", arrow_x),
+                                        None => "".into()
+                                    }
+                                }
+                            />
+                        }.into_any().node_ref(arrow_ref),
+                        false => view!{
+                            <div
+                                class="arrow"
+                                style:position="absolute"
+                                style:top=move || match static_side() {
+                                    Side::Top => "-15px".into(),
+                                    _ => match arrow_y() {
+                                        Some(arrow_y) => format!("{}px", arrow_y),
+                                        None => "".into()
+                                    }
+                                }
+                                style:right=move || match static_side() {
+                                    Side::Right => "-15px",
+                                    _ => ""
+                                }
+                                style:bottom=move || match static_side() {
+                                    Side::Bottom => "-15px",
+                                    _ => ""
+                                }
+                                style:left=move || match static_side() {
+                                    Side::Left => "-15px".into(),
+                                    _ => match arrow_x() {
+                                        Some(arrow_x) => format!("{}px", arrow_x),
+                                        None => "".into()
+                                    }
+                                }
+                            />
+                        }.into_any().node_ref(arrow_ref)
+                    }}
                 </div>
             </div>
         </div>

@@ -1,31 +1,31 @@
-use std::{cell::RefCell, ops::Deref, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 use floating_ui_dom::{
     compute_position, ComputePositionConfig, MiddlewareData, Placement, Strategy,
 };
 use leptos::{
     create_effect, create_memo, create_rw_signal, create_signal, html::ElementDescriptor,
-    on_cleanup, watch, NodeRef, SignalGet, SignalGetUntracked, SignalUpdate,
+    on_cleanup, watch, SignalGet, SignalGetUntracked, SignalUpdate,
 };
 
 use crate::{
+    node_ref::NodeRefAsElement,
     types::{FloatingStyles, UseFloatingOptions, UseFloatingReturn},
     utils::{get_dpr::get_dpr, round_by_dpr::round_by_dpr},
     WhileElementsMountedCleanupFn,
 };
 
 /// Computes the `x` and `y` coordinates that will place the floating element next to a reference element.
-pub fn use_floating<Reference, ReferenceEl, Floating, FloatingEl>(
-    reference: NodeRef<Reference>,
-    floating: NodeRef<Floating>,
+pub fn use_floating<
+    Reference: NodeRefAsElement<ReferenceEl> + Copy + 'static,
+    ReferenceEl: ElementDescriptor + Clone + 'static,
+    Floating: NodeRefAsElement<FloatingEl> + Copy + 'static,
+    FloatingEl: ElementDescriptor + Clone + 'static,
+>(
+    reference: Reference,
+    floating: Floating,
     options: UseFloatingOptions,
-) -> UseFloatingReturn
-where
-    Reference: ElementDescriptor + Deref<Target = ReferenceEl> + Clone + 'static,
-    ReferenceEl: Deref<Target = web_sys::HtmlElement>,
-    Floating: ElementDescriptor + Deref<Target = FloatingEl> + Clone + 'static,
-    FloatingEl: Deref<Target = web_sys::HtmlElement>,
-{
+) -> UseFloatingReturn {
     let open_option = move || options.open.get().unwrap_or(true);
     let placement_option_untracked = move || {
         options
@@ -58,7 +58,7 @@ where
             will_change: None,
         };
 
-        if let Some(floating_element) = floating.get() {
+        if let Some(floating_element) = floating.get_as_element() {
             let x_val = round_by_dpr(&floating_element, x());
             let y_val = round_by_dpr(&floating_element, y());
 
@@ -84,8 +84,8 @@ where
     });
 
     let update = move || {
-        if let Some(reference_element) = reference.get_untracked() {
-            if let Some(floating_element) = floating.get_untracked() {
+        if let Some(reference_element) = reference.get_untracked_as_element() {
+            if let Some(floating_element) = floating.get_untracked_as_element() {
                 let config = ComputePositionConfig {
                     placement: Some(placement_option_untracked()),
                     strategy: Some(strategy_option_untracked()),
@@ -124,8 +124,8 @@ where
         attach_cleanup_rc();
 
         if let Some(while_elements_mounted) = options.while_elements_mounted.get() {
-            if let Some(reference_element) = reference.get() {
-                if let Some(floating_element) = floating.get() {
+            if let Some(reference_element) = reference.get_as_element() {
+                if let Some(floating_element) = floating.get_as_element() {
                     attach_while_elements_mounted_cleanup.replace(Some(while_elements_mounted(
                         &reference_element,
                         &floating_element,
