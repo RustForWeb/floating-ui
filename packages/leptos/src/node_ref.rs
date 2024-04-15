@@ -4,16 +4,18 @@ use leptos::{html::ElementDescriptor, HtmlElement, NodeRef};
 use web_sys::Element;
 
 pub trait NodeRefAsElement<T: ElementDescriptor + Clone + 'static> {
+    fn get(&self) -> Option<HtmlElement<T>>;
+
     fn get_as_element(&self) -> Option<Element>;
 
     fn get_untracked_as_element(&self) -> Option<Element>;
-
-    fn on_load<F>(self, f: F)
-    where
-        F: FnOnce(HtmlElement<T>) + 'static;
 }
 
 impl NodeRefAsElement<leptos::html::AnyElement> for NodeRef<leptos::html::AnyElement> {
+    fn get(&self) -> Option<HtmlElement<leptos::html::AnyElement>> {
+        self.get()
+    }
+
     fn get_as_element(&self) -> Option<Element> {
         self.get().map(|html_element| {
             let element: &web_sys::Element = html_element.deref();
@@ -27,13 +29,6 @@ impl NodeRefAsElement<leptos::html::AnyElement> for NodeRef<leptos::html::AnyEle
             element.clone()
         })
     }
-
-    fn on_load<F>(self, f: F)
-    where
-        F: FnOnce(HtmlElement<leptos::html::AnyElement>) + 'static,
-    {
-        self.on_load(f)
-    }
 }
 
 macro_rules! generate_html_tags {
@@ -43,6 +38,10 @@ macro_rules! generate_html_tags {
         paste::paste! {
             $(
                 impl NodeRefAsElement<leptos::html::[<$tag>]> for NodeRef<leptos::html::[<$tag>]> {
+                    fn get(&self) -> Option<HtmlElement<leptos::html::[<$tag>]>> {
+                        self.get()
+                    }
+
                     fn get_as_element(&self) -> Option<Element> {
                         self.get().map(|html_element| {
                             let element: &web_sys::Element = html_element.deref();
@@ -55,13 +54,6 @@ macro_rules! generate_html_tags {
                             let element: &web_sys::Element = html_element.deref();
                             element.clone()
                         })
-                    }
-
-                    fn on_load<F>(self, f: F)
-                    where
-                        F: FnOnce(HtmlElement<leptos::html::[<$tag>]>) + 'static,
-                    {
-                        self.on_load(f)
                     }
                 }
             )*
@@ -76,6 +68,10 @@ macro_rules! generate_math_tags {
         paste::paste! {
             $(
                 impl NodeRefAsElement<leptos::math::[<$tag>]> for NodeRef<leptos::math::[<$tag>]> {
+                    fn get(&self) -> Option<HtmlElement<leptos::math::[<$tag>]>> {
+                        self.get()
+                    }
+
                     fn get_as_element(&self) -> Option<Element> {
                         self.get().map(|html_element| {
                             let element: &web_sys::Element = html_element.deref();
@@ -88,13 +84,6 @@ macro_rules! generate_math_tags {
                             let element: &web_sys::Element = html_element.deref();
                             element.clone()
                         })
-                    }
-
-                    fn on_load<F>(self, f: F)
-                    where
-                        F: FnOnce(HtmlElement<leptos::math::[<$tag>]>) + 'static,
-                    {
-                        self.on_load(f)
                     }
                 }
             )*
@@ -109,6 +98,10 @@ macro_rules! generate_svg_tags {
         paste::paste! {
             $(
                 impl NodeRefAsElement<leptos::svg::[<$tag>]> for NodeRef<leptos::svg::[<$tag>]> {
+                    fn get(&self) -> Option<HtmlElement<leptos::svg::[<$tag>]>> {
+                        self.get()
+                    }
+
                     fn get_as_element(&self) -> Option<Element> {
                         self.get().map(|html_element| {
                             let element: &web_sys::Element = html_element.deref();
@@ -121,13 +114,6 @@ macro_rules! generate_svg_tags {
                             let element: &web_sys::Element = html_element.deref();
                             element.clone()
                         })
-                    }
-
-                    fn on_load<F>(self, f: F)
-                    where
-                        F: FnOnce(HtmlElement<leptos::svg::[<$tag>]>) + 'static,
-                    {
-                        self.on_load(f)
                     }
                 }
             )*

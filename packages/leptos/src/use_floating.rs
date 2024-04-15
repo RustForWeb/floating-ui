@@ -4,8 +4,8 @@ use floating_ui_dom::{
     compute_position, ComputePositionConfig, MiddlewareData, Placement, Strategy,
 };
 use leptos::{
-    create_effect, create_memo, create_rw_signal, create_signal, html::ElementDescriptor,
-    on_cleanup, watch, SignalGet, SignalGetUntracked, SignalUpdate,
+    create_effect, create_memo, create_signal, html::ElementDescriptor, on_cleanup, watch,
+    SignalGet, SignalGetUntracked,
 };
 
 use crate::{
@@ -124,8 +124,8 @@ pub fn use_floating<
         attach_cleanup_rc();
 
         if let Some(while_elements_mounted) = options.while_elements_mounted.get() {
-            if let Some(reference_element) = reference.get_as_element() {
-                if let Some(floating_element) = floating.get_as_element() {
+            if let Some(reference_element) = reference.get_untracked_as_element() {
+                if let Some(floating_element) = floating.get_untracked_as_element() {
                     attach_while_elements_mounted_cleanup.replace(Some(while_elements_mounted(
                         &reference_element,
                         &floating_element,
@@ -137,6 +137,7 @@ pub fn use_floating<
             attach_update_rc();
         }
     };
+    let attach_rc = Rc::new(attach);
 
     let reset = move || {
         if !open_option() {
@@ -144,20 +145,23 @@ pub fn use_floating<
         }
     };
 
-    let remaining_mounts = create_rw_signal::<u32>(2);
-    reference.on_load(move |reference| {
-        _ = reference.on_mount(move |_| {
-            remaining_mounts.update(|count| *count -= 1);
-        });
-    });
-    floating.on_load(move |floating| {
-        _ = floating.on_mount(move |_| {
-            remaining_mounts.update(|count| *count -= 1);
-        });
-    });
+    let reference_attach = attach_rc.clone();
     create_effect(move |_| {
-        if remaining_mounts.get() == 0 {
-            attach();
+        if let Some(reference) = reference.get() {
+            let reference_attach = reference_attach.clone();
+            _ = reference.on_mount(move |_| {
+                reference_attach();
+            });
+        }
+    });
+
+    let floating_attach = attach_rc.clone();
+    create_effect(move |_| {
+        if let Some(floating) = floating.get() {
+            let floating_attach = floating_attach.clone();
+            _ = floating.on_mount(move |_| {
+                floating_attach();
+            });
         }
     });
 
