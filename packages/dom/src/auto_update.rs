@@ -1,9 +1,12 @@
 use std::{cell::RefCell, rc::Rc};
 
-use floating_ui_utils::dom::{get_overflow_ancestors, OverflowAncestor};
+use floating_ui_utils::dom::{
+    get_document_element, get_overflow_ancestors, get_window, OverflowAncestor,
+};
 use web_sys::{
-    wasm_bindgen::{closure::Closure, JsCast},
-    window, AddEventListenerOptions, Element, EventTarget, ResizeObserver, ResizeObserverEntry,
+    wasm_bindgen::{closure::Closure, JsCast, JsValue},
+    window, AddEventListenerOptions, Element, EventTarget, IntersectionObserver,
+    IntersectionObserverEntry, IntersectionObserverInit, ResizeObserver, ResizeObserverEntry,
 };
 
 use crate::{
@@ -25,10 +28,126 @@ fn cancel_animation_frame(handle: i32) {
         .expect("Cancel animation frame should be successful.")
 }
 
-fn observe_move(_element: &Element, _on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
-    // TODO
+fn observe_move(element: Element, on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
+    let io: Rc<RefCell<Option<IntersectionObserver>>> = Rc::new(RefCell::new(None));
+    let timeout_id: Rc<RefCell<Option<i32>>> = Rc::new(RefCell::new(None));
 
-    Box::new(|| {})
+    let window = get_window(Some(&element));
+    let root = get_document_element(Some((&element).into()));
+
+    type ObserveClosure = Closure<dyn Fn(Vec<IntersectionObserverEntry>)>;
+    let observe_closure: Rc<RefCell<Option<ObserveClosure>>> = Rc::new(RefCell::new(None));
+
+    let cleanup_io = io.clone();
+    let cleanup_timeout_id = timeout_id.clone();
+    let cleanup_window = window.clone();
+    let cleanup_observe_closure = observe_closure.clone();
+    let cleanup = move || {
+        if let Some(timeout_id) = cleanup_timeout_id.take() {
+            cleanup_window.clear_timeout_with_handle(timeout_id);
+        }
+
+        if let Some(io) = cleanup_io.take() {
+            io.disconnect();
+        }
+
+        _ = cleanup_observe_closure.take();
+    };
+    let cleanup_rc = Rc::new(cleanup);
+    type RefreshFn = Box<dyn Fn(bool, f64)>;
+    let refresh_closure: Rc<RefCell<Option<RefreshFn>>> = Rc::new(RefCell::new(None));
+    let refresh_closure_clone = refresh_closure.clone();
+
+    let refresh_cleanup = cleanup_rc.clone();
+    *refresh_closure_clone.borrow_mut() = Some(Box::new(move |skip: bool, threshold: f64| {
+        refresh_cleanup();
+
+        let rect = element.get_bounding_client_rect();
+
+        if !skip {
+            on_move();
+        }
+
+        if rect.width() == 0.0 || rect.height() == 0.0 {
+            return;
+        }
+
+        let inset_top = rect.top().floor();
+        let inset_right = (root.client_width() as f64 - (rect.left() + rect.width())).floor();
+        let inset_bottom = (root.client_height() as f64 - (rect.top() + rect.height())).floor();
+        let inset_left = rect.left().floor();
+        let root_margin = format!(
+            "{}px {}px {}px {}px",
+            -inset_top, -inset_right, -inset_bottom, -inset_left
+        );
+
+        let is_first_update: Rc<RefCell<bool>> = Rc::new(RefCell::new(true));
+
+        let timeout_refresh = refresh_closure.clone();
+        let timeout_closure: Rc<Closure<dyn Fn()>> = Rc::new(Closure::new(move || {
+            timeout_refresh
+                .borrow()
+                .as_ref()
+                .expect("Refresh closure should exist.")(false, 1e-7)
+        }));
+
+        let observe_timeout_id = timeout_id.clone();
+        let observe_window = window.clone();
+        let observe_refresh = refresh_closure.clone();
+        let local_observe_closure = Closure::new(move |entries: Vec<IntersectionObserverEntry>| {
+            let ratio = entries[0].intersection_ratio();
+
+            if ratio != threshold {
+                if !*is_first_update.borrow() {
+                    observe_refresh
+                        .borrow()
+                        .as_ref()
+                        .expect("Refresh closure should exist.")(false, 1.0);
+                    return;
+                }
+
+                if ratio == 0.0 {
+                    observe_timeout_id.replace(Some(
+                        observe_window
+                            .set_timeout_with_callback_and_timeout_and_arguments_0(
+                                (*timeout_closure).as_ref().unchecked_ref(),
+                                100,
+                            )
+                            .expect("Set timeout should be successful."),
+                    ));
+                } else {
+                    observe_refresh
+                        .borrow()
+                        .as_ref()
+                        .expect("Refresh closure should exist.")(false, ratio);
+                }
+
+                is_first_update.replace(false);
+            }
+        });
+
+        let local_io = IntersectionObserver::new_with_options(
+            local_observe_closure.as_ref().unchecked_ref(),
+            IntersectionObserverInit::new()
+                .root_margin(&root_margin)
+                .threshold(&JsValue::from_f64(threshold.max(0.0).min(1.0))),
+        )
+        .expect("Intersection observer should be created.");
+
+        observe_closure.replace(Some(local_observe_closure));
+
+        local_io.observe(&element);
+        io.replace(Some(local_io));
+    }));
+
+    refresh_closure_clone
+        .borrow()
+        .as_ref()
+        .expect("Refresh closure should exist.")(true, 1.0);
+
+    Box::new(move || {
+        cleanup_rc();
+    })
 }
 
 /// Options for [`auto_update`].
@@ -160,7 +279,7 @@ pub fn auto_update(
         reference_element
             .as_ref()
             .and_then(|reference_element| match layout_shift {
-                true => Some(observe_move(reference_element, update.clone())),
+                true => Some(observe_move(reference_element.clone(), update.clone())),
                 false => None,
             });
 
