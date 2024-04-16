@@ -130,7 +130,7 @@ fn observe_move(element: Element, on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
             local_observe_closure.as_ref().unchecked_ref(),
             IntersectionObserverInit::new()
                 .root_margin(&root_margin)
-                .threshold(&JsValue::from_f64(threshold.max(0.0).min(1.0))),
+                .threshold(&JsValue::from_f64(threshold.clamp(0.0, 1.0))),
         )
         .expect("Intersection observer should be created.");
 
