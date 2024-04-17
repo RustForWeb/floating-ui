@@ -284,8 +284,8 @@ pub fn Hide() -> impl IntoView {
     view! {
         <h1>Hide</h1>
         <p></p>
-        <div class="container">
-            <div _ref=scroll_ref class="scroll" data-x="" style:position="relative">
+        <div class="container" style:position="relative">
+            <div _ref=scroll_ref class="scroll" data-x="">
                 {indicator}
                 {reference_view}
                 {floating_view}

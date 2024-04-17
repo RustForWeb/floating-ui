@@ -36,6 +36,7 @@ features = [
     "Node",
     "ResizeObserver",
     "ResizeObserverEntry",
+    "Selection",
     "ShadowRoot",
     "Window",
 ]

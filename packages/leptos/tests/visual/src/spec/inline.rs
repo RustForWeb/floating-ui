@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
     use_floating, Coords, Flip, FlipOptions, Inline, InlineOptions, MiddlewareVec, Placement, Size,
@@ -73,7 +75,66 @@ pub fn Inline() -> impl IntoView {
         set_open(false);
     };
 
-    // TODO: effect
+    let handle_mouse_up = move |event: MouseEvent| {
+        let target: web_sys::Node = event_target(&event);
+
+        if let Some(floating) = floating_ref.get() {
+            if floating.contains(Some(&target)) {
+                return;
+            }
+        }
+
+        set_timeout(
+            move || {
+                let selection = window()
+                    .get_selection()
+                    .expect("Window should have selection.");
+                let range =
+                    selection
+                        .as_ref()
+                        .and_then(|selection| match selection.range_count() {
+                            0 => None,
+                            _ => selection.get_range_at(0).ok(),
+                        });
+
+                if selection.is_some_and(|selection| selection.is_collapsed()) {
+                    set_open(false);
+                    return;
+                }
+
+                if let Some(_range) = range {
+                    // TODO: virtual reference
+                    set_open(true);
+                }
+            },
+            Duration::from_millis(0),
+        );
+    };
+    let handle_mouse_down = move |event: MouseEvent| {
+        let target: web_sys::Node = event_target(&event);
+
+        if let Some(floating) = floating_ref.get() {
+            if floating.contains(Some(&target)) {
+                return;
+            }
+        }
+
+        if window()
+            .get_selection()
+            .expect("Window should have selection.")
+            .is_some_and(|selection| selection.is_collapsed())
+        {
+            set_open(false);
+        }
+    };
+
+    let mouse_up_handle = window_event_listener(ev::mouseup, handle_mouse_up);
+    let mouse_down_handle = window_event_listener(ev::mousedown, handle_mouse_down);
+
+    on_cleanup(move || {
+        mouse_up_handle.remove();
+        mouse_down_handle.remove();
+    });
 
     view! {
         <h1>Inline</h1>
@@ -97,34 +158,18 @@ pub fn Inline() -> impl IntoView {
                 Duis cursus nisi massa, non dictum turpis interdum at.
             </p>
 
-            // TODO: use this when refs can be re-mounted
-            // <Show when=open>
-            //    <div
-            //         _ref=floating_ref
-            //         class="floating"
-            //         style:position=move || format!("{:?}", strategy()).to_lowercase()
-            //         style:top=move || format!("{}px", y())
-            //         style:left=move || format!("{}px", x())
-            //         style:pointer-events="none"
-            //     >
-            //         Floating
-            //     </div>
-            // </Show>
-
-            <div
-                _ref=floating_ref
-                class="floating"
-                style:display=move || match open() {
-                    true => "block",
-                    false => "none"
-                }
-                style:position=move || format!("{:?}", strategy()).to_lowercase()
-                style:top=move || format!("{}px", y())
-                style:left=move || format!("{}px", x())
-                style:pointer-events="none"
-            >
-                Floating
-            </div>
+            <Show when=open>
+               <div
+                    _ref=floating_ref
+                    class="floating"
+                    style:position=move || format!("{:?}", strategy()).to_lowercase()
+                    style:top=move || format!("{}px", y())
+                    style:left=move || format!("{}px", x())
+                    style:pointer-events="none"
+                >
+                    Floating
+                </div>
+            </Show>
         </div>
 
         <h2>Placement</h2>
