@@ -164,14 +164,13 @@ pub fn Inline() -> impl IntoView {
             <p class="prose" style:padding="10px">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.{' '}
                 {move || view! {
-                    <span
+                    <strong
                         style:color="royalblue"
-                        style:font-weight="bold"
                         on:mouseenter=handle_mouse_enter
                         on:mouseleave=handle_mouse_leave
                     >
                         {text}
-                    </span>
+                    </strong>
                 }.into_any().node_ref(reference_ref)}. Ut eu magna eu augue efficitur bibendum id commodo tellus. Nullam
                 gravida, mi nec sodales tincidunt, lorem orci aliquam ex, id commodo
                 erat libero ut risus. Nam molestie non lectus sit amet tempus. Vivamus
