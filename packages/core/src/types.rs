@@ -11,12 +11,12 @@ use floating_ui_utils::{
 
 pub type DerivableFn<'a, Element, Window, T> = &'a dyn Fn(MiddlewareState<Element, Window>) -> T;
 
-pub enum Derivable<'a, Element, Window, T: Clone> {
+pub enum Derivable<'a, Element: Clone, Window: Clone, T: Clone> {
     Value(T),
     Fn(DerivableFn<'a, Element, Window, T>),
 }
 
-impl<'a, Element, Window, T: Clone> Clone for Derivable<'a, Element, Window, T> {
+impl<'a, Element: Clone, Window: Clone, T: Clone> Clone for Derivable<'a, Element, Window, T> {
     fn clone(&self) -> Self {
         match self {
             Self::Value(value) => Self::Value(value.clone()),
@@ -25,7 +25,7 @@ impl<'a, Element, Window, T: Clone> Clone for Derivable<'a, Element, Window, T> 
     }
 }
 
-impl<'a, Element, Window, T: Clone> Derivable<'a, Element, Window, T> {
+impl<'a, Element: Clone, Window: Clone, T: Clone> Derivable<'a, Element, Window, T> {
     pub fn evaluate(&self, state: MiddlewareState<Element, Window>) -> T {
         match self {
             Derivable::Value(value) => value.clone(),
@@ -34,13 +34,13 @@ impl<'a, Element, Window, T: Clone> Derivable<'a, Element, Window, T> {
     }
 }
 
-impl<'a, Element, Window, T: Clone> From<T> for Derivable<'a, Element, Window, T> {
+impl<'a, Element: Clone, Window: Clone, T: Clone> From<T> for Derivable<'a, Element, Window, T> {
     fn from(value: T) -> Self {
         Derivable::Value(value)
     }
 }
 
-impl<'a, Element, Window, T: Clone> From<DerivableFn<'a, Element, Window, T>>
+impl<'a, Element: Clone, Window: Clone, T: Clone> From<DerivableFn<'a, Element, Window, T>>
     for Derivable<'a, Element, Window, T>
 {
     fn from(value: DerivableFn<'a, Element, Window, T>) -> Self {
@@ -64,7 +64,11 @@ pub struct GetClippingRectArgs<'a, Element> {
 }
 
 /// Arguments for [`Platform::convert_offset_parent_relative_rect_to_viewport_relative_rect`].
-pub struct ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<'a, Element, Window> {
+pub struct ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<
+    'a,
+    Element: Clone,
+    Window: Clone,
+> {
     pub elements: Option<Elements<'a, Element>>,
     pub rect: Rect,
     pub offset_parent: Option<ElementOrWindow<'a, Element, Window>>,
@@ -103,7 +107,10 @@ pub trait Platform<Element: Clone, Window: Clone>: Debug {
         None
     }
 
-    fn get_client_rects(&self, _element: &Element) -> Option<Vec<ClientRectObject>> {
+    fn get_client_rects(
+        &self,
+        _element: ElementOrVirtual<Element>,
+    ) -> Option<Vec<ClientRectObject>> {
         None
     }
 
@@ -250,7 +257,7 @@ pub struct MiddlewareReturn {
 }
 
 /// Middleware used by [`compute_position`][`crate::compute_position::compute_position`].
-pub trait Middleware<Element, Window>: DynClone {
+pub trait Middleware<Element: Clone, Window: Clone>: DynClone {
     /// The name of this middleware.
     fn name(&self) -> &'static str;
 
@@ -261,41 +268,51 @@ pub trait Middleware<Element, Window>: DynClone {
 dyn_clone::clone_trait_object!(<Element, Window> Middleware<Element, Window>);
 
 /// Middleware with options.
-pub trait MiddlewareWithOptions<Element, Window, O: Clone> {
+pub trait MiddlewareWithOptions<Element: Clone, Window: Clone, O: Clone> {
     /// The options passed to this middleware.
     fn options(&self) -> &Derivable<Element, Window, O>;
 }
 
-#[derive(Clone, Debug)]
-pub struct Elements<'a, Element> {
-    pub reference: &'a Element,
+pub struct Elements<'a, Element: Clone> {
+    pub reference: ElementOrVirtual<'a, Element>,
     pub floating: &'a Element,
 }
 
-impl<'a, Element> Elements<'a, Element> {
-    pub fn get_element_context(&self, element_context: ElementContext) -> &Element {
+impl<'a, Element: Clone> Elements<'a, Element> {
+    pub fn get_element_context(
+        &self,
+        element_context: ElementContext,
+    ) -> ElementOrVirtual<'a, Element> {
         match element_context {
-            ElementContext::Reference => self.reference,
-            ElementContext::Floating => self.floating,
+            ElementContext::Reference => self.reference.clone(),
+            ElementContext::Floating => self.floating.into(),
+        }
+    }
+}
+
+impl<'a, Element: Clone> Clone for Elements<'a, Element> {
+    fn clone(&self) -> Self {
+        Self {
+            reference: self.reference.clone(),
+            floating: self.floating,
         }
     }
 }
 
 /// State passed to [`Middleware::compute`].
-#[derive(Debug)]
-pub struct MiddlewareState<'a, Element, Window> {
+pub struct MiddlewareState<'a, Element: Clone, Window: Clone> {
     pub x: f64,
     pub y: f64,
     pub initial_placement: Placement,
     pub placement: Placement,
     pub strategy: Strategy,
     pub middleware_data: &'a MiddlewareData,
-    pub elements: Elements<'a, &'a Element>,
+    pub elements: Elements<'a, Element>,
     pub rects: &'a ElementRects,
     pub platform: &'a dyn Platform<Element, Window>,
 }
 
-impl<'a, Element, Window> Clone for MiddlewareState<'a, Element, Window> {
+impl<'a, Element: Clone, Window: Clone> Clone for MiddlewareState<'a, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             x: self.x,

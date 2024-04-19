@@ -74,7 +74,7 @@ impl ComputePositionConfig {
 
 /// Computes the `x` and `y` coordinates that will place the floating element next to a given reference element.
 pub fn compute_position(
-    reference: &Element,
+    reference: ElementOrVirtual,
     floating: &Element,
     config: Option<ComputePositionConfig>,
 ) -> ComputePositionReturn {

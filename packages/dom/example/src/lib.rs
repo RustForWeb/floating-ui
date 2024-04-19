@@ -7,7 +7,7 @@ use floating_ui_dom::{
 };
 use log::Level;
 use wasm_bindgen::prelude::*;
-use web_sys::HtmlElement;
+use web_sys::{Element, HtmlElement};
 
 #[wasm_bindgen(start)]
 fn run() -> Result<(), JsValue> {
@@ -40,6 +40,8 @@ fn run() -> Result<(), JsValue> {
         tooltip: &HtmlElement,
         arrow: &HtmlElement,
     ) -> Result<(), JsValue> {
+        let button_element: &Element = button;
+
         let ComputePositionReturn {
             x,
             y,
@@ -47,7 +49,7 @@ fn run() -> Result<(), JsValue> {
             middleware_data,
             ..
         } = compute_position(
-            button,
+            button_element.into(),
             tooltip,
             Some(
                 ComputePositionConfig::default()

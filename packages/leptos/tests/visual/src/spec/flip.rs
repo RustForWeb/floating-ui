@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, FallbackStrategy, Flip, FlipOptions, MiddlewareVec, Placement, Shift,
-    ShiftOptions, UseFloatingOptions, UseFloatingReturn,
+    use_floating, FallbackStrategy, Flip, FlipOptions, IntoReference, MiddlewareVec, Placement,
+    Shift, ShiftOptions, UseFloatingOptions, UseFloatingReturn,
 };
 use leptos::{html::Div, *};
 
@@ -37,7 +37,7 @@ pub fn Flip() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref,
+        reference_ref.into_reference(),
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())

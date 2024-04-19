@@ -1,4 +1,6 @@
-use floating_ui_leptos::{use_floating, Strategy, UseFloatingOptions, UseFloatingReturn};
+use floating_ui_leptos::{
+    use_floating, IntoReference, Strategy, UseFloatingOptions, UseFloatingReturn,
+};
 use leptos::{html::Div, *};
 
 #[component]
@@ -15,7 +17,7 @@ pub fn ContainingBlock() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref,
+        reference_ref.into_reference(),
         floating_ref,
         UseFloatingOptions::default()
             .strategy(Strategy::Absolute.into())

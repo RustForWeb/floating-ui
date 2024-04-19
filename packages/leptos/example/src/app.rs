@@ -1,6 +1,6 @@
 use floating_ui_leptos::{
-    use_floating, Arrow, ArrowOptions, MiddlewareVec, Offset, OffsetOptions, Placement,
-    UseFloatingOptions, UseFloatingReturn,
+    use_floating, Arrow, ArrowOptions, IntoReference, MiddlewareVec, Offset, OffsetOptions,
+    Placement, UseFloatingOptions, UseFloatingReturn,
 };
 use leptos::{
     html::{Div, Span},
@@ -24,7 +24,7 @@ pub fn App() -> impl IntoView {
     let UseFloatingReturn {
         floating_styles, ..
     } = use_floating(
-        reference,
+        reference.into_reference(),
         floating,
         UseFloatingOptions::default()
             .open(open.into())

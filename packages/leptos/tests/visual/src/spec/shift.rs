@@ -1,8 +1,8 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, Derivable, DerivableFn, LimitShift, LimitShiftOffset, LimitShiftOffsetValues,
-    LimitShiftOptions, MiddlewareState, MiddlewareVec, Offset, OffsetOptions, Placement, Shift,
-    ShiftOptions, UseFloatingOptions, UseFloatingReturn,
+    use_floating, Derivable, DerivableFn, IntoReference, LimitShift, LimitShiftOffset,
+    LimitShiftOffsetValues, LimitShiftOptions, MiddlewareState, MiddlewareVec, Offset,
+    OffsetOptions, Placement, Shift, ShiftOptions, UseFloatingOptions, UseFloatingReturn,
 };
 use leptos::{html::Div, *};
 
@@ -66,7 +66,7 @@ pub fn Shift() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref,
+        reference_ref.into_reference(),
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())

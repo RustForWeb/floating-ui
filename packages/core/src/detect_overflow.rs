@@ -1,6 +1,6 @@
 use floating_ui_utils::{
-    get_padding_object, rect_to_client_rect, Coords, OwnedElementOrWindow, Padding, Rect,
-    SideObject,
+    get_padding_object, rect_to_client_rect, Coords, ElementOrVirtual, OwnedElementOrWindow,
+    Padding, Rect, SideObject,
 };
 
 use crate::types::{
@@ -113,20 +113,28 @@ pub fn detect_overflow<Element: Clone, Window: Clone>(
         ElementContext::Floating => ElementContext::Reference,
     };
     let element = match alt_boundary {
-        true => *elements.get_element_context(alt_context),
-        false => *elements.get_element_context(element_context),
+        true => elements.get_element_context(alt_context),
+        false => elements.get_element_context(element_context),
     };
 
-    // let document_element = platform.get_document_element(elements.floating);
+    let document_element = platform.get_document_element(elements.floating);
+    let context_element: Option<Element>;
+
+    let element = match element {
+        ElementOrVirtual::Element(element) => element,
+        ElementOrVirtual::VirtualElement(virtual_element) => {
+            context_element = virtual_element.context_element();
+
+            context_element
+                .as_ref()
+                .or(document_element.as_ref())
+                .expect("Element should exist.")
+        }
+    };
 
     let clipping_client_rect =
         rect_to_client_rect(platform.get_clipping_rect(GetClippingRectArgs {
             element,
-            // TODO: virtual element
-            //  match platform.is_element(element).unwrap_or(true) {
-            //     true => element,
-            //     false => document_element.as_ref().unwrap_or(element),
-            // },
             boundary,
             root_boundary,
             strategy,

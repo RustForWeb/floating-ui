@@ -1,4 +1,4 @@
-use floating_ui_utils::{Coords, Placement, Strategy};
+use floating_ui_utils::{Coords, ElementOrVirtual, Placement, Strategy};
 
 use crate::compute_coords_from_placement::compute_coords_from_placement;
 use crate::types::{
@@ -12,7 +12,7 @@ use crate::types::{
 ///
 /// See [`Platform`][`crate::types::Platform`].
 pub fn compute_position<Element: Clone, Window: Clone>(
-    reference: &Element,
+    reference: ElementOrVirtual<Element>,
     floating: &Element,
     config: ComputePositionConfig<Element, Window>,
 ) -> ComputePositionReturn {
@@ -24,7 +24,7 @@ pub fn compute_position<Element: Clone, Window: Clone>(
     let rtl = platform.is_rtl(floating);
 
     let mut rects = platform.get_element_rects(GetElementRectsArgs {
-        reference: reference.into(),
+        reference: reference.clone(),
         floating,
         strategy,
     });
@@ -52,8 +52,8 @@ pub fn compute_position<Element: Clone, Window: Clone>(
             rects: &rects,
             platform,
             elements: Elements {
-                reference: &reference,
-                floating: &floating,
+                reference: reference.clone(),
+                floating,
             },
         });
 
@@ -79,7 +79,7 @@ pub fn compute_position<Element: Clone, Window: Clone>(
                             rects = match reset_rects {
                                 ResetRects::True => {
                                     platform.get_element_rects(GetElementRectsArgs {
-                                        reference: reference.into(),
+                                        reference: reference.clone(),
                                         floating,
                                         strategy,
                                     })
@@ -128,7 +128,7 @@ mod tests {
         #[derive(Clone)]
         struct CustomMiddleware {}
 
-        impl<Element, Window> Middleware<Element, Window> for CustomMiddleware {
+        impl<Element: Clone, Window: Clone> Middleware<Element, Window> for CustomMiddleware {
             fn name(&self) -> &'static str {
                 "custom"
             }
@@ -150,7 +150,7 @@ mod tests {
             strategy,
             middleware_data,
         } = compute_position(
-            &REFERENCE,
+            (&REFERENCE).into(),
             &FLOATING,
             ComputePositionConfig {
                 platform: &PLATFORM,
@@ -175,7 +175,7 @@ mod tests {
         #[derive(Clone)]
         struct TestMiddleware {}
 
-        impl<Element, Window> Middleware<Element, Window> for TestMiddleware {
+        impl<Element: Clone, Window: Clone> Middleware<Element, Window> for TestMiddleware {
             fn name(&self) -> &'static str {
                 "test"
             }
@@ -194,7 +194,7 @@ mod tests {
         }
 
         let ComputePositionReturn { x, y, .. } = compute_position(
-            &REFERENCE,
+            (&REFERENCE).into(),
             &FLOATING,
             ComputePositionConfig {
                 platform: &PLATFORM,
@@ -205,7 +205,7 @@ mod tests {
         );
 
         let ComputePositionReturn { x: x2, y: y2, .. } = compute_position(
-            &REFERENCE,
+            (&REFERENCE).into(),
             &FLOATING,
             ComputePositionConfig {
                 platform: &PLATFORM,
@@ -223,7 +223,7 @@ mod tests {
         #[derive(Clone)]
         struct TestMiddleware {}
 
-        impl<Element, Window> Middleware<Element, Window> for TestMiddleware {
+        impl<Element: Clone, Window: Clone> Middleware<Element, Window> for TestMiddleware {
             fn name(&self) -> &'static str {
                 "test"
             }
@@ -241,7 +241,7 @@ mod tests {
         let ComputePositionReturn {
             middleware_data, ..
         } = compute_position(
-            &REFERENCE,
+            (&REFERENCE).into(),
             &FLOATING,
             ComputePositionConfig {
                 platform: &PLATFORM,

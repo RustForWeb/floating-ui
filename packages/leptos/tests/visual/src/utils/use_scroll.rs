@@ -2,8 +2,8 @@ use std::rc::Rc;
 
 use floating_ui_leptos::{
     dom::{get_overflow_ancestors, OverflowAncestor},
-    use_floating, DetectOverflowOptions, MiddlewareVec, Padding, Placement, Shift, ShiftOptions,
-    Strategy, UseFloatingOptions, UseFloatingReturn,
+    use_floating, DetectOverflowOptions, IntoReference, MiddlewareVec, Padding, Placement, Shift,
+    ShiftOptions, Strategy, UseFloatingOptions, UseFloatingReturn,
 };
 use leptos::{html::Div, *};
 use wasm_bindgen::{closure::Closure, JsCast};
@@ -50,7 +50,7 @@ pub fn use_scroll(
         update: indicator_update,
         ..
     } = use_floating(
-        reference_ref,
+        reference_ref.into_reference(),
         indicator_floating_ref,
         UseFloatingOptions::default()
             .strategy(Strategy::Fixed.into())

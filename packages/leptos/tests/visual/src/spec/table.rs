@@ -1,5 +1,5 @@
 use convert_case::{Case, Casing};
-use floating_ui_leptos::{use_floating, UseFloatingOptions, UseFloatingReturn};
+use floating_ui_leptos::{use_floating, IntoReference, UseFloatingOptions, UseFloatingReturn};
 use leptos::{
     html::{Div, Table, Td, Tr},
     *,
@@ -32,7 +32,7 @@ pub fn Table() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_table_ref,
+        reference_table_ref.into_reference(),
         floating_ref,
         UseFloatingOptions::default(),
     );

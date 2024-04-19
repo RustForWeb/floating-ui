@@ -243,6 +243,33 @@ pub struct ClientRectObject {
     pub left: f64,
 }
 
+cfg_if::cfg_if! {
+    if #[cfg(feature = "dom")] {
+        impl ClientRectObject {
+            pub fn from_dom_rect_list(value: web_sys::DomRectList) -> Vec<Self> {
+                (0..value.length())
+                    .filter_map(|i| value.item(i).map(ClientRectObject::from))
+                    .collect()
+            }
+        }
+
+        impl From<web_sys::DomRect> for ClientRectObject {
+            fn from(value: web_sys::DomRect) -> Self {
+                Self {
+                    x: value.x(),
+                    y: value.y(),
+                    width: value.width(),
+                    height: value.height(),
+                    top: value.top(),
+                    right: value.right(),
+                    bottom: value.bottom(),
+                    left: value.left(),
+                }
+            }
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct ElementRects {
     pub reference: Rect,
@@ -254,6 +281,8 @@ pub struct ElementRects {
 /// See <https://floating-ui.com/docs/virtual-elements> for the original documentation.
 pub trait VirtualElement<Element>: DynClone {
     fn get_bounding_client_rect(&self) -> ClientRectObject;
+
+    fn get_client_rects(&self) -> Option<Vec<ClientRectObject>>;
 
     fn context_element(&self) -> Option<Element>;
 }
@@ -275,9 +304,25 @@ where
 
 dyn_clone::clone_trait_object!(GetBoundingClientRectCloneable);
 
+pub trait GetClientRectsCloneable: DynClone {
+    fn call(&self) -> Vec<ClientRectObject>;
+}
+
+impl<F> GetClientRectsCloneable for F
+where
+    F: Fn() -> Vec<ClientRectObject> + Clone,
+{
+    fn call(&self) -> Vec<ClientRectObject> {
+        self()
+    }
+}
+
+dyn_clone::clone_trait_object!(GetClientRectsCloneable);
+
 #[derive(Clone)]
 pub struct DefaultVirtualElement<Element: Clone> {
     pub get_bounding_client_rect: Box<dyn GetBoundingClientRectCloneable>,
+    pub get_client_rects: Option<Box<dyn GetClientRectsCloneable>>,
     pub context_element: Option<Element>,
 }
 
@@ -285,6 +330,7 @@ impl<Element: Clone> DefaultVirtualElement<Element> {
     pub fn new(get_bounding_client_rect: Box<dyn GetBoundingClientRectCloneable>) -> Self {
         DefaultVirtualElement {
             get_bounding_client_rect,
+            get_client_rects: None,
             context_element: None,
         }
     }
@@ -294,6 +340,11 @@ impl<Element: Clone> DefaultVirtualElement<Element> {
         get_bounding_client_rect: Box<dyn GetBoundingClientRectCloneable>,
     ) -> Self {
         self.get_bounding_client_rect = get_bounding_client_rect;
+        self
+    }
+
+    pub fn get_client_rects(mut self, get_client_rects: Box<dyn GetClientRectsCloneable>) -> Self {
+        self.get_client_rects = Some(get_client_rects);
         self
     }
 
@@ -315,6 +366,12 @@ impl<Element: Clone> DefaultVirtualElement<Element> {
 impl<Element: Clone> VirtualElement<Element> for DefaultVirtualElement<Element> {
     fn get_bounding_client_rect(&self) -> ClientRectObject {
         (self.get_bounding_client_rect).call()
+    }
+
+    fn get_client_rects(&self) -> Option<Vec<ClientRectObject>> {
+        self.get_client_rects
+            .as_ref()
+            .map(|get_client_rects| get_client_rects.call())
     }
 
     fn context_element(&self) -> Option<Element> {
@@ -376,6 +433,18 @@ impl<Element> OwnedElementOrVirtual<Element> {
                 virtal_element.context_element()
             }
         }
+    }
+}
+
+impl<Element> From<Element> for OwnedElementOrVirtual<Element> {
+    fn from(value: Element) -> Self {
+        OwnedElementOrVirtual::Element(value)
+    }
+}
+
+impl<Element> From<Box<dyn VirtualElement<Element>>> for OwnedElementOrVirtual<Element> {
+    fn from(value: Box<dyn VirtualElement<Element>>) -> Self {
+        OwnedElementOrVirtual::VirtualElement(value)
     }
 }
 

@@ -18,6 +18,8 @@ use floating_ui_utils::{
 };
 use web_sys::{Element, Window};
 
+use crate::types::ElementOrVirtual;
+
 use self::convert_offset_parent_relative_rect_to_viewport_relative_rect::convert_offset_parent_relative_rect_to_viewport_relative_rect;
 use self::get_client_length::get_client_length;
 use self::get_client_rects::get_client_rects;
@@ -59,7 +61,6 @@ impl CorePlatform<Element, Window> for Platform {
     }
 
     fn is_element(&self, _value: &ElementOrWindow<Element, Window>) -> Option<bool> {
-        // TODO: value should probably be expanded in CorePlatform
         Some(true)
     }
 
@@ -67,7 +68,7 @@ impl CorePlatform<Element, Window> for Platform {
         Some(get_document_element(Some(element.into())))
     }
 
-    fn get_client_rects(&self, element: &Element) -> Option<Vec<ClientRectObject>> {
+    fn get_client_rects(&self, element: ElementOrVirtual) -> Option<Vec<ClientRectObject>> {
         Some(get_client_rects(element))
     }
 

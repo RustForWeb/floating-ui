@@ -1,8 +1,8 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, Arrow, ArrowData, ArrowOptions, DetectOverflowOptions, MiddlewareVec, Offset,
-    OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side, UseFloatingOptions,
-    UseFloatingReturn, ARROW_NAME,
+    use_floating, Arrow, ArrowData, ArrowOptions, DetectOverflowOptions, IntoReference,
+    MiddlewareVec, Offset, OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side,
+    UseFloatingOptions, UseFloatingReturn, ARROW_NAME,
 };
 use leptos::{
     html::{AnyElement, Div},
@@ -37,7 +37,7 @@ pub fn Arrow() -> impl IntoView {
         middleware_data,
         ..
     } = use_floating(
-        reference_ref,
+        reference_ref.into_reference(),
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())

@@ -2,7 +2,8 @@ use std::{cell::RefCell, rc::Rc};
 
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    auto_update, use_floating, AutoUpdateOptions, Strategy, UseFloatingOptions, UseFloatingReturn,
+    auto_update, use_floating, AutoUpdateOptions, IntoReference, Strategy, UseFloatingOptions,
+    UseFloatingReturn,
 };
 use leptos::{html::Div, *};
 use web_sys::Element;
@@ -48,7 +49,7 @@ pub fn AutoUpdate() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref,
+        reference_ref.into_reference(),
         floating_ref,
         UseFloatingOptions::default()
             .strategy(Strategy::Fixed.into())

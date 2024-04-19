@@ -1,5 +1,5 @@
 use floating_ui_leptos::{
-    use_floating, ApplyState, MiddlewareState, MiddlewareVec, Size, SizeOptions,
+    use_floating, ApplyState, IntoReference, MiddlewareState, MiddlewareVec, Size, SizeOptions,
     UseFloatingOptions, UseFloatingReturn,
 };
 use leptos::{html::Div, *};
@@ -40,7 +40,7 @@ pub fn DecimalSize() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref,
+        reference_ref.into_reference(),
         floating_ref,
         UseFloatingOptions::default().middleware(middleware.into()),
     );

@@ -2,26 +2,12 @@ use floating_ui_utils::{
     dom::{get_computed_style, get_window, DomElementOrWindow},
     rect_to_client_rect, ClientRectObject, Coords, Rect,
 };
-use web_sys::DomRect;
 
 use crate::{
     platform::get_scale::get_scale,
     types::ElementOrVirtual,
     utils::get_visual_offsets::{get_visual_offsets, should_add_visual_offsets},
 };
-
-pub fn dom_rect_to_client_rect_object(dom_rect: DomRect) -> ClientRectObject {
-    ClientRectObject {
-        x: dom_rect.x(),
-        y: dom_rect.y(),
-        width: dom_rect.width(),
-        height: dom_rect.height(),
-        top: dom_rect.top(),
-        right: dom_rect.right(),
-        bottom: dom_rect.bottom(),
-        left: dom_rect.left(),
-    }
-}
 
 pub fn get_bounding_client_rect(
     element_or_virtual: ElementOrVirtual,
@@ -30,9 +16,7 @@ pub fn get_bounding_client_rect(
     offset_parent: Option<DomElementOrWindow>,
 ) -> ClientRectObject {
     let client_rect = match &element_or_virtual {
-        ElementOrVirtual::Element(element) => {
-            dom_rect_to_client_rect_object(element.get_bounding_client_rect())
-        }
+        ElementOrVirtual::Element(element) => element.get_bounding_client_rect().into(),
         ElementOrVirtual::VirtualElement(virtual_element) => {
             virtual_element.get_bounding_client_rect()
         }

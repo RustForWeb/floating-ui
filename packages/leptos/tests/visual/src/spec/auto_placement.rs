@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, Alignment, AutoPlacement, AutoPlacementOptions, MiddlewareVec, Placement, Shift,
-    ShiftOptions, UseFloatingOptions, UseFloatingReturn,
+    use_floating, Alignment, AutoPlacement, AutoPlacementOptions, IntoReference, MiddlewareVec,
+    Placement, Shift, ShiftOptions, UseFloatingOptions, UseFloatingReturn,
 };
 use leptos::{html::Div, *};
 
@@ -59,7 +59,7 @@ pub fn AutoPlacement() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref,
+        reference_ref.into_reference(),
         floating_ref,
         UseFloatingOptions::default()
             .while_elements_mounted_auto_update()

@@ -17,7 +17,7 @@ use crate::{
 pub const SHIFT_NAME: &str = "shift";
 
 /// Limiter used by [`Shift`] middleware. Limits the shifting done in order to prevent detachment.
-pub trait Limiter<Element, Window>: DynClone {
+pub trait Limiter<Element: Clone, Window: Clone>: DynClone {
     fn compute(&self, state: MiddlewareState<Element, Window>) -> Coords;
 }
 
@@ -232,7 +232,7 @@ impl<'a, Element: Clone, Window: Clone>
 #[derive(Clone, Debug, Default)]
 pub struct DefaultLimiter;
 
-impl<Element, Window> Limiter<Element, Window> for DefaultLimiter {
+impl<Element: Clone, Window: Clone> Limiter<Element, Window> for DefaultLimiter {
     fn compute(&self, state: MiddlewareState<Element, Window>) -> Coords {
         Coords {
             x: state.x,
@@ -278,7 +278,7 @@ impl Default for LimitShiftOffset {
 
 /// Options for [`LimitShift`] limiter.
 #[derive(Clone)]
-pub struct LimitShiftOptions<'a, Element, Window> {
+pub struct LimitShiftOptions<'a, Element: Clone, Window: Clone> {
     pub offset: Option<Derivable<'a, Element, Window, LimitShiftOffset>>,
 
     pub main_axis: Option<bool>,

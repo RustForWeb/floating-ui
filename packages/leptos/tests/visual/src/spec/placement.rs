@@ -1,5 +1,7 @@
 use convert_case::{Case, Casing};
-use floating_ui_leptos::{use_floating, Placement, UseFloatingOptions, UseFloatingReturn};
+use floating_ui_leptos::{
+    use_floating, IntoReference, Placement, UseFloatingOptions, UseFloatingReturn,
+};
 use leptos::{html::Div, *};
 
 use crate::utils::{all_placements::ALL_PLACEMENTS, use_size::use_size};
@@ -17,7 +19,7 @@ pub fn Placement() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref,
+        reference_ref.into_reference(),
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())

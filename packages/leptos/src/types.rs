@@ -1,13 +1,14 @@
 use std::rc::Rc;
 
 use floating_ui_dom::{
-    auto_update, AutoUpdateOptions, Middleware, MiddlewareData, Placement, Strategy,
+    auto_update, AutoUpdateOptions, ElementOrVirtual, Middleware, MiddlewareData, Placement,
+    Strategy,
 };
 use leptos::{Attribute, IntoAttribute, MaybeProp, MaybeSignal, Signal, SignalGet};
 use web_sys::{Element, Window};
 
 pub type WhileElementsMountedFn =
-    dyn Fn(&Element, &Element, Rc<dyn Fn()>) -> WhileElementsMountedCleanupFn;
+    dyn Fn(ElementOrVirtual, &Element, Rc<dyn Fn()>) -> WhileElementsMountedCleanupFn;
 
 pub type WhileElementsMountedCleanupFn = Box<dyn Fn()>;
 
@@ -88,12 +89,7 @@ impl UseFloatingOptions {
     /// Set `while_elements_mounted` option to [`auto_update`] with [`AutoUpdateOptions::default`].
     pub fn while_elements_mounted_auto_update(self) -> Self {
         let auto_update_rc: Rc<WhileElementsMountedFn> = Rc::new(|reference, floating, update| {
-            auto_update(
-                reference.into(),
-                floating,
-                update,
-                AutoUpdateOptions::default(),
-            )
+            auto_update(reference, floating, update, AutoUpdateOptions::default())
         });
         self.while_elements_mounted(auto_update_rc.into())
     }
@@ -101,12 +97,7 @@ impl UseFloatingOptions {
     /// Set `while_elements_mounted` option to [`auto_update`] with [`AutoUpdateOptions::default`].
     pub fn while_elements_mounted_auto_update_enabled(self, enabled: MaybeSignal<bool>) -> Self {
         let auto_update_rc: Rc<WhileElementsMountedFn> = Rc::new(|reference, floating, update| {
-            auto_update(
-                reference.into(),
-                floating,
-                update,
-                AutoUpdateOptions::default(),
-            )
+            auto_update(reference, floating, update, AutoUpdateOptions::default())
         });
         self.while_elements_mounted(MaybeProp::derive(move || {
             if enabled.get() {

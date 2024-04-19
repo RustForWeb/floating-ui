@@ -1,5 +1,5 @@
 use convert_case::{Case, Casing};
-use floating_ui_leptos::{use_floating, UseFloatingOptions, UseFloatingReturn};
+use floating_ui_leptos::{use_floating, IntoReference, UseFloatingOptions, UseFloatingReturn};
 use leptos::{html::Div, *};
 use wasm_bindgen::JsCast;
 
@@ -26,7 +26,11 @@ pub fn Relative() -> impl IntoView {
         strategy,
         update,
         ..
-    } = use_floating(reference_ref, floating_ref, UseFloatingOptions::default());
+    } = use_floating(
+        reference_ref.into_reference(),
+        floating_ref,
+        UseFloatingOptions::default(),
+    );
 
     create_effect(move |_| {
         let element = match node() {

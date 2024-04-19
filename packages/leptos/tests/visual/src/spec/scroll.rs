@@ -1,5 +1,7 @@
 use convert_case::{Case, Casing};
-use floating_ui_leptos::{use_floating, Strategy, UseFloatingOptions, UseFloatingReturn};
+use floating_ui_leptos::{
+    use_floating, IntoReference, Strategy, UseFloatingOptions, UseFloatingReturn,
+};
 use leptos::{html::Div, *};
 
 use crate::utils::use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn};
@@ -29,7 +31,7 @@ pub fn Scroll() -> impl IntoView {
     let (node, set_node) = create_signal(Node::ReferenceScrollParent);
 
     let UseFloatingReturn { x, y, update, .. } = use_floating(
-        reference_ref,
+        reference_ref.into_reference(),
         floating_ref,
         UseFloatingOptions::default().strategy(strategy.into()),
     );

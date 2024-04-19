@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, DetectOverflowOptions, MiddlewareVec, Placement, Shift, ShiftOptions,
-    UseFloatingOptions, UseFloatingReturn,
+    use_floating, DetectOverflowOptions, IntoReference, MiddlewareVec, Placement, Shift,
+    ShiftOptions, UseFloatingOptions, UseFloatingReturn,
 };
 use leptos::{html::Div, *};
 
@@ -26,7 +26,7 @@ pub fn Scrollbars() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref,
+        reference_ref.into_reference(),
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())

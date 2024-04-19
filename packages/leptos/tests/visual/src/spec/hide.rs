@@ -1,8 +1,8 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, ApplyState, Hide, HideData, HideOptions, HideStrategy, MiddlewareState,
-    MiddlewareVec, Placement, Shift, ShiftOptions, Size, SizeOptions, Strategy, UseFloatingOptions,
-    UseFloatingReturn, HIDE_NAME,
+    use_floating, ApplyState, Hide, HideData, HideOptions, HideStrategy, IntoReference,
+    MiddlewareState, MiddlewareVec, Placement, Shift, ShiftOptions, Size, SizeOptions, Strategy,
+    UseFloatingOptions, UseFloatingReturn, HIDE_NAME,
 };
 use leptos::{html::Div, *};
 use wasm_bindgen::JsCast;
@@ -29,7 +29,7 @@ pub fn Hide() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref,
+        reference_ref.into_reference(),
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())

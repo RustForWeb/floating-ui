@@ -2,9 +2,13 @@ use std::ops::Deref;
 
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, MiddlewareVec, Shift, ShiftOptions, UseFloatingOptions, UseFloatingReturn,
+    use_floating, DefaultVirtualElement, MiddlewareVec, Shift, ShiftOptions, UseFloatingOptions,
+    UseFloatingReturn, VirtualElement, VirtualElementOrNodeRef,
 };
-use leptos::{html::Div, *};
+use leptos::{
+    html::{AnyElement, Div},
+    *,
+};
 use wasm_bindgen::JsCast;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -38,11 +42,32 @@ const ALL_NODES: [Node; 11] = [
 
 #[component]
 pub fn Transform() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
+    let reference_ref = create_node_ref::<AnyElement>();
     let floating_ref = create_node_ref::<Div>();
     let offset_parent_ref = create_node_ref::<Div>();
 
     let (node, set_node) = create_signal(Node::None);
+
+    let reference_signal: MaybeProp<VirtualElementOrNodeRef<NodeRef<AnyElement>, AnyElement>> =
+        MaybeProp::derive(move || match node() {
+            Node::Virtual => {
+                let context_element = document()
+                    .get_element_by_id("virtual-context")
+                    .expect("Element should exist.");
+                let virtual_context_clone = context_element.clone();
+
+                Some(
+                    (Box::new(
+                        DefaultVirtualElement::new(Box::new(move || {
+                            context_element.get_bounding_client_rect().into()
+                        }))
+                        .context_element(virtual_context_clone),
+                    ) as Box<dyn VirtualElement<web_sys::Element>>)
+                        .into(),
+                )
+            }
+            _ => Some(reference_ref.into()),
+        });
 
     let middleware: MiddlewareVec = vec![Box::new(Shift::new(
         ShiftOptions::default().cross_axis(true),
@@ -55,7 +80,7 @@ pub fn Transform() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref,
+        reference_signal,
         floating_ref,
         UseFloatingOptions::default()
             .middleware(middleware.into())
@@ -91,10 +116,7 @@ pub fn Transform() -> impl IntoView {
                 .set_property("transform", transform)
                 .expect("Style should be updated.");
 
-            if node() == Node::Virtual {
-                let _virtual_context = document().get_element_by_id("virtual-context");
-                // TODO: change reference ref to virtual element
-            }
+            if node() == Node::Virtual {}
         }
 
         update();
@@ -151,16 +173,17 @@ pub fn Transform() -> impl IntoView {
                         style:background="black"
                     />
                 </Show>
-                <div
-                    _ref=reference_ref
-                    class="reference"
-                    style:transform=move || match node() {
-                        Node::Reference | Node::OffsetParentReference => "scale(1.25) translate(2rem, -2rem)",
-                        _ => ""
-                    }
-                >
-                    Reference
-                </div>
+                {move || view!{
+                    <div
+                        class="reference"
+                        style:transform=move || match node() {
+                            Node::Reference | Node::OffsetParentReference => "scale(1.25) translate(2rem, -2rem)",
+                            _ => ""
+                        }
+                    >
+                        Reference
+                    </div>
+                }.into_any().node_ref(reference_ref)}
                 <div
                     _ref=floating_ref
                     class="floating"
@@ -197,7 +220,12 @@ pub fn Transform() -> impl IntoView {
                         }
                         on:click=move |_| set_node(local_node)
                     >
-                        {format!("{:?}", local_node).to_case(Case::Camel)}
+                        {match local_node {
+                            Node::OffsetParent3d => "offsetParent-3d".into(),
+                            Node::OffsetParentInverse => "offsetParent-inverse".into(),
+                            Node::OffsetParentReference => "offsetParent-reference".into(),
+                            _ => format!("{:?}", local_node).to_case(Case::Camel)
+                        }}
                     </button>
                 }
             />

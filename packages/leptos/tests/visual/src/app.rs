@@ -19,6 +19,7 @@ use crate::spec::shift::Shift;
 use crate::spec::size::Size;
 use crate::spec::table::Table;
 use crate::spec::transform::Transform;
+use crate::spec::virtual_element::VirtualElement;
 use crate::utils::new::New;
 
 const ROUTES: [&str; 23] = [
@@ -122,7 +123,7 @@ pub fn App() -> impl IntoView {
                     <Route path="autoUpdate" view=AutoUpdate />
                     // <Route path="shadow-DOM" view=ShadowDom />
                     <Route path="containing-block" view=ContainingBlock />
-                    // <Route path="virtual-element" view=VirtualElement />
+                    <Route path="virtual-element" view=VirtualElement />
                     // <Route path="perf" view=Perf />
                     // <Route path="iframe" view=Iframe />
                     // <Route path="top-layer" view=TopLayer />

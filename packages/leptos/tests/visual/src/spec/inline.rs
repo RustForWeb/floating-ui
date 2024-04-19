@@ -2,12 +2,13 @@ use std::time::Duration;
 
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, Coords, Flip, FlipOptions, Inline, InlineOptions, MiddlewareVec, Placement, Size,
-    SizeOptions, UseFloatingOptions, UseFloatingReturn,
+    use_floating, ClientRectObject, Coords, DefaultVirtualElement, Flip, FlipOptions, Inline,
+    InlineOptions, MiddlewareVec, Placement, Size, SizeOptions, UseFloatingOptions,
+    UseFloatingReturn, VirtualElement, VirtualElementOrNodeRef,
 };
 use leptos::{
     ev::MouseEvent,
-    html::{Div, Span},
+    html::{AnyElement, Div},
     *,
 };
 
@@ -23,7 +24,7 @@ enum ConnectedStatus {
 
 #[component]
 pub fn Inline() -> impl IntoView {
-    let reference_ref = create_node_ref::<Span>();
+    let reference_ref = create_node_ref::<AnyElement>();
     let floating_ref = create_node_ref::<Div>();
 
     let (placement, set_placement) = create_signal(Placement::Bottom);
@@ -31,8 +32,12 @@ pub fn Inline() -> impl IntoView {
     let (open, set_open) = create_signal(false);
     let (mouse_coords, set_mouse_coords) = create_signal::<Option<Coords>>(None);
 
+    let reference_signal = create_rw_signal::<
+        VirtualElementOrNodeRef<NodeRef<AnyElement>, AnyElement>,
+    >(reference_ref.into());
+
     let UseFloatingReturn { x, y, strategy, .. } = use_floating(
-        reference_ref,
+        reference_signal.into(),
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())
@@ -102,8 +107,24 @@ pub fn Inline() -> impl IntoView {
                     return;
                 }
 
-                if let Some(_range) = range {
-                    // TODO: virtual reference
+                if let Some(range) = range {
+                    let range_clone = range.clone();
+
+                    reference_signal.set(
+                        (Box::new(
+                            DefaultVirtualElement::new(Box::new(move || {
+                                range.get_bounding_client_rect().into()
+                            }))
+                            .get_client_rects(Box::new(move || {
+                                ClientRectObject::from_dom_rect_list(
+                                    range_clone
+                                        .get_client_rects()
+                                        .expect("Range should have client rects."),
+                                )
+                            })),
+                        ) as Box<dyn VirtualElement<web_sys::Element>>)
+                            .into(),
+                    );
                     set_open(true);
                 }
             },
@@ -142,15 +163,16 @@ pub fn Inline() -> impl IntoView {
         <div class="container">
             <p class="prose" style:padding="10px">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.{' '}
-                <span
-                    _ref=reference_ref
-                    style:color="royalblue"
-                    style:font-weight="bold"
-                    on:mouseenter=handle_mouse_enter
-                    on:mouseleave=handle_mouse_leave
-                >
-                    {text}
-                </span>. Ut eu magna eu augue efficitur bibendum id commodo tellus. Nullam
+                {move || view! {
+                    <span
+                        style:color="royalblue"
+                        style:font-weight="bold"
+                        on:mouseenter=handle_mouse_enter
+                        on:mouseleave=handle_mouse_leave
+                    >
+                        {text}
+                    </span>
+                }.into_any().node_ref(reference_ref)}. Ut eu magna eu augue efficitur bibendum id commodo tellus. Nullam
                 gravida, mi nec sodales tincidunt, lorem orci aliquam ex, id commodo
                 erat libero ut risus. Nam molestie non lectus sit amet tempus. Vivamus
                 accumsan{' '}
