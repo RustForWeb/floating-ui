@@ -240,7 +240,7 @@ pub fn Inline() -> impl IntoView {
                 key=|value| format!("{:?}", value)
                 children=move |value| view! {
                     <button
-                        data-testid=format!("fallbackPlacements-{}", match value {
+                        data-testid=format!("connected-{}", match value {
                             ConnectedStatus::One => "1",
                             ConnectedStatus::TwoDisjoined => "2-disjoined",
                             ConnectedStatus::TwoJoined => "2-joined",

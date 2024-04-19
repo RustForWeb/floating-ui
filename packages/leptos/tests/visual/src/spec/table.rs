@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
-use floating_ui_leptos::{use_floating, IntoReference, UseFloatingOptions, UseFloatingReturn};
+use floating_ui_leptos::{use_floating, UseFloatingOptions, UseFloatingReturn};
 use leptos::{
-    html::{Div, Table, Td, Tr},
+    html::{AnyElement, Div},
     *,
 };
 
@@ -16,15 +16,20 @@ const ALL_NODES: [Node; 3] = [Node::Table, Node::Td, Node::Th];
 
 #[component]
 pub fn Table() -> impl IntoView {
-    let reference_table_ref = create_node_ref::<Table>();
-    let reference_tr_ref = create_node_ref::<Tr>();
-    let reference_td_ref = create_node_ref::<Td>();
+    let reference_table_ref = create_node_ref::<AnyElement>();
+    let reference_tr_ref = create_node_ref::<AnyElement>();
+    let reference_td_ref = create_node_ref::<AnyElement>();
     let floating_ref = create_node_ref::<Div>();
 
     let (same_parent, set_same_parent) = create_signal(false);
     let (node, set_node) = create_signal(Node::Td);
 
-    // TODO: other refs
+    let reference_signal = MaybeProp::derive(move || match node() {
+        Node::Table => Some(reference_table_ref.into()),
+        Node::Td => Some(reference_td_ref.into()),
+        Node::Th => Some(reference_tr_ref.into()),
+    });
+
     let UseFloatingReturn {
         x,
         y,
@@ -32,7 +37,7 @@ pub fn Table() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_table_ref.into_reference(),
+        reference_signal,
         floating_ref,
         UseFloatingOptions::default(),
     );
@@ -62,23 +67,29 @@ pub fn Table() -> impl IntoView {
             The floating element should be correctly positioned when the reference or ancestor is a table element.
         </p>
         <div class="container">
-            <table _ref=reference_table_ref>
-                <thead>
-                    <tr _ref=reference_tr_ref>
-                        <th>Reference th</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td _ref=reference_td_ref>
-                            Reference td
-                            <Show when=same_parent>
-                                {floating_view}
-                            </Show>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            {move || view! {
+                <table>
+                    <thead>
+                        {move || view! {
+                            <tr>
+                                <th>Reference th</th>
+                            </tr>
+                        }.into_any().node_ref(reference_tr_ref)}
+                    </thead>
+                    <tbody>
+                        <tr>
+                            {move || view! {
+                                <td>
+                                    Reference td
+                                    <Show when=same_parent>
+                                        {floating_view}
+                                    </Show>
+                                </td>
+                            }.into_any().node_ref(reference_td_ref)}
+                        </tr>
+                    </tbody>
+                </table>
+            }.into_any().node_ref(reference_table_ref)}
 
             <Show when=move || !same_parent()>
                 {floating_view}
