@@ -4,7 +4,7 @@ use floating_ui_dom::{
     auto_update, AutoUpdateOptions, ElementOrVirtual, Middleware, MiddlewareData, Placement,
     Strategy,
 };
-use leptos::{Attribute, IntoAttribute, MaybeProp, MaybeSignal, Signal, SignalGet};
+use leptos::{Attribute, IntoAttribute, MaybeProp, MaybeSignal, Signal};
 use web_sys::{Element, Window};
 
 pub type WhileElementsMountedFn =
@@ -100,7 +100,7 @@ impl UseFloatingOptions {
             auto_update(reference, floating, update, AutoUpdateOptions::default())
         });
         self.while_elements_mounted(MaybeProp::derive(move || {
-            if enabled.get() {
+            if enabled() {
                 Some(auto_update_rc.clone())
             } else {
                 None

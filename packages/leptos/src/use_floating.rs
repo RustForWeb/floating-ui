@@ -135,6 +135,8 @@ pub fn use_floating<
     let options_middleware = options.middleware.clone();
     let middleware_option_untracked = move || options_middleware.get_untracked();
     let transform_option = move || options.transform.get().unwrap_or(true);
+    let options_while_elements_mounted = options.while_elements_mounted.clone();
+    let while_elements_mounted_untracked = move || options_while_elements_mounted.get_untracked();
 
     let (x, set_x) = create_signal(0.0);
     let (y, set_y) = create_signal(0.0);
@@ -223,7 +225,7 @@ pub fn use_floating<
     let attach = move || {
         attach_cleanup_rc();
 
-        if let Some(while_elements_mounted) = options.while_elements_mounted.get() {
+        if let Some(while_elements_mounted) = while_elements_mounted_untracked() {
             if let Some(reference) = attach_reference.get_untracked() {
                 if let Some(reference_element) = reference.get_untracked() {
                     if let Some(floating_element) = floating.get_untracked_as_element() {
@@ -303,6 +305,13 @@ pub fn use_floating<
         options.middleware,
         move |_, _, _| {
             middleware_update_rc();
+        },
+        false,
+    );
+    _ = watch(
+        options.while_elements_mounted,
+        move |_, _, _| {
+            attach_rc();
         },
         false,
     );
