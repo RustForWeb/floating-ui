@@ -61,7 +61,29 @@ pub fn compute_position<Element: Clone, Window: Clone>(
         y = next_y.unwrap_or(y);
 
         if let Some(data) = data {
-            middleware_data.set(middleware.name(), data);
+            let existing_data = middleware_data.get(middleware.name());
+
+            let new_data = match existing_data {
+                Some(existing_data) => {
+                    let mut a = existing_data
+                        .as_object()
+                        .expect("Existing data should be an object.")
+                        .to_owned();
+
+                    let mut b = data
+                        .as_object()
+                        .expect("New data should be an object.")
+                        .to_owned();
+
+                    b.retain(|_, v| !v.is_null());
+                    a.extend(b);
+
+                    serde_json::Value::Object(a)
+                }
+                None => data,
+            };
+
+            middleware_data.set(middleware.name(), new_data);
         }
 
         if let Some(reset) = reset {

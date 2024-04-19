@@ -92,18 +92,9 @@ pub fn Hide() -> impl IntoView {
     );
 
     let hide_data = move || middleware_data().get_as::<HideData>(HIDE_NAME);
-    let reference_hidden = move || {
-        hide_data().map_or(false, |data| match data {
-            HideData::ReferenceHidden(data) => data.reference_hidden,
-            HideData::Escaped(_) => false,
-        })
-    };
-    let escaped = move || {
-        hide_data().map_or(false, |data| match data {
-            HideData::ReferenceHidden(_) => false,
-            HideData::Escaped(data) => data.escaped,
-        })
-    };
+    let reference_hidden =
+        move || hide_data().map_or(false, |data| data.reference_hidden.unwrap_or(false));
+    let escaped = move || hide_data().map_or(false, |data| data.escaped.unwrap_or(false));
 
     let hierarchy_update = update.clone();
 

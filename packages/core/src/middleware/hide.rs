@@ -70,25 +70,13 @@ impl<Element: Clone> Default for HideOptions<Element> {
     }
 }
 
-/// Data stored in [`HideData`] when using [`HideStrategy::ReferenceHidden`].
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct HideDataReferenceHidden {
-    pub reference_hidden: bool,
-    pub reference_hidden_offsets: SideObject,
-}
-
-/// Data stored in [`HideData`] when using [`HideStrategy::Escaped`].
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct HideDataEscaped {
-    pub escaped: bool,
-    pub escaped_offsets: SideObject,
-}
-
 /// Data stored by [`Hide`] middleware.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub enum HideData {
-    ReferenceHidden(HideDataReferenceHidden),
-    Escaped(HideDataEscaped),
+pub struct HideData {
+    pub reference_hidden: Option<bool>,
+    pub reference_hidden_offsets: Option<SideObject>,
+    pub escaped: Option<bool>,
+    pub escaped_offsets: Option<SideObject>,
 }
 
 /// Provides data to hide the floating element in applicable situations,
@@ -163,10 +151,12 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Hide<'a,
                     x: None,
                     y: None,
                     data: Some(
-                        serde_json::to_value(HideData::ReferenceHidden(HideDataReferenceHidden {
-                            reference_hidden: is_any_side_fully_clipped(&offsets),
-                            reference_hidden_offsets: offsets,
-                        }))
+                        serde_json::to_value(HideData {
+                            reference_hidden: Some(is_any_side_fully_clipped(&offsets)),
+                            reference_hidden_offsets: Some(offsets),
+                            escaped: None,
+                            escaped_offsets: None,
+                        })
                         .expect("Data should be valid JSON."),
                     ),
                     reset: None,
@@ -190,10 +180,12 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Hide<'a,
                     x: None,
                     y: None,
                     data: Some(
-                        serde_json::to_value(HideData::Escaped(HideDataEscaped {
-                            escaped: is_any_side_fully_clipped(&offsets),
-                            escaped_offsets: offsets,
-                        }))
+                        serde_json::to_value(HideData {
+                            reference_hidden: None,
+                            reference_hidden_offsets: None,
+                            escaped: Some(is_any_side_fully_clipped(&offsets)),
+                            escaped_offsets: Some(offsets),
+                        })
                         .expect("Data should be valid JSON."),
                     ),
                     reset: None,
