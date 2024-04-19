@@ -3,12 +3,9 @@ use floating_ui_utils::{
     DefaultVirtualElement, ElementOrVirtual, Padding, Rect, Side,
 };
 
-use crate::{
-    types::{
-        Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
-        MiddlewareWithOptions,
-    },
-    GetElementRectsArgs, Reset, ResetRects, ResetValue,
+use crate::types::{
+    Derivable, DerivableFn, GetElementRectsArgs, Middleware, MiddlewareReturn, MiddlewareState,
+    MiddlewareWithOptions, Reset, ResetRects, ResetValue,
 };
 
 fn get_bounding_rect(rects: Vec<ClientRectObject>) -> Rect {
@@ -35,7 +32,7 @@ fn get_bounding_rect(rects: Vec<ClientRectObject>) -> Rect {
     Rect {
         x: min_x,
         y: min_y,
-        width: max_x - min_y,
+        width: max_x - min_x,
         height: max_y - min_y,
     }
 }
@@ -170,6 +167,8 @@ impl<'a, Element: Clone + 'static, Window: Clone> Middleware<Element, Window>
             ..
         } = state;
 
+        // A MouseEvent's client{X,Y} coords can be up to 2 pixels off a ClientRect's bounds,
+        // despite the event listener being triggered. A padding of 2 seems to handle this issue.
         let padding = options.padding.unwrap_or(Padding::All(2.0));
 
         let native_client_rects = platform

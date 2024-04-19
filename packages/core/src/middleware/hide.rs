@@ -4,10 +4,9 @@ use serde::{Deserialize, Serialize};
 use crate::{
     detect_overflow::{detect_overflow, DetectOverflowOptions},
     types::{
-        Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
+        Derivable, DerivableFn, ElementContext, Middleware, MiddlewareReturn, MiddlewareState,
         MiddlewareWithOptions,
     },
-    ElementContext,
 };
 
 fn get_side_offsets(overflow: SideObject, rect: &Rect) -> SideObject {

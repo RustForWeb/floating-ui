@@ -4,9 +4,8 @@ use crate::{
     detect_overflow::{detect_overflow, DetectOverflowOptions},
     types::{
         Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
-        MiddlewareWithOptions,
+        MiddlewareWithOptions, ResetRects, ResetValue,
     },
-    ResetRects, ResetValue,
 };
 
 use super::SHIFT_NAME;
