@@ -270,6 +270,24 @@ pub fn Hide() -> impl IntoView {
                     </div>
                </div>
             },
+            'o' => view! {
+                <div
+                    style:width="50px"
+                    style:height="50px"
+                    style:overflow="auto"
+                    style:position="absolute"
+                    style:top="50px"
+                    style:left="50px"
+                    style:background="blue"
+                    style:display="inline-block"
+                >
+                    <div style:position="fixed">
+                        <div style:transform="translateZ(0)">
+                            {base}
+                        </div>
+                    </div>
+                </div>
+            },
             _ => base,
         }
     };
