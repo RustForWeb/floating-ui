@@ -48,7 +48,7 @@ pub fn Scroll() -> impl IntoView {
         floating_ref,
         update,
         rtl: None::<bool>.into(),
-        disable_ref_updates: None,
+        disable_ref_updates: Some(true),
     });
 
     let reference_view = move || {
