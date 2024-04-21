@@ -96,8 +96,6 @@ pub fn Hide() -> impl IntoView {
         move || hide_data().map_or(false, |data| data.reference_hidden.unwrap_or(false));
     let escaped = move || hide_data().map_or(false, |data| data.escaped.unwrap_or(false));
 
-    // let hierarchy_update = update.clone();
-
     let UseScrollReturn {
         scroll_ref,
         indicator,
@@ -339,6 +337,7 @@ pub fn Hide() -> impl IntoView {
                                 log::info!("set hierarchy {:?}", local_hierarchy);
                                 set_hierarchy(local_hierarchy);
 
+                                // Match React test behaviour
                                 if ['j', 'm', 'k', 'l'].contains(&local_hierarchy) {
                                     update_scroll();
                                 }

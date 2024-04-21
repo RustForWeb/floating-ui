@@ -22,7 +22,9 @@ pub fn Scrollbars() -> impl IntoView {
     ))];
 
     let UseFloatingReturn {
-        floating_styles,
+        x,
+        y,
+        strategy,
         update,
         ..
     } = use_floating(
@@ -50,7 +52,15 @@ pub fn Scrollbars() -> impl IntoView {
             <div _ref=reference_ref class="reference">
                 Reference
             </div>
-            <div _ref=floating_ref class="floating" style=move || format!("{} width: {}px; height: {}px;", String::from(floating_styles()), size(), size())>
+            <div
+                _ref=floating_ref
+                class="floating"
+                style:position=move || format!("{:?}", strategy()).to_lowercase()
+                style:top=move || format!("{}px", y())
+                style:left=move || format!("{}px", x())
+                style:width=move || format!("{}px", size())
+                style:height=move || format!("{}px", size())
+            >
                 Floating
             </div>
         </div>
