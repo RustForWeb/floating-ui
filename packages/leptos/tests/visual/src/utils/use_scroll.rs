@@ -117,11 +117,7 @@ pub fn use_scroll(
                     Some(true) => -x,
                     _ => x,
                 });
-
-                log::info!("scroll {x} {y}");
             }
-
-            log::info!("scroll update");
 
             update();
         }
