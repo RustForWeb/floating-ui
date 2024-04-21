@@ -36,6 +36,9 @@ pub fn Scroll() -> impl IntoView {
         UseFloatingOptions::default().strategy(strategy.into()),
     );
 
+    let strategy_update = update.clone();
+    let node_update = update.clone();
+
     let UseScrollReturn {
         scroll_ref,
         indicator,
@@ -115,17 +118,24 @@ pub fn Scroll() -> impl IntoView {
             <For
                 each=|| ALL_STRATEGIES
                 key=|local_strategy| format!("{:?}", local_strategy)
-                children=move |local_strategy| view! {
-                    <button
-                        data-testid=move || format!("Strategy{:?}", local_strategy).to_case(Case::Kebab)
-                        style:background-color=move || match strategy() == local_strategy {
-                            true => "black",
-                            false => ""
-                        }
-                        on:click=move |_| set_strategy(local_strategy)
-                    >
-                        {format!("{:?}", local_strategy).to_case(Case::Kebab)}
-                    </button>
+                children=move |local_strategy| {
+                    let strategy_update = strategy_update.clone();
+
+                    view! {
+                        <button
+                            data-testid=move || format!("Strategy{:?}", local_strategy).to_case(Case::Kebab)
+                            style:background-color=move || match strategy() == local_strategy {
+                                true => "black",
+                                false => ""
+                            }
+                            on:click=move |_| {
+                                set_strategy(local_strategy);
+                                strategy_update();
+                            }
+                        >
+                            {format!("{:?}", local_strategy).to_case(Case::Kebab)}
+                        </button>
+                    }
                 }
             />
         </div>
@@ -135,17 +145,24 @@ pub fn Scroll() -> impl IntoView {
             <For
                 each=|| ALL_NODES
                 key=|local_node| format!("{:?}", local_node)
-                children=move |local_node| view! {
-                    <button
-                        data-testid=move || format!("scroll-{}", format!("{:?}", local_node).to_case(Case::Camel))
-                        style:background-color=move || match node() == local_node {
-                            true => "black",
-                            false => ""
-                        }
-                        on:click=move |_| set_node(local_node)
-                    >
-                        {format!("{:?}", local_node).to_case(Case::Camel)}
-                    </button>
+                children=move |local_node| {
+                    let node_update = node_update.clone();
+
+                    view! {
+                        <button
+                            data-testid=move || format!("scroll-{}", format!("{:?}", local_node).to_case(Case::Camel))
+                            style:background-color=move || match node() == local_node {
+                                true => "black",
+                                false => ""
+                            }
+                            on:click=move |_| {
+                                set_node(local_node);
+                                node_update();
+                            }
+                        >
+                            {format!("{:?}", local_node).to_case(Case::Camel)}
+                        </button>
+                    }
                 }
             />
         </div>
