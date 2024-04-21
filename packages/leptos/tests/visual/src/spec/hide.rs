@@ -101,8 +101,7 @@ pub fn Hide() -> impl IntoView {
     let UseScrollReturn {
         scroll_ref,
         indicator,
-        // update_scroll,
-        ..
+        update_scroll,
     } = use_scroll(UseScrollOptions {
         reference_ref,
         floating_ref,
@@ -328,7 +327,7 @@ pub fn Hide() -> impl IntoView {
                 each=|| ['a', 'b', 'c', 'd', 'e', 'f', 'g','h','i','j','k','l','m','n','o','p','q']
                 key=|local_hierarchy| format!("{:?}", local_hierarchy)
                 children=move |local_hierarchy| {
-                    // let update_scroll = update_scroll.clone();
+                    let update_scroll = update_scroll.clone();
                     view! {
                         <button
                             data-testid=format!("hierarchy-{}", local_hierarchy)
@@ -339,7 +338,10 @@ pub fn Hide() -> impl IntoView {
                             on:click=move |_| {
                                 log::info!("set hierarchy {:?}", local_hierarchy);
                                 set_hierarchy(local_hierarchy);
-                                // update_scroll();
+
+                                if ['j', 'm', 'k', 'l'].contains(&local_hierarchy) {
+                                    update_scroll();
+                                }
                             }
                         >
                             {local_hierarchy}
