@@ -14,6 +14,8 @@ pub struct UseScrollOptions {
     pub floating_ref: NodeRef<Div>,
     pub update: Rc<dyn Fn()>,
     pub rtl: MaybeProp<bool>,
+
+    pub disable_ref_updates: Option<bool>,
 }
 
 pub struct UseScrollReturn {
@@ -28,6 +30,7 @@ pub fn use_scroll(
         floating_ref,
         update,
         rtl,
+        disable_ref_updates,
     }: UseScrollOptions,
 ) -> UseScrollReturn {
     let scroll_ref = create_node_ref::<Div>();
@@ -75,10 +78,20 @@ pub fn use_scroll(
 
     let effect_local_update = local_update.clone();
     let effect = move || {
-        if let Some(reference) = reference_ref() {
+        let reference = match disable_ref_updates.unwrap_or(false) {
+            true => reference_ref.get_untracked(),
+            false => reference_ref.get(),
+        };
+
+        if let Some(reference) = reference {
             let mut ancestors = get_overflow_ancestors(&reference, vec![], true);
 
-            if let Some(floating) = floating_ref() {
+            let floating = match disable_ref_updates.unwrap_or(false) {
+                true => floating_ref.get_untracked(),
+                false => floating_ref.get(),
+            };
+
+            if let Some(floating) = floating {
                 ancestors.append(&mut get_overflow_ancestors(&floating, vec![], true));
             }
 
@@ -103,8 +116,12 @@ pub fn use_scroll(
                 scroll.set_scroll_left(match rtl() {
                     Some(true) => -x,
                     _ => x,
-                })
+                });
+
+                log::info!("scroll {x} {y}");
             }
+
+            log::info!("scroll update");
 
             update();
         }

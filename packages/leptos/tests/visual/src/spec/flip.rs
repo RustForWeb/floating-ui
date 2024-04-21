@@ -79,6 +79,7 @@ pub fn Flip() -> impl IntoView {
         floating_ref,
         update,
         rtl: None::<bool>.into(),
+        disable_ref_updates: None,
     });
 
     view! {

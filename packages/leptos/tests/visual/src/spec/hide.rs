@@ -96,17 +96,19 @@ pub fn Hide() -> impl IntoView {
         move || hide_data().map_or(false, |data| data.reference_hidden.unwrap_or(false));
     let escaped = move || hide_data().map_or(false, |data| data.escaped.unwrap_or(false));
 
-    let hierarchy_update = update.clone();
+    // let hierarchy_update = update.clone();
 
     let UseScrollReturn {
         scroll_ref,
         indicator,
+        // update_scroll,
         ..
     } = use_scroll(UseScrollOptions {
         reference_ref,
         floating_ref,
         update,
         rtl: None::<bool>.into(),
+        disable_ref_updates: Some(true),
     });
 
     let reference_view = move || {
@@ -308,7 +310,7 @@ pub fn Hide() -> impl IntoView {
                 each=|| ['a', 'b', 'c', 'd', 'e', 'f', 'g','h','i','j','k','l','m','n','o','p','q']
                 key=|local_hierarchy| format!("{:?}", local_hierarchy)
                 children=move |local_hierarchy| {
-                    let hierarchy_update = hierarchy_update.clone();
+                    // let update_scroll = update_scroll.clone();
                     view! {
                         <button
                             data-testid=format!("hierarchy-{}", local_hierarchy)
@@ -317,8 +319,9 @@ pub fn Hide() -> impl IntoView {
                                 false => ""
                             }
                             on:click=move |_| {
+                                log::info!("set hierarchy {:?}", local_hierarchy);
                                 set_hierarchy(local_hierarchy);
-                                hierarchy_update();
+                                // update_scroll();
                             }
                         >
                             {local_hierarchy}

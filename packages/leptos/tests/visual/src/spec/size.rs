@@ -97,6 +97,7 @@ pub fn Size() -> impl IntoView {
         floating_ref,
         update,
         rtl: rtl.into(),
+        disable_ref_updates: None,
     });
 
     view! {
