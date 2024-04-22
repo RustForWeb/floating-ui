@@ -33,6 +33,15 @@ impl Side {
             Side::Left => Side::Right,
         }
     }
+
+    pub fn axis(&self) -> Axis {
+        match self {
+            Side::Top => Axis::Y,
+            Side::Right => Axis::X,
+            Side::Bottom => Axis::Y,
+            Side::Left => Axis::X,
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -97,6 +106,59 @@ impl Placement {
             Placement::LeftEnd => Side::Left,
         }
     }
+
+    pub fn opposite(&self) -> Placement {
+        match self {
+            Placement::Top => Placement::Bottom,
+            Placement::TopStart => Placement::BottomStart,
+            Placement::TopEnd => Placement::BottomEnd,
+            Placement::Right => Placement::Left,
+            Placement::RightStart => Placement::LeftStart,
+            Placement::RightEnd => Placement::LeftEnd,
+            Placement::Bottom => Placement::Top,
+            Placement::BottomStart => Placement::TopStart,
+            Placement::BottomEnd => Placement::TopEnd,
+            Placement::Left => Placement::Right,
+            Placement::LeftStart => Placement::RightStart,
+            Placement::LeftEnd => Placement::RightEnd,
+        }
+    }
+
+    pub fn opposite_alignment(&self) -> Placement {
+        match self {
+            Placement::Top => Placement::Top,
+            Placement::TopStart => Placement::TopEnd,
+            Placement::TopEnd => Placement::TopStart,
+            Placement::Right => Placement::Right,
+            Placement::RightStart => Placement::RightEnd,
+            Placement::RightEnd => Placement::RightStart,
+            Placement::Bottom => Placement::Bottom,
+            Placement::BottomStart => Placement::BottomEnd,
+            Placement::BottomEnd => Placement::BottomStart,
+            Placement::Left => Placement::Left,
+            Placement::LeftStart => Placement::LeftEnd,
+            Placement::LeftEnd => Placement::LeftStart,
+        }
+    }
+}
+
+impl From<(Side, Option<Alignment>)> for Placement {
+    fn from(value: (Side, Option<Alignment>)) -> Self {
+        match value {
+            (Side::Top, None) => Placement::Top,
+            (Side::Top, Some(Alignment::Start)) => Placement::TopStart,
+            (Side::Top, Some(Alignment::End)) => Placement::TopEnd,
+            (Side::Right, None) => Placement::Right,
+            (Side::Right, Some(Alignment::Start)) => Placement::RightStart,
+            (Side::Right, Some(Alignment::End)) => Placement::RightEnd,
+            (Side::Bottom, None) => Placement::Bottom,
+            (Side::Bottom, Some(Alignment::Start)) => Placement::BottomStart,
+            (Side::Bottom, Some(Alignment::End)) => Placement::BottomEnd,
+            (Side::Left, None) => Placement::Left,
+            (Side::Left, Some(Alignment::Start)) => Placement::LeftStart,
+            (Side::Left, Some(Alignment::End)) => Placement::LeftEnd,
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -112,6 +174,13 @@ pub enum Axis {
 }
 
 impl Axis {
+    pub fn opposite(&self) -> Axis {
+        match self {
+            Axis::X => Axis::Y,
+            Axis::Y => Axis::X,
+        }
+    }
+
     pub fn length(&self) -> Length {
         match self {
             Axis::X => Length::Width,
@@ -241,6 +310,21 @@ pub struct ClientRectObject {
     pub right: f64,
     pub bottom: f64,
     pub left: f64,
+}
+
+impl From<Rect> for ClientRectObject {
+    fn from(value: Rect) -> Self {
+        ClientRectObject {
+            x: value.x,
+            y: value.y,
+            width: value.width,
+            height: value.height,
+            top: value.y,
+            right: value.x + value.width,
+            bottom: value.y + value.height,
+            left: value.x,
+        }
+    }
 }
 
 cfg_if::cfg_if! {
@@ -501,43 +585,19 @@ pub fn get_alignment(placement: Placement) -> Option<Alignment> {
 }
 
 pub fn get_placement(side: Side, alignment: Option<Alignment>) -> Placement {
-    match (side, alignment) {
-        (Side::Top, None) => Placement::Top,
-        (Side::Top, Some(Alignment::Start)) => Placement::TopStart,
-        (Side::Top, Some(Alignment::End)) => Placement::TopEnd,
-        (Side::Right, None) => Placement::Right,
-        (Side::Right, Some(Alignment::Start)) => Placement::RightStart,
-        (Side::Right, Some(Alignment::End)) => Placement::RightEnd,
-        (Side::Bottom, None) => Placement::Bottom,
-        (Side::Bottom, Some(Alignment::Start)) => Placement::BottomStart,
-        (Side::Bottom, Some(Alignment::End)) => Placement::BottomEnd,
-        (Side::Left, None) => Placement::Left,
-        (Side::Left, Some(Alignment::Start)) => Placement::LeftStart,
-        (Side::Left, Some(Alignment::End)) => Placement::LeftEnd,
-    }
+    (side, alignment).into()
 }
 
 pub fn get_opposite_axis(axis: Axis) -> Axis {
-    match axis {
-        Axis::X => Axis::Y,
-        Axis::Y => Axis::X,
-    }
+    axis.opposite()
 }
 
 pub fn get_axis_length(axis: Axis) -> Length {
-    match axis {
-        Axis::X => Length::Width,
-        Axis::Y => Length::Height,
-    }
+    axis.length()
 }
 
 pub fn get_side_axis(placement: Placement) -> Axis {
-    match get_side(placement) {
-        Side::Top => Axis::Y,
-        Side::Right => Axis::X,
-        Side::Bottom => Axis::Y,
-        Side::Left => Axis::X,
-    }
+    placement.side().axis()
 }
 
 pub fn get_alignment_axis(placement: Placement) -> Axis {
@@ -584,20 +644,7 @@ pub fn get_expanded_placements(placement: Placement) -> Vec<Placement> {
 }
 
 pub fn get_opposite_alignment_placement(placement: Placement) -> Placement {
-    match placement {
-        Placement::Top => Placement::Top,
-        Placement::TopStart => Placement::TopEnd,
-        Placement::TopEnd => Placement::TopStart,
-        Placement::Right => Placement::Right,
-        Placement::RightStart => Placement::RightEnd,
-        Placement::RightEnd => Placement::RightStart,
-        Placement::Bottom => Placement::Bottom,
-        Placement::BottomStart => Placement::BottomEnd,
-        Placement::BottomEnd => Placement::BottomStart,
-        Placement::Left => Placement::Left,
-        Placement::LeftStart => Placement::LeftEnd,
-        Placement::LeftEnd => Placement::LeftStart,
-    }
+    placement.opposite_alignment()
 }
 
 pub fn get_side_list(side: Side, is_start: bool, rtl: Option<bool>) -> Vec<Side> {
@@ -655,20 +702,7 @@ pub fn get_opposite_axis_placements(
 }
 
 pub fn get_opposite_placement(placement: Placement) -> Placement {
-    match placement {
-        Placement::Top => Placement::Bottom,
-        Placement::TopStart => Placement::BottomStart,
-        Placement::TopEnd => Placement::BottomEnd,
-        Placement::Right => Placement::Left,
-        Placement::RightStart => Placement::LeftStart,
-        Placement::RightEnd => Placement::LeftEnd,
-        Placement::Bottom => Placement::Top,
-        Placement::BottomStart => Placement::TopStart,
-        Placement::BottomEnd => Placement::TopEnd,
-        Placement::Left => Placement::Right,
-        Placement::LeftStart => Placement::RightStart,
-        Placement::LeftEnd => Placement::RightEnd,
-    }
+    placement.opposite()
 }
 
 pub fn expand_padding_object(padding: PartialSideObject) -> SideObject {
