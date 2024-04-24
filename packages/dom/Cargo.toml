@@ -10,6 +10,6 @@ version.workspace = true
 
 [dependencies]
 dyn-clone.workspace = true
-floating-ui-core = { path = "../core", version = "0.0.7" }
-floating-ui-utils = { path = "../utils", version = "0.0.7", features = ["dom"] }
+floating-ui-core = { path = "../core", version = "0.0.8" }
+floating-ui-utils = { path = "../utils", version = "0.0.8", features = ["dom"] }
 web-sys.workspace = true
