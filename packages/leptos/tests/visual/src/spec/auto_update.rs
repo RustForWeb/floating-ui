@@ -53,7 +53,7 @@ pub fn AutoUpdate() -> impl IntoView {
         floating_ref,
         UseFloatingOptions::default()
             .strategy(Strategy::Fixed.into())
-            .while_elements_mounted_auto_update_enabled(while_elements_mounted.into()),
+            .while_elements_mounted_auto_update_with_enabled(while_elements_mounted.into()),
     );
 
     type CleanupFn = Box<dyn Fn()>;

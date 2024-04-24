@@ -94,14 +94,52 @@ impl UseFloatingOptions {
         self.while_elements_mounted(auto_update_rc.into())
     }
 
-    /// Set `while_elements_mounted` option to [`auto_update`] with [`AutoUpdateOptions::default`].
-    pub fn while_elements_mounted_auto_update_enabled(self, enabled: MaybeSignal<bool>) -> Self {
+    /// Set `while_elements_mounted` option to [`auto_update`] with [`AutoUpdateOptions::default`] when `enabled` is `true`.
+    pub fn while_elements_mounted_auto_update_with_enabled(
+        self,
+        enabled: MaybeSignal<bool>,
+    ) -> Self {
         let auto_update_rc: Rc<WhileElementsMountedFn> = Rc::new(|reference, floating, update| {
             auto_update(reference, floating, update, AutoUpdateOptions::default())
         });
         self.while_elements_mounted(MaybeProp::derive(move || {
             if enabled() {
                 Some(auto_update_rc.clone())
+            } else {
+                None
+            }
+        }))
+    }
+
+    /// Set `while_elements_mounted` option to [`auto_update`] with `options`.
+    pub fn while_elements_mounted_auto_update_with_options(
+        self,
+        options: MaybeSignal<AutoUpdateOptions>,
+    ) -> Self {
+        let auto_update_rc = move |options: AutoUpdateOptions| -> Rc<WhileElementsMountedFn> {
+            Rc::new(move |reference, floating, update| {
+                auto_update(reference, floating, update, options.clone())
+            })
+        };
+
+        self.while_elements_mounted(MaybeProp::derive(move || Some(auto_update_rc(options()))))
+    }
+
+    /// Set `while_elements_mounted` option to [`auto_update`] with `options` when `enabled` is `true`.
+    pub fn while_elements_mounted_auto_update_with_enabled_and_options(
+        self,
+        enabled: MaybeSignal<bool>,
+        options: MaybeSignal<AutoUpdateOptions>,
+    ) -> Self {
+        let auto_update_rc = move |options: AutoUpdateOptions| -> Rc<WhileElementsMountedFn> {
+            Rc::new(move |reference, floating, update| {
+                auto_update(reference, floating, update, options.clone())
+            })
+        };
+
+        self.while_elements_mounted(MaybeProp::derive(move || {
+            if enabled() {
+                Some(auto_update_rc(options()))
             } else {
                 None
             }
@@ -117,6 +155,31 @@ pub struct FloatingStyles {
     pub left: String,
     pub transform: Option<String>,
     pub will_change: Option<String>,
+}
+
+impl FloatingStyles {
+    pub fn style_position(&self) -> String {
+        match self.position {
+            Strategy::Absolute => "absolute".into(),
+            Strategy::Fixed => "fixed".into(),
+        }
+    }
+
+    pub fn style_top(&self) -> String {
+        self.top.clone()
+    }
+
+    pub fn style_left(&self) -> String {
+        self.left.clone()
+    }
+
+    pub fn style_transform(&self) -> Option<String> {
+        self.transform.clone()
+    }
+
+    pub fn style_will_change(&self) -> Option<String> {
+        self.will_change.clone()
+    }
 }
 
 impl From<FloatingStyles> for String {
