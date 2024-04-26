@@ -5,13 +5,13 @@ use floating_ui_dom::{
     DetectOverflowOptions, Flip, FlipOptions, Offset, OffsetOptions, Padding, Placement, Shift,
     ShiftOptions, Side, ARROW_NAME,
 };
-use log::Level;
 use wasm_bindgen::prelude::*;
 use web_sys::{Element, HtmlElement};
 
 #[wasm_bindgen(start)]
 fn run() -> Result<(), JsValue> {
-    console_log::init_with_level(Level::Debug).expect("Console logger should be available.");
+    console_log::init_with_level(log::Level::Debug).expect("Console logger should be available");
+    console_error_panic_hook::set_once();
 
     let window = web_sys::window().expect("Window should exist.");
     let document = window.document().expect("Window should have document.");
