@@ -1,7 +1,8 @@
-use std::{collections::HashMap, error::Error, fs};
+use std::{collections::HashMap, error::Error, fs, str::FromStr};
 
 use octocrab::models::repos::Release;
 use serde::{Deserialize, Serialize};
+use strum::{EnumString, VariantArray};
 
 // #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 // enum Package {
@@ -22,8 +23,11 @@ use serde::{Deserialize, Serialize};
 //     }
 // }
 
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, EnumString, VariantArray,
+)]
 #[serde(rename_all = "kebab-case")]
+#[strum(serialize_all = "kebab-case")]
 enum UpstreamPackage {
     Core,
     Dom,
@@ -36,15 +40,37 @@ struct UpstreamConfig {
     releases: HashMap<UpstreamPackage, String>,
 }
 
+const PERSONAL_TOKEN: &str = "";
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    env_logger::init();
+
+    octocrab::initialise(
+        octocrab::OctocrabBuilder::new()
+            .personal_token(PERSONAL_TOKEN.to_string())
+            .build()?,
+    );
+
     let current_releases = read_current_releases()?;
 
-    println!("{:#?}", current_releases);
+    log::debug!("Current releases:\n{:#?}", current_releases);
 
     let new_releases = fetch_new_releases(current_releases).await?;
 
-    println!("{:#?}", new_releases);
+    log::debug!(
+        "New releases:\n{:#?}",
+        new_releases
+            .into_iter()
+            .map(|(package, releases)| (
+                package,
+                releases
+                    .into_iter()
+                    .map(|release| release.tag_name)
+                    .collect::<Vec<String>>()
+            ))
+            .collect::<Vec<(UpstreamPackage, Vec<String>)>>()
+    );
 
     Ok(())
 }
@@ -62,40 +88,72 @@ async fn fetch_new_releases(
 
     let repo = octocrab.repos("floating-ui", "floating-ui");
 
-    let releases_by_package: HashMap<UpstreamPackage, Vec<Release>> = HashMap::new();
-    let mut releases_to_find_count = current_releases.len();
+    let mut releases_by_package: HashMap<UpstreamPackage, Vec<Release>> = HashMap::new();
+    let mut releases_found_by_pacakge: HashMap<UpstreamPackage, bool> = HashMap::new();
 
-    while releases_to_find_count > 0 {
+    releases_found_by_pacakge.extend(
+        UpstreamPackage::VARIANTS
+            .iter()
+            .map(|package| (*package, false)),
+    );
+
+    let mut page: u32 = 1;
+    while releases_found_by_pacakge.iter().any(|(_, &found)| !found) {
         let releases = repo
             .releases()
             .list()
             .per_page(10)
-            .page(1u32)
+            .page(page)
             .send()
             .await?;
+        page += 1;
+
+        log::debug!("Got releases.");
 
         for release in releases {
             if !release.tag_name.starts_with("@floating-ui/") {
+                log::debug!("Not a Floating UI package {}", release.tag_name);
                 continue;
             }
 
             let tag_name = &release.tag_name["@floating-ui/".len()..];
-            let (package_name, package_version) =
-                tag_name.split_at(tag_name.rfind('@').unwrap_or(tag_name.len()));
+            if let Some((package_name, package_version)) = tag_name.split_once('@') {
+                log::debug!("{} | {} {}", tag_name, package_name, package_version);
 
-            let upstream_package: Option<UpstreamPackage> = toml::from_str(package_name).ok();
-            if let Some(upstream_package) = upstream_package {
-                if current_releases
-                    .get(&upstream_package)
-                    .expect("Upstream package version should exist.")
-                    == package_version
-                {
-                    releases_to_find_count -= 1;
+                let upstream_package = UpstreamPackage::from_str(package_name).ok();
+                if let Some(upstream_package) = upstream_package {
+                    log::debug!("Release for package {:?}.", upstream_package);
+
+                    if *releases_found_by_pacakge
+                        .get(&upstream_package)
+                        .unwrap_or(&false)
+                    {
+                        log::debug!("Already found the current release.");
+                        continue;
+                    }
+
+                    if current_releases
+                        .get(&upstream_package)
+                        .expect("Upstream package version should exist.")
+                        == package_version
+                    {
+                        log::debug!("Found current release.");
+                        releases_found_by_pacakge.insert(upstream_package, true);
+                        continue;
+                    }
+
+                    log::debug!("Found new release {}.", package_version);
+                    releases_by_package
+                        .entry(upstream_package)
+                        .or_default()
+                        .insert(0, release);
+                } else {
+                    log::debug!("Not a relevant package {}", release.tag_name);
                     continue;
                 }
-
-                // TODO
-                // let package_releases = releases_by_package.get_mut(&upstream_package);
+            } else {
+                log::debug!("Not the correct version format.");
+                continue;
             }
         }
     }
