@@ -1,0 +1,16 @@
+[package]
+name = "scripts"
+description = "Scripts for Rust Floating UI."
+publish = false
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+octocrab = "0.38.0"
+serde.workspace = true
+tokio = { version = "1.37.0", features = ["full"] }
+toml = "0.8.12"
