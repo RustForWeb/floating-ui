@@ -1,6 +1,13 @@
 #![feature(exit_status_error)]
 
-use std::{collections::HashMap, env, error::Error, fs, process::Command, str::FromStr};
+use std::{
+    collections::{BTreeMap, HashMap},
+    env,
+    error::Error,
+    fs,
+    process::Command,
+    str::FromStr,
+};
 
 use octocrab::{
     models::repos::{CommitAuthor, Release},
@@ -19,6 +26,8 @@ use tempfile::tempdir;
     Hash,
     PartialEq,
     Eq,
+    PartialOrd,
+    Ord,
     Serialize,
     Deserialize,
     Display,
@@ -36,7 +45,7 @@ enum UpstreamPackage {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 struct UpstreamConfig {
-    releases: HashMap<UpstreamPackage, String>,
+    releases: BTreeMap<UpstreamPackage, String>,
 }
 
 #[tokio::main]
@@ -95,12 +104,12 @@ fn read_config() -> Result<UpstreamConfig, Box<dyn Error>> {
 }
 
 async fn fetch_new_releases(
-    current_releases: &HashMap<UpstreamPackage, String>,
-) -> Result<HashMap<UpstreamPackage, Vec<Release>>, Box<dyn Error>> {
+    current_releases: &BTreeMap<UpstreamPackage, String>,
+) -> Result<BTreeMap<UpstreamPackage, Vec<Release>>, Box<dyn Error>> {
     let octocrab = octocrab::instance();
     let repo = octocrab.repos("floating-ui", "floating-ui");
 
-    let mut releases_by_package: HashMap<UpstreamPackage, Vec<Release>> = HashMap::new();
+    let mut releases_by_package: BTreeMap<UpstreamPackage, Vec<Release>> = BTreeMap::new();
     let mut releases_found_by_pacakge: HashMap<UpstreamPackage, bool> = HashMap::new();
 
     releases_found_by_pacakge.extend(
@@ -283,9 +292,12 @@ async fn create_pull_request(
         current_tag, new_tag
     );
     let body = format!(
-        "**Diff for `{}`**\n<details>\n    <summary>Diff</summary>\n    ```\n{}\n```\n</details>\n\n\
+        "**Release**\n[{}]({})\n\n\
+        **Diff for `{}`**\n<details>\n    <summary>Diff</summary>\n```diff\n{}```\n</details>\n\n\
         **Full diff**\n[`{}...{}`]({}).
-    ", directory, diff, current_version, new_version, compare_url);
+    ",
+        new_tag, release.url, directory, diff, current_version, new_version, compare_url
+    );
 
     log::debug!("Creating pull request for branch {branch}.");
     octocrab
