@@ -15,7 +15,7 @@ jobs:
               run: rustup toolchain install nightly --no-self-update --profile default
 
             - name: Check for upstream releases
-              run: cargo -p scripts --bin upstream
+              run: cargo run -p scripts --bin upstream
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   GIT_USER_NAME: github-actions[bot]
