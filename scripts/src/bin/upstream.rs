@@ -190,7 +190,7 @@ async fn create_pull_request(
 ) -> Result<(), Box<dyn Error>> {
     let current_tag = format!("@floating-ui/{}@{}", upstream_package, current_version);
     let new_tag = release.tag_name;
-    let (_, new_version) = new_tag.split_at(new_tag.rfind('@').expect("Tag should contain @."));
+    let (_, new_version) = new_tag.split_at(new_tag.rfind('@').expect("Tag should contain @.") + 1);
     let directory = format!("packages/{}", upstream_package);
 
     log::debug!(
