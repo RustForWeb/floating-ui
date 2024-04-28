@@ -12,25 +12,6 @@ use serde::{Deserialize, Serialize};
 use strum::{Display, EnumString, VariantArray};
 use tempfile::tempdir;
 
-// #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-// enum Package {
-//     Core,
-//     Dom,
-//     Leptos,
-//     Utils,
-// }
-
-// impl Package {
-//     fn upstream(&self) -> UpstreamPackage {
-//         match self {
-//             Package::Core => UpstreamPackage::Core,
-//             Package::Dom => UpstreamPackage::Dom,
-//             Package::Leptos => UpstreamPackage::Vue,
-//             Package::Utils => UpstreamPackage::Utils,
-//         }
-//     }
-// }
-
 #[derive(
     Clone,
     Copy,
@@ -64,7 +45,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     octocrab::initialise(
         octocrab::OctocrabBuilder::new()
-            .personal_token(env::var("GITHUB_PERSONAL_ACCESS_TOKEN")?)
+            .personal_token(env::var("GITHUB_TOKEN")?)
             .build()?,
     );
 
@@ -272,8 +253,8 @@ async fn create_pull_request(
 
     let message = format!("Update to upstream {}", new_tag);
     let author = CommitAuthor {
-        name: env::var("GIT_AUTHOR_NAME")?,
-        email: env::var("GIT_AUTHOR_EMAIL")?,
+        name: env::var("GIT_USER_NAME")?,
+        email: env::var("GIT_USER_EMAIL")?,
         date: None,
     };
 
