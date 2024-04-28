@@ -220,13 +220,13 @@ async fn create_pull_request(
 
     log::debug!(
         "git diff {}..{} -- packages/{}",
-        new_tag,
         current_tag,
+        new_tag,
         upstream_package
     );
     let output = Command::new("git")
         .arg("diff")
-        .arg(format!("{}..{}", new_tag, current_tag))
+        .arg(format!("{}..{}", current_tag, new_tag))
         .arg("--")
         .arg(&directory)
         .current_dir(&temp_dir)
@@ -293,10 +293,10 @@ async fn create_pull_request(
     );
     let body = format!(
         "**Release**\n[{}]({})\n\n\
-        **Diff for `{}`**\n<details>\n    <summary>Diff</summary>\n```diff\n{}```\n</details>\n\n\
+        **Diff for `{}`**\n<details>\n    <summary>Diff</summary>\n\n```diff\n{}```\n</details>\n\n\
         **Full diff**\n[`{}...{}`]({}).
     ",
-        new_tag, release.url, directory, diff, current_version, new_version, compare_url
+        new_tag, release.html_url, directory, diff, current_version, new_version, compare_url
     );
 
     log::debug!("Creating pull request for branch {branch}.");
