@@ -107,11 +107,12 @@ fn observe_move(element: Element, on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
                 }
 
                 if ratio == 0.0 {
+                    // If the reference is clipped, the ratio is 0. Throttle the refresh to prevent an infinite loop of updates.
                     observe_timeout_id.replace(Some(
                         observe_window
                             .set_timeout_with_callback_and_timeout_and_arguments_0(
                                 (*timeout_closure).as_ref().unchecked_ref(),
-                                100,
+                                1000,
                             )
                             .expect("Set timeout should be successful."),
                     ));
