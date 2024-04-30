@@ -1,6 +1,9 @@
 name: Check for upstream releases
 
-on: [workflow_dispatch]
+on:
+    schedule:
+        - cron: '00 16 * * *'
+    workflow_dispatch: {}
 
 jobs:
     check:
