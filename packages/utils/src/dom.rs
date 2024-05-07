@@ -125,6 +125,10 @@ pub fn get_document_element(node_or_window: Option<DomNodeOrWindow>) -> Element 
         .expect("Document should have document element.")
 }
 
+pub fn is_element(node: &Node) -> bool {
+    node.is_instance_of::<Element>()
+}
+
 pub fn is_html_element(node: &Node) -> bool {
     node.is_instance_of::<HtmlElement>()
 }

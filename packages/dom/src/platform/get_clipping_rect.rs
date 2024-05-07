@@ -15,6 +15,7 @@ use crate::{
     utils::{
         get_bounding_client_rect::get_bounding_client_rect, get_document_rect::get_document_rect,
         get_viewport_rect::get_viewport_rect, get_visual_offsets::get_visual_offsets,
+        is_top_layer::is_top_layer,
     },
 };
 
@@ -172,7 +173,10 @@ pub fn get_clipping_rect(
     // TODO: cache
 
     let clipping_element_ancestors = match boundary {
-        floating_ui_core::Boundary::ClippingAncestors => get_clipping_element_ancestors(element),
+        floating_ui_core::Boundary::ClippingAncestors => match is_top_layer(element) {
+            true => vec![],
+            false => get_clipping_element_ancestors(element),
+        },
         _ => vec![],
     };
 

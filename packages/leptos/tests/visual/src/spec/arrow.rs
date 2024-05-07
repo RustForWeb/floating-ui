@@ -27,14 +27,13 @@ pub fn Arrow() -> impl IntoView {
     let (svg, set_svg) = create_signal(false);
     let (center_offset, set_center_offset) = create_signal(false);
     let (add_offset, set_add_offset) = create_signal(false);
+    let (nested, set_nested) = create_signal(false);
 
     let UseFloatingReturn {
-        x,
-        y,
-        strategy,
         update,
         placement: resultant_placement,
         middleware_data,
+        floating_styles,
         ..
     } = use_floating(
         reference_ref.into_reference(),
@@ -71,6 +70,9 @@ pub fn Arrow() -> impl IntoView {
     let arrow_y = move || arrow_data().and_then(|arrow_data| arrow_data.y);
     let center_offset_value = move || arrow_data().map(|arrow_data| arrow_data.center_offset);
 
+    let svg_update = update.clone();
+    let nested_update = update.clone();
+
     let UseScrollReturn {
         scroll_ref,
         update_scroll,
@@ -88,6 +90,108 @@ pub fn Arrow() -> impl IntoView {
     let add_offset_update_scroll = update_scroll.clone();
     let center_offset_update_scroll = update_scroll.clone();
 
+    let floating_view = move || {
+        let base = view! {
+            {move || match center_offset() {
+                true => center_offset_value().map_or("".into(), |center_offset_value| center_offset_value.to_string()),
+                false => "Floating".into()
+            }}
+
+            {move || match svg() {
+                true => view!{
+                    <svg
+                        class="arrow"
+                        style:position="absolute"
+                        style:top=move || match static_side() {
+                            Side::Top => "-15px".into(),
+                            _ => match arrow_y() {
+                                Some(arrow_y) => format!("{}px", arrow_y),
+                                None => "".into()
+                            }
+                        }
+                        style:right=move || match static_side() {
+                            Side::Right => "-15px",
+                            _ => ""
+                        }
+                        style:bottom=move || match static_side() {
+                            Side::Bottom => "-15px",
+                            _ => ""
+                        }
+                        style:left=move || match static_side() {
+                            Side::Left => "-15px".into(),
+                            _ => match arrow_x() {
+                                Some(arrow_x) => format!("{}px", arrow_x),
+                                None => "".into()
+                            }
+                        }
+                    />
+                }.into_any().node_ref(arrow_ref),
+                false => view!{
+                    <div
+                        class="arrow"
+                        style:position="absolute"
+                        style:top=move || match static_side() {
+                            Side::Top => "-15px".into(),
+                            _ => match arrow_y() {
+                                Some(arrow_y) => format!("{}px", arrow_y),
+                                None => "".into()
+                            }
+                        }
+                        style:right=move || match static_side() {
+                            Side::Right => "-15px",
+                            _ => ""
+                        }
+                        style:bottom=move || match static_side() {
+                            Side::Bottom => "-15px",
+                            _ => ""
+                        }
+                        style:left=move || match static_side() {
+                            Side::Left => "-15px".into(),
+                            _ => match arrow_x() {
+                                Some(arrow_x) => format!("{}px", arrow_x),
+                                None => "".into()
+                            }
+                        }
+                    />
+                }.into_any().node_ref(arrow_ref)
+            }}
+        };
+
+        match nested() {
+            true => view! {
+                <div
+                    _ref=floating_ref
+                    style:position=move || floating_styles().style_position()
+                    style:top=move || floating_styles().style_top()
+                    style:left=move || floating_styles().style_left()
+                    style:transform=move || floating_styles().style_transform()
+                    style:will-change=move || floating_styles().style_will_change()
+                    style:width=move || format!("{}px", floating_size())
+                    style:height=move || format!("{}px", floating_size())
+                >
+                    <div class="floating" style:position="relative" style:border="5px solid black">
+                        {base}
+                    </div>
+                </div>
+            },
+            false => view! {
+                <div
+                    _ref=floating_ref
+                    class="floating"
+                    style:position=move || floating_styles().style_position()
+                    style:top=move || floating_styles().style_top()
+                    style:left=move || floating_styles().style_left()
+                    style:transform=move || floating_styles().style_transform()
+                    style:will-change=move || floating_styles().style_will_change()
+                    style:width=move || format!("{}px", floating_size())
+                    style:height=move || format!("{}px", floating_size())
+                >
+                    {base}
+                </div>
+            },
+        }
+    };
+
     view! {
         <h1>Arrow</h1>
         <p></p>
@@ -104,79 +208,7 @@ pub fn Arrow() -> impl IntoView {
                 >
                     Reference
                 </div>
-                <div
-                    _ref=floating_ref
-                    class="floating"
-                    style:position=move || format!("{:?}", strategy()).to_lowercase()
-                    style:top=move || format!("{}px", y())
-                    style:left=move || format!("{}px", x())
-                    style:width=move || format!("{}px", floating_size())
-                    style:height=move || format!("{}px", floating_size())
-                >
-                    {move || match center_offset() {
-                        true => center_offset_value().map_or("".into(), |center_offset_value| center_offset_value.to_string()),
-                        false => "Floating".into()
-                    }}
-
-                    {move || match svg() {
-                        true => view!{
-                            <svg
-                                class="arrow"
-                                style:position="absolute"
-                                style:top=move || match static_side() {
-                                    Side::Top => "-15px".into(),
-                                    _ => match arrow_y() {
-                                        Some(arrow_y) => format!("{}px", arrow_y),
-                                        None => "".into()
-                                    }
-                                }
-                                style:right=move || match static_side() {
-                                    Side::Right => "-15px",
-                                    _ => ""
-                                }
-                                style:bottom=move || match static_side() {
-                                    Side::Bottom => "-15px",
-                                    _ => ""
-                                }
-                                style:left=move || match static_side() {
-                                    Side::Left => "-15px".into(),
-                                    _ => match arrow_x() {
-                                        Some(arrow_x) => format!("{}px", arrow_x),
-                                        None => "".into()
-                                    }
-                                }
-                            />
-                        }.into_any().node_ref(arrow_ref),
-                        false => view!{
-                            <div
-                                class="arrow"
-                                style:position="absolute"
-                                style:top=move || match static_side() {
-                                    Side::Top => "-15px".into(),
-                                    _ => match arrow_y() {
-                                        Some(arrow_y) => format!("{}px", arrow_y),
-                                        None => "".into()
-                                    }
-                                }
-                                style:right=move || match static_side() {
-                                    Side::Right => "-15px",
-                                    _ => ""
-                                }
-                                style:bottom=move || match static_side() {
-                                    Side::Bottom => "-15px",
-                                    _ => ""
-                                }
-                                style:left=move || match static_side() {
-                                    Side::Left => "-15px".into(),
-                                    _ => match arrow_x() {
-                                        Some(arrow_x) => format!("{}px", arrow_x),
-                                        None => "".into()
-                                    }
-                                }
-                            />
-                        }.into_any().node_ref(arrow_ref)
-                    }}
-                </div>
+                {floating_view}
             </div>
         </div>
 
@@ -307,6 +339,7 @@ pub fn Arrow() -> impl IntoView {
                 each=|| [true, false]
                 key=|value| format!("{}", value)
                 children=move |value| {
+                    let svg_update = svg_update.clone();
                     view! {
                         <button
                             data-testid=format!("svg-{}", value)
@@ -314,7 +347,36 @@ pub fn Arrow() -> impl IntoView {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_svg(value)
+                            on:click=move |_| {
+                                set_svg(value);
+                                svg_update();
+                            }
+                        >
+                            {format!("{}", value)}
+                        </button>
+                    }
+                }
+            />
+        </div>
+
+        <h2>Nested</h2>
+        <div class="controls">
+            <For
+                each=|| [true, false]
+                key=|value| format!("{}", value)
+                children=move |value| {
+                    let nested_update = nested_update.clone();
+                    view! {
+                        <button
+                            data-testid=format!("nested-{}", value)
+                            style:background-color=move || match nested() == value {
+                                true => "black",
+                                false => ""
+                            }
+                            on:click=move |_| {
+                                set_nested(value);
+                                nested_update();
+                            }
                         >
                             {format!("{}", value)}
                         </button>
