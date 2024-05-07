@@ -44,6 +44,10 @@ pub fn get_offset_parent(
     if !is_html_element(element) {
         let mut svg_offset_parent = Some(get_parent_node(element));
         while let Some(parent) = svg_offset_parent.as_ref() {
+            if is_last_traversable_node(parent) {
+                break;
+            }
+
             if is_element(parent) {
                 let element = parent.unchecked_ref::<Element>();
                 if !is_static_positioned(element) {
@@ -52,6 +56,7 @@ pub fn get_offset_parent(
             }
             svg_offset_parent = Some(get_parent_node(parent))
         }
+        return OwnedElementOrWindow::Window(window);
     }
 
     let mut offset_parent = get_true_offset_parent(element, &polyfill);
