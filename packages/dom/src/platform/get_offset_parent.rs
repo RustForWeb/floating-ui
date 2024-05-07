@@ -1,11 +1,12 @@
 use floating_ui_utils::dom::{
-    get_computed_style, get_containing_block, get_node_name, get_window, is_containing_block,
-    is_html_element, is_table_element,
+    get_computed_style, get_containing_block, get_parent_node, get_window, is_containing_block,
+    is_element, is_html_element, is_last_traversable_node, is_table_element,
 };
 use floating_ui_utils::OwnedElementOrWindow;
 use web_sys::Window;
 use web_sys::{wasm_bindgen::JsCast, Element, HtmlElement};
 
+use crate::utils::is_static_positioned::is_static_positioned;
 use crate::utils::is_top_layer::is_top_layer;
 
 pub type Polyfill = Box<dyn Fn(&HtmlElement) -> Option<Element>>;
@@ -40,15 +41,28 @@ pub fn get_offset_parent(
         return OwnedElementOrWindow::Window(window);
     }
 
+    if !is_html_element(element) {
+        let mut svg_offset_parent = Some(get_parent_node(element));
+        while let Some(parent) = svg_offset_parent.as_ref() {
+            if is_last_traversable_node(parent) {
+                break;
+            }
+
+            if is_element(parent) {
+                let element = parent.unchecked_ref::<Element>();
+                if !is_static_positioned(element) {
+                    return OwnedElementOrWindow::Element(element.clone());
+                }
+            }
+            svg_offset_parent = Some(get_parent_node(parent))
+        }
+        return OwnedElementOrWindow::Window(window);
+    }
+
     let mut offset_parent = get_true_offset_parent(element, &polyfill);
 
     while let Some(parent) = offset_parent.as_ref() {
-        if is_table_element(parent)
-            && get_computed_style(parent)
-                .get_property_value("position")
-                .expect("Computed style should have position.")
-                == "static"
-        {
+        if is_table_element(parent) && is_static_positioned(parent) {
             offset_parent = get_true_offset_parent(parent, &polyfill);
         } else {
             break;
@@ -56,15 +70,9 @@ pub fn get_offset_parent(
     }
 
     if let Some(parent) = offset_parent.as_ref() {
-        let node_name = get_node_name(parent.into());
-
-        if node_name == "html"
-            || node_name == "body"
-                && get_computed_style(parent)
-                    .get_property_value("position")
-                    .expect("Computed style should have position.")
-                    == "static"
-                && !is_containing_block(parent)
+        if is_last_traversable_node(parent)
+            && is_static_positioned(parent)
+            && !is_containing_block(parent)
         {
             return OwnedElementOrWindow::Window(window);
         }
