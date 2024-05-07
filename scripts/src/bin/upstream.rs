@@ -218,12 +218,7 @@ async fn create_pull_request(
         .status()?
         .exit_ok()?;
 
-    log::debug!(
-        "git diff {}..{} -- packages/{}",
-        current_tag,
-        new_tag,
-        upstream_package
-    );
+    log::debug!("git diff {}..{} -- {}", current_tag, new_tag, directory);
     let output = Command::new("git")
         .arg("diff")
         .arg(format!("{}..{}", current_tag, new_tag))
@@ -232,6 +227,12 @@ async fn create_pull_request(
         .current_dir(&temp_dir)
         .output()?;
     let diff = String::from_utf8(output.stdout)?;
+
+    let diff = if diff.len() > 60_000 {
+        format!("Diff is too big for GitHub pull request description.\n\n```sh\ngit clone https://github.com/floating-ui/floating-ui.git /tmp/floating-ui\n(cd /tmp/floating-ui && git diff {}..{} -- packages/{})\nrm -rf /tmp/floating-ui\n```", current_tag, new_tag, directory)
+    } else {
+        format!("```diff\n{}```", diff)
+    };
 
     let octocrab = octocrab::instance();
     let repo = octocrab.repos("NixySoftware", "floating-ui");
