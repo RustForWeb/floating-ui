@@ -161,8 +161,13 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Size<'a,
             }
         }
 
-        let overflow_available_height = height - overflow.side(height_side);
-        let overflow_available_width = width - overflow.side(width_side);
+        let maximum_clipping_height = height - overflow.top - overflow.bottom;
+        let maximum_clipping_width = width - overflow.left - overflow.right;
+
+        let overflow_available_height =
+            maximum_clipping_height.min(height - overflow.side(height_side));
+        let overflow_available_width =
+            maximum_clipping_width.min(width - overflow.side(width_side));
 
         let no_shift = state.middleware_data.get(SHIFT_NAME).is_none();
 
@@ -170,13 +175,11 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Size<'a,
         let mut available_width = overflow_available_width;
 
         if is_y_axis {
-            let maximum_clipping_width = width - overflow.left - overflow.right;
             available_width = match alignment.is_some() || no_shift {
                 true => overflow_available_width.min(maximum_clipping_width),
                 false => maximum_clipping_width,
             };
         } else {
-            let maximum_clipping_height = height - overflow.top - overflow.bottom;
             available_height = match alignment.is_some() || no_shift {
                 true => overflow_available_height.min(maximum_clipping_height),
                 false => maximum_clipping_height,
