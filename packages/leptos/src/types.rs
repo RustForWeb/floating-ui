@@ -122,7 +122,9 @@ impl UseFloatingOptions {
             })
         };
 
-        self.while_elements_mounted(MaybeProp::derive(move || Some(auto_update_rc(options.get()))))
+        self.while_elements_mounted(MaybeProp::derive(move || {
+            Some(auto_update_rc(options.get()))
+        }))
     }
 
     /// Set `while_elements_mounted` option to [`auto_update`] with `options` when `enabled` is `true`.
