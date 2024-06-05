@@ -7,7 +7,7 @@ use floating_ui_dom::{
 use leptos::{
     create_effect, create_memo, create_signal,
     html::{AnyElement, ElementDescriptor},
-    on_cleanup, watch, MaybeProp, NodeRef, SignalGet, SignalGetUntracked,
+    on_cleanup, watch, MaybeProp, NodeRef, SignalGet, SignalGetUntracked, SignalSet,
 };
 
 use crate::{
@@ -146,7 +146,7 @@ pub fn use_floating<
     let (is_positioned, set_is_positioned) = create_signal(false);
     let floating_styles = create_memo(move |_| {
         let initial_styles = FloatingStyles {
-            position: strategy(),
+            position: strategy.get(),
             top: "0".into(),
             left: "0".into(),
             transform: None,
@@ -154,8 +154,8 @@ pub fn use_floating<
         };
 
         if let Some(floating_element) = floating.get_as_element() {
-            let x_val = round_by_dpr(&floating_element, x());
-            let y_val = round_by_dpr(&floating_element, y());
+            let x_val = round_by_dpr(&floating_element, x.get());
+            let y_val = round_by_dpr(&floating_element, y.get());
 
             if transform_option() {
                 FloatingStyles {
@@ -194,12 +194,12 @@ pub fn use_floating<
                         &floating_element,
                         Some(config),
                     );
-                    set_x(position.x);
-                    set_y(position.y);
-                    set_strategy(position.strategy);
-                    set_placement(position.placement);
-                    set_middleware_data(position.middleware_data);
-                    set_is_positioned(true);
+                    set_x.set(position.x);
+                    set_y.set(position.y);
+                    set_strategy.set(position.strategy);
+                    set_placement.set(position.placement);
+                    set_middleware_data.set(position.middleware_data);
+                    set_is_positioned.set(true);
                 }
             }
         }
@@ -247,7 +247,7 @@ pub fn use_floating<
 
     let reset = move || {
         if !open_option() {
-            set_is_positioned(false);
+            set_is_positioned.set(false);
         }
     };
 
@@ -288,28 +288,28 @@ pub fn use_floating<
     let strategy_update_rc = update_rc.clone();
     let middleware_update_rc = update_rc.clone();
     _ = watch(
-        options.placement,
+        move || options.placement.get(),
         move |_, _, _| {
             placement_update_rc();
         },
         false,
     );
     _ = watch(
-        options.strategy,
+        move || options.strategy.get(),
         move |_, _, _| {
             strategy_update_rc();
         },
         false,
     );
     _ = watch(
-        options.middleware,
+        move || options.middleware.get(),
         move |_, _, _| {
             middleware_update_rc();
         },
         false,
     );
     _ = watch(
-        options.while_elements_mounted,
+        move || options.while_elements_mounted.get(),
         move |_, _, _| {
             attach_rc();
         },
