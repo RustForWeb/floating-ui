@@ -101,10 +101,12 @@ pub fn use_scroll(
                     OverflowAncestor::Window(window) => window,
                 };
 
-                _ = event_target.add_event_listener_with_callback(
-                    "scroll",
-                    (*effect_local_update).as_ref().unchecked_ref(),
-                );
+                event_target
+                    .add_event_listener_with_callback(
+                        "scroll",
+                        (*effect_local_update).as_ref().unchecked_ref(),
+                    )
+                    .expect("Scroll event listener should be added.");
             }
 
             set_ancestors(ancestors);
@@ -136,10 +138,12 @@ pub fn use_scroll(
                 OverflowAncestor::Window(window) => window.into(),
             };
 
-            _ = event_target.remove_event_listener_with_callback(
-                "scroll",
-                (*local_update).as_ref().unchecked_ref(),
-            );
+            event_target
+                .remove_event_listener_with_callback(
+                    "scroll",
+                    (*local_update).as_ref().unchecked_ref(),
+                )
+                .expect("Scroll event listener should be removed.");
         }
     });
 

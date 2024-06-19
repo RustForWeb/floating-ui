@@ -261,18 +261,19 @@ pub fn auto_update(
         };
 
         if ancestor_scoll {
-            _ = event_target.add_event_listener_with_callback_and_add_event_listener_options(
-                "scroll",
-                update_closure.as_ref().unchecked_ref(),
-                AddEventListenerOptions::new().passive(true),
-            );
+            event_target
+                .add_event_listener_with_callback_and_add_event_listener_options(
+                    "scroll",
+                    update_closure.as_ref().unchecked_ref(),
+                    AddEventListenerOptions::new().passive(true),
+                )
+                .expect("Scroll event listener should be added.");
         }
 
         if ancestor_resize {
-            _ = event_target.add_event_listener_with_callback(
-                "resize",
-                update_closure.as_ref().unchecked_ref(),
-            );
+            event_target
+                .add_event_listener_with_callback("resize", update_closure.as_ref().unchecked_ref())
+                .expect("Resize event listener should be added.");
         }
     }
 
@@ -393,17 +394,21 @@ pub fn auto_update(
             };
 
             if ancestor_scoll {
-                _ = event_target.remove_event_listener_with_callback(
-                    "scroll",
-                    update_closure.as_ref().unchecked_ref(),
-                );
+                event_target
+                    .remove_event_listener_with_callback(
+                        "scroll",
+                        update_closure.as_ref().unchecked_ref(),
+                    )
+                    .expect("Scroll event listener should be removed.");
             }
 
             if ancestor_resize {
-                _ = event_target.remove_event_listener_with_callback(
-                    "resize",
-                    update_closure.as_ref().unchecked_ref(),
-                );
+                event_target
+                    .remove_event_listener_with_callback(
+                        "resize",
+                        update_closure.as_ref().unchecked_ref(),
+                    )
+                    .expect("Resize event listener should be removed.");
             }
         }
 
