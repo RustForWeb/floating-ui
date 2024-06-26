@@ -1,6 +1,6 @@
 use floating_ui_utils::{
     get_alignment, get_alignment_sides, get_expanded_placements, get_opposite_axis_placements,
-    get_opposite_placement, get_side, Alignment, Placement,
+    get_opposite_placement, get_side, get_side_axis, Alignment, Axis, Placement,
 };
 use serde::{Deserialize, Serialize};
 
@@ -217,6 +217,7 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Flip<'a,
         }
 
         let side = get_side(placement);
+        let initial_side_axis = get_side_axis(initial_placement);
         let is_base_placement = get_alignment(initial_placement).is_none();
         let rtl = platform.is_rtl(elements.floating);
 
@@ -227,7 +228,9 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Flip<'a,
                 false => get_expanded_placements(initial_placement),
             });
 
-        if !has_specified_fallback_placements && fallback_axis_side_direction.is_some() {
+        let has_fallback_axis_side_direction = fallback_axis_side_direction.is_some();
+
+        if !has_specified_fallback_placements && has_fallback_axis_side_direction {
             placements.append(&mut get_opposite_axis_placements(
                 initial_placement,
                 flip_alignment,
@@ -302,6 +305,17 @@ impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Flip<'a,
                     FallbackStrategy::BestFit => {
                         let mut placement: Vec<(Placement, f64)> = overflows_data
                             .into_iter()
+                            .filter(|overflow| {
+                                if has_fallback_axis_side_direction {
+                                    let current_side_axis = get_side_axis(overflow.placement);
+
+                                    // Create a bias to the `y` side axis due to horizontal reading directions favoring greater width.
+                                    current_side_axis == initial_side_axis
+                                        || current_side_axis == Axis::Y
+                                } else {
+                                    true
+                                }
+                            })
                             .map(|overflow| {
                                 (
                                     overflow.placement,
