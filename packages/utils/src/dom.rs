@@ -156,6 +156,12 @@ pub fn is_table_element(element: &Element) -> bool {
     ["table", "td", "th"].into_iter().any(|s| node_name == s)
 }
 
+pub fn is_top_layer(element: &Element) -> bool {
+    [":popover-open", ":modal"]
+        .into_iter()
+        .any(|selector| element.matches(selector).unwrap_or(false))
+}
+
 const WILL_CHANGE_VALUES: [&str; 3] = ["transform", "perspective", "filter"];
 const CONTAIN_VALUES: [&str; 4] = ["paint", "layout", "strict", "content"];
 
@@ -197,6 +203,10 @@ pub fn get_containing_block(element: &Element) -> Option<HtmlElement> {
 
     while !is_last_traversable_node(&current_node) {
         if let Ok(element) = current_node.dyn_into::<HtmlElement>() {
+            if is_top_layer(&element) {
+                return None;
+            }
+
             if is_containing_block(&element) {
                 return Some(element);
             }
