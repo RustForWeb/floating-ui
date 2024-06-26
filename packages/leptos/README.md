@@ -10,4 +10,4 @@ This is the library to use Floating UI with Leptos.
 
 ## Rust Floating UI
 
-[Rust Floating UI](https://github.com/NixySoftware/floating-ui) is a Rust port of [Floating UI](https://floating-ui.com).
+[Rust Floating UI](https://github.com/RustForWeb/floating-ui) is a Rust port of [Floating UI](https://floating-ui.com).

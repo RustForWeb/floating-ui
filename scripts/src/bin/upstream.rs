@@ -235,7 +235,7 @@ async fn create_pull_request(
     };
 
     let octocrab = octocrab::instance();
-    let repo = octocrab.repos("NixySoftware", "floating-ui");
+    let repo = octocrab.repos("RustForWeb", "floating-ui");
 
     let main_ref = repo.get_ref(&Reference::Branch("main".into())).await?;
 
@@ -302,7 +302,7 @@ async fn create_pull_request(
 
     log::debug!("Creating pull request for branch {branch}.");
     octocrab
-        .pulls("NixySoftware", "floating-ui")
+        .pulls("RustForWeb", "floating-ui")
         .create(title, branch, "main")
         .body(body)
         .draft(true)

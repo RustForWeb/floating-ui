@@ -1,8 +1,8 @@
 {
-    "name": "@nixysoftware/floating-ui",
+    "name": "@rustforweb/floating-ui",
     "description": "Rust port of Floating UI.",
-    "author": "Nixy <info@nixy.software>",
-    "repository": "github:NixySoftware/floating-ui",
+    "author": "Rust For Web <info@rustforweb.org>",
+    "repository": "github:RustForWeb/floating-ui",
     "license": "MIT",
     "private": true,
     "scripts": {},
