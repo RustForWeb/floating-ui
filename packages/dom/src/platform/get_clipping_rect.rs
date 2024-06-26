@@ -3,7 +3,7 @@ use floating_ui_utils::{
     dom::{
         get_computed_style, get_document_element, get_node_name, get_overflow_ancestors,
         get_parent_node, is_containing_block, is_last_traversable_node, is_overflow_element,
-        OverflowAncestor,
+        is_top_layer, OverflowAncestor,
     },
     rect_to_client_rect, ClientRectObject, Rect, Strategy,
 };
@@ -15,7 +15,6 @@ use crate::{
     utils::{
         get_bounding_client_rect::get_bounding_client_rect, get_document_rect::get_document_rect,
         get_viewport_rect::get_viewport_rect, get_visual_offsets::get_visual_offsets,
-        is_top_layer::is_top_layer,
     },
 };
 
