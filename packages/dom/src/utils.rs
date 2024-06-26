@@ -6,4 +6,3 @@ pub mod get_viewport_rect;
 pub mod get_visual_offsets;
 pub mod get_window_scroll_bar_x;
 pub mod is_static_positioned;
-pub mod is_top_layer;
