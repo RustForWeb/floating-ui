@@ -260,12 +260,8 @@ pub fn get_node_scroll(element_or_window: DomElementOrWindow) -> NodeScroll {
             scroll_top: element.scroll_top() as f64,
         },
         DomElementOrWindow::Window(window) => NodeScroll {
-            scroll_left: window
-                .page_x_offset()
-                .expect("Window should have page x offset."),
-            scroll_top: window
-                .page_y_offset()
-                .expect("Window should have page y offset."),
+            scroll_left: window.scroll_x().expect("Window should have scroll x."),
+            scroll_top: window.scroll_y().expect("Window should have scroll y."),
         },
     }
 }
