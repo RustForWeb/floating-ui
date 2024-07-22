@@ -8,7 +8,7 @@
 
 Rust port of [Floating UI](https://floating-ui.com).
 
-[Floating UI](https://floating-ui.com) is a small library that helps you create "floating" elements such as tooltips, popovers, dropdowns, and more.
+[Floating UI](https://floating-ui.com) is a library that helps you create "floating" elements such as tooltips, popovers, dropdowns, and more.
 
 ## Frameworks
 
@@ -17,7 +17,14 @@ Rust Floating UI is available for these Rust frameworks:
 -   [DOM](./packages/dom) ([`web-sys`](https://rustwasm.github.io/wasm-bindgen/web-sys/index.html))
 -   [Leptos](./packages/leptos)
 
+The following frameworks are under consideration:
+
+-   [Dioxus](https://dioxuslabs.com/)
+-   [Yew](https://yew.rs/)
+
 ## Examples
+
+See [the Rust Floating UI book](https://floating-ui.rustforweb.org/) for examples.
 
 Each framework has an implementations of the [Floating UI tutorial](https://floating-ui.com/docs/tutorial) as an example:
 
@@ -29,6 +36,8 @@ Additionally, implementations of [Floating UI tests](https://github.com/floating
 -   [Leptos](./packages/leptos/tests)
 
 ## Documentation
+
+See [the Rust Floating UI book](https://floating-ui.rustforweb.org/) for documentation.
 
 Documentation for the crates is available on [Docs.rs](https://docs.rs/):
 

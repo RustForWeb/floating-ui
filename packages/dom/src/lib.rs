@@ -2,6 +2,8 @@
 //!
 //! This is the library to use Floating UI on the web, wrapping [`floating_ui_core`] with DOM interface logic.
 //!
+//! See [the Rust Floating UI book](https://floating-ui.rustforweb.org/) for more documenation.
+//!
 //! See [@floating-ui/dom](https://www.npmjs.com/package/@floating-ui/dom) for the original package.
 
 mod auto_update;

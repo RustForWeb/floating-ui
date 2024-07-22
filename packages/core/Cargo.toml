@@ -1,6 +1,7 @@
 [package]
 name = "floating-ui-core"
 description = "Rust port of Floating UI. Positioning library for floating elements: tooltips, popovers, dropdowns, and more."
+homepage = "https://floating-ui.rustforweb.org"
 
 authors.workspace = true
 edition.workspace = true

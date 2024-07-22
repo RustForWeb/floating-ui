@@ -1,3 +1,9 @@
+//! Rust port of [Floating UI](https://floating-ui.com/).
+//!
+//! This is the library to use Floating UI with Leptos.
+//!
+//! See [the Rust Floating UI book](https://floating-ui.rustforweb.org/frameworks/leptos.html) for more documenation.
+
 mod arrow;
 mod node_ref;
 mod types;

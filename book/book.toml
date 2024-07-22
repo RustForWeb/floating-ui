@@ -1,0 +1,22 @@
+[book]
+authors = ["Daniëlle Huisman"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Rust Floating UI"
+
+[preprocessor.tabs]
+
+[preprocessor.trunk]
+
+[output.html]
+additional-css = ["theme/tabs.css", "theme/theme.css"]
+additional-js = ["theme/tabs.js"]
+edit-url-template = "https://github.com/RustForWeb/floating-ui/edit/main/book/{path}"
+git-repository-url = "https://github.com/RustForWeb/floating-ui"
+
+[output.trunk]
+serve = true
+
+[rust]
+edition = "2021"

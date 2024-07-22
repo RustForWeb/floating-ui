@@ -1,6 +1,7 @@
 [package]
 name = "floating-ui-dom"
 description = "Rust port of Floating UI. Floating UI for the web."
+homepage = "https://floating-ui.rustforweb.org"
 
 authors.workspace = true
 edition.workspace = true
