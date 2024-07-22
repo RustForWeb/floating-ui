@@ -1,6 +1,6 @@
 <p align="center">
-    <a href="../../logo.svg" alt="Rust Floating UI logo">
-        <img src="../../logo.svg" width="225" height="300">
+    <a href="../../logo.svg">
+        <img src="../../logo.svg" width="225" height="300" alt="Rust Floating UI Logo">
     </a>
 </p>
 
