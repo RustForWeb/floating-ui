@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="./images/logo.svg" width="225" height="300" alt="Rust Floating UI Logo">
+</p>
+
 # Introduction
 
 Rust Floating UI is a Rust port of [Floating UI](https://floating-ui.com/).
