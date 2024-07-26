@@ -12,8 +12,8 @@ version.workspace = true
 [dependencies]
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
-leptos = { version = "0.6.12", features = ["csr", "nightly"] }
-log = "0.4.21"
 floating-ui-leptos = { path = ".." }
+leptos = { version = "0.6.13", features = ["csr", "nightly"] }
+log = "0.4.21"
 wasm-bindgen.workspace = true
 web-sys.workspace = true
