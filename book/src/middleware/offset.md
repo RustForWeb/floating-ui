@@ -7,6 +7,6 @@ custom placements.
 
 TODO
 
-# See Also
+## See Also
 
 -   [Floating UI documentation](https://floating-ui.com/docs/offset)

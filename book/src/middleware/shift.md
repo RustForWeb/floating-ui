@@ -6,6 +6,6 @@ This prevents the floating element from overflowing along its axis of alignment,
 
 TODO
 
-# See Also
+## See Also
 
 -   [Floating UI documentation](https://floating-ui.com/docs/shift)

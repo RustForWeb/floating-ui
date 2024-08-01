@@ -6,6 +6,6 @@ This is useful to add an additional visual cue to the floating element about whi
 
 TODO
 
-# See Also
+## See Also
 
 -   [Floating UI documentation](https://floating-ui.com/docs/arrow)
