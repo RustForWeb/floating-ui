@@ -167,7 +167,7 @@ This lets you place the floating element anywhere in the DOM tree and have it be
 
 Since `compute_position()` is only a single function call, it only positions the floating element once.
 
-To ensure it remains anchored to the reference element in a variety of scenarios, such as when resizing or scrolling, wrap the calculation in [`auto_pdate`](./auto-update.md):
+To ensure it remains anchored to the reference element in a variety of scenarios, such as when resizing or scrolling, wrap the calculation in [`auto_update`](./auto-update.md):
 
 ```rust,ignore
 use floating_ui_dom::{auto_update, compute_position, AutoUpdateOptions, ComputePositionReturn};
@@ -360,7 +360,7 @@ The final placement of the floating element, which may be different from the ini
 
 The CSS position property to use.
 
-### `middlewareData`
+### `middleware_data`
 
 The data returned by any middleware used.
 
