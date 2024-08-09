@@ -229,11 +229,10 @@ pub fn get_containing_block(element: &Element) -> Option<HtmlElement> {
 
     while !is_last_traversable_node(&current_node) {
         if let Ok(element) = current_node.dyn_into::<HtmlElement>() {
-            if is_top_layer(&element) {
-                return None;
-            }
             if is_containing_block((&element).into()) {
                 return Some(element);
+            } else if is_top_layer(&element) {
+                return None;
             }
 
             current_node = get_parent_node(&element);
