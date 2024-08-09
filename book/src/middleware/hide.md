@@ -6,6 +6,6 @@ This is useful for situations where you want to hide the floating element becaus
 
 TODO
 
-# See Also
+## See Also
 
 -   [Floating UI documentation](https://floating-ui.com/docs/hide)

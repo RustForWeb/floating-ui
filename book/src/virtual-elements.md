@@ -4,6 +4,6 @@ Position a floating element relative to a custom reference area, useful for cont
 
 TODO
 
-# See Also
+## See Also
 
 -   [Floating UI documentation](https://floating-ui.com/docs/virtual-elements)

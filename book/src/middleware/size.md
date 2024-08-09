@@ -6,6 +6,6 @@ This is useful to ensure the floating element isn’t too big to fit in the view
 
 TODO
 
-# See Also
+## See Also
 
 -   [Floating UI documentation](https://floating-ui.com/docs/size)

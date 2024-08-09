@@ -165,9 +165,35 @@ pub fn is_top_layer(element: &Element) -> bool {
 const WILL_CHANGE_VALUES: [&str; 3] = ["transform", "perspective", "filter"];
 const CONTAIN_VALUES: [&str; 4] = ["paint", "layout", "strict", "content"];
 
-pub fn is_containing_block(element: &Element) -> bool {
+pub enum ElementOrCss<'a> {
+    Element(&'a Element),
+    Css(CssStyleDeclaration),
+}
+
+impl<'a> From<&'a Element> for ElementOrCss<'a> {
+    fn from(value: &'a Element) -> Self {
+        ElementOrCss::Element(value)
+    }
+}
+
+impl<'a> From<&'a HtmlElement> for ElementOrCss<'a> {
+    fn from(value: &'a HtmlElement) -> Self {
+        ElementOrCss::Element(value)
+    }
+}
+
+impl<'a> From<CssStyleDeclaration> for ElementOrCss<'a> {
+    fn from(value: CssStyleDeclaration) -> Self {
+        ElementOrCss::Css(value)
+    }
+}
+
+pub fn is_containing_block(element: ElementOrCss) -> bool {
     let webkit = is_web_kit();
-    let css = get_computed_style(element);
+    let css = match element {
+        ElementOrCss::Element(element) => get_computed_style(element),
+        ElementOrCss::Css(css) => css,
+    };
 
     css.get_property_value("transform").unwrap_or("none".into()) != "none"
         || css
@@ -203,12 +229,10 @@ pub fn get_containing_block(element: &Element) -> Option<HtmlElement> {
 
     while !is_last_traversable_node(&current_node) {
         if let Ok(element) = current_node.dyn_into::<HtmlElement>() {
-            if is_top_layer(&element) {
-                return None;
-            }
-
-            if is_containing_block(&element) {
+            if is_containing_block((&element).into()) {
                 return Some(element);
+            } else if is_top_layer(&element) {
+                return None;
             }
 
             current_node = get_parent_node(&element);

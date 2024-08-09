@@ -4,6 +4,6 @@ Automatically updates the position of the floating element when necessary to ens
 
 TODO
 
-# See Also
+## See Also
 
 -   [Floating UI documentation](https://floating-ui.com/docs/autoUpdate)

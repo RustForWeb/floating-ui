@@ -114,7 +114,7 @@ fn get_clipping_element_ancestors(element: &Element) -> Vec<Element> {
     while current_node.is_instance_of::<Element>() && !is_last_traversable_node(&current_node) {
         let current_element = current_node.unchecked_ref::<Element>();
         let computed_style = get_computed_style(current_element);
-        let current_node_is_containing = is_containing_block(current_element);
+        let current_node_is_containing = is_containing_block(current_element.into());
 
         let position = computed_style
             .get_property_value("position")
