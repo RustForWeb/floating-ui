@@ -71,7 +71,7 @@ pub fn get_offset_parent(
     if let Some(parent) = offset_parent.as_ref() {
         if is_last_traversable_node(parent)
             && is_static_positioned(parent)
-            && !is_containing_block(parent)
+            && !is_containing_block(parent.into())
         {
             return OwnedElementOrWindow::Window(window);
         }
