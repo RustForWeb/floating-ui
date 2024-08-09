@@ -251,7 +251,7 @@ impl Platform<Element, Window> for CustomPlatform {
     }
 
     fn get_scale(&self, element: &Element) -> Option<Coords> {
-        Some(get_scale(element.into()))
+        Some(get_scale(element))
     }
 
     fn get_client_length(
