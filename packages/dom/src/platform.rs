@@ -14,7 +14,7 @@ use floating_ui_core::{
 };
 use floating_ui_utils::dom::get_document_element;
 use floating_ui_utils::{
-    ClientRectObject, Coords, Dimensions, ElementOrWindow, ElementRects, OwnedElementOrWindow, Rect,
+    ClientRectObject, Coords, Dimensions, ElementRects, Length, OwnedElementOrWindow, Rect,
 };
 use web_sys::{Element, Window};
 
@@ -60,10 +60,6 @@ impl CorePlatform<Element, Window> for Platform {
         Some(get_offset_parent(element, None))
     }
 
-    fn is_element(&self, _value: &ElementOrWindow<Element, Window>) -> Option<bool> {
-        Some(true)
-    }
-
     fn get_document_element(&self, element: &Element) -> Option<Element> {
         Some(get_document_element(Some(element.into())))
     }
@@ -80,11 +76,7 @@ impl CorePlatform<Element, Window> for Platform {
         Some(get_scale(element.into()))
     }
 
-    fn get_client_length(
-        &self,
-        element: &Element,
-        length: floating_ui_utils::Length,
-    ) -> Option<f64> {
+    fn get_client_length(&self, element: &Element, length: Length) -> Option<f64> {
         Some(get_client_length(element, length))
     }
 }

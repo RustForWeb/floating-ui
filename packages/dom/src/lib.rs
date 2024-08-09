@@ -12,6 +12,7 @@ mod platform;
 mod types;
 mod utils;
 
+pub use self::platform::Platform;
 pub use crate::auto_update::*;
 pub use crate::middleware::*;
 pub use crate::types::*;
@@ -31,8 +32,6 @@ use floating_ui_core::{
     compute_position as compute_position_core, ComputePositionConfig as CoreComputePositionConfig,
 };
 use web_sys::Element;
-
-use self::platform::Platform;
 
 const PLATFORM: Platform = Platform {};
 

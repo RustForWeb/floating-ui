@@ -99,10 +99,6 @@ pub trait Platform<Element: Clone, Window: Clone>: Debug {
         None
     }
 
-    fn is_element(&self, _value: &ElementOrWindow<Element, Window>) -> Option<bool> {
-        None
-    }
-
     fn get_document_element(&self, _element: &Element) -> Option<Element> {
         None
     }
