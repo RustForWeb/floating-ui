@@ -6,6 +6,6 @@ This is useful for reference elements such as hyperlinks or range selections, as
 
 TODO
 
-# See Also
+## See Also
 
 -   [Floating UI documentation](https://floating-ui.com/docs/inline)

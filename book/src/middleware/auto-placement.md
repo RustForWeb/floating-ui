@@ -6,6 +6,6 @@ This is useful when you don’t know which placement will be best for the floati
 
 TODO
 
-# See Also
+## See Also
 
 -   [Floating UI documentation](https://floating-ui.com/docs/autoPlacement)
