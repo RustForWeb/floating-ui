@@ -136,7 +136,7 @@ The first argument is the reference element to anchor to, and the second argumen
 
 By default, the floating element will be placed at the bottom center of the reference element.
 
-### Initial layout
+### Initial Layout
 
 To ensure positioning works smoothly, the dimensions of the floating element should not change before and after being positioned.
 
@@ -273,7 +273,7 @@ When you want granular control over how the floating element is positioned, midd
 
 The following are included in the package:
 
-**Placement modifiers**
+**Placement Modifiers**
 
 These middleware alter the base placement coordinates.
 
@@ -281,7 +281,7 @@ These middleware alter the base placement coordinates.
 
 -   [`Inline`](./middleware/inline.md) positions the floating element relative to individual client rects rather than the bounding box for better precision.
 
-**Visibility optimizers**
+**Visibility Optimizers**
 
 These middleware alter the coordinates to ensure the floating element stays on screen optimally.
 
@@ -293,7 +293,7 @@ These middleware alter the coordinates to ensure the floating element stays on s
 
 -   [`Size`](./middleware/size.md) resizes the floating element, for example so it will not overflow a clipping container, or to match the width of the reference element.
 
-**Data providers**
+**Data Providers**
 
 These middleware only provide data and do not alter the coordinates.
 
