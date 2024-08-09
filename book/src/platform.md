@@ -281,7 +281,7 @@ use web_sys::{Element, Window};
 
 #[derive(Debug)]
 struct CustomPlatform {
-    dom_platform: DomPlatform;
+    dom_platform: DomPlatform,
 }
 
 impl Platform<Element, Window> for CustomPlatform {
@@ -301,7 +301,9 @@ impl Platform<Element, Window> for CustomPlatform {
     // Etc.
 }
 
-const PLATFORM: CustomPlatform = CustomPlatform {};
+const PLATFORM: CustomPlatform = CustomPlatform {
+    dom_platform: DomPlatform {}
+};
 
 compute_position(
     reference_el,
