@@ -1,8 +1,8 @@
 //! Utility functions for the DOM. Requires `dom` feature.
 
 use web_sys::{
-    css, wasm_bindgen::JsCast, window, CssStyleDeclaration, Document, Element, HtmlElement, Node,
-    ShadowRoot, Window,
+    css, js_sys::Object, wasm_bindgen::JsCast, window, CssStyleDeclaration, Document, Element,
+    HtmlElement, Node, ShadowRoot, Window,
 };
 
 use crate::ElementOrWindow;
@@ -385,9 +385,18 @@ pub fn get_overflow_ancestors(
 }
 
 pub fn get_frame_element(window: &Window) -> Option<Element> {
-    window.parent().ok().flatten().and_then(|_| {
-        window
-            .frame_element()
-            .expect("Window should have frame element option.")
-    })
+    window
+        .parent()
+        .ok()
+        .flatten()
+        .and_then(|_| {
+            window
+                .frame_element()
+                .expect("Window should have frame element option.")
+        })
+        .and_then(|frame_element| {
+            Object::get_prototype_of(&frame_element)
+                .is_truthy()
+                .then_some(frame_element)
+        })
 }
