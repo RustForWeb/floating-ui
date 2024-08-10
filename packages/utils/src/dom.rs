@@ -358,9 +358,7 @@ pub fn get_overflow_ancestors(
     let window = get_window(Some(&scrollable_ancestor));
 
     if is_body {
-        let frame_element = window
-            .frame_element()
-            .expect("Window should have frame element option.");
+        let frame_element = get_frame_element(&window);
 
         list.push(OverflowAncestor::Window(window));
         // TODO: visual viewport
@@ -384,4 +382,12 @@ pub fn get_overflow_ancestors(
 
         list
     }
+}
+
+pub fn get_frame_element(window: &Window) -> Option<Element> {
+    window.parent().ok().flatten().and_then(|_| {
+        window
+            .frame_element()
+            .expect("Window should have frame element option.")
+    })
 }
