@@ -13,11 +13,12 @@ pub fn VirtualElement() -> impl IntoView {
     let virtual_element = MaybeProp::derive(move || {
         let context_element = reference_ref.get();
         context_element.map(|context_element| {
-            let context_element_clone = context_element.clone();
             let element: &web_sys::Element = context_element.as_ref();
             (Box::new(
-                DefaultVirtualElement::new(Box::new(move || {
-                    context_element_clone.get_bounding_client_rect().into()
+                DefaultVirtualElement::new(Box::new({
+                    let context_element = context_element.clone();
+
+                    move || context_element.get_bounding_client_rect().into()
                 }))
                 .context_element(element.clone()),
             ) as Box<dyn VirtualElement<web_sys::Element>>)

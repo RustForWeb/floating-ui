@@ -108,19 +108,21 @@ pub fn Inline() -> impl IntoView {
                 }
 
                 if let Some(range) = range {
-                    let range_clone = range.clone();
-
                     reference_signal.set(
                         (Box::new(
-                            DefaultVirtualElement::new(Box::new(move || {
-                                range.get_bounding_client_rect().into()
+                            DefaultVirtualElement::new(Box::new({
+                                let range = range.clone();
+
+                                move || range.get_bounding_client_rect().into()
                             }))
-                            .get_client_rects(Box::new(move || {
-                                ClientRectObject::from_dom_rect_list(
-                                    range_clone
-                                        .get_client_rects()
-                                        .expect("Range should have client rects."),
-                                )
+                            .get_client_rects(Box::new({
+                                move || {
+                                    ClientRectObject::from_dom_rect_list(
+                                        range
+                                            .get_client_rects()
+                                            .expect("Range should have client rects."),
+                                    )
+                                }
                             })),
                         ) as Box<dyn VirtualElement<web_sys::Element>>)
                             .into(),

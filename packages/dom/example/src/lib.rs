@@ -111,16 +111,15 @@ fn run() -> Result<(), JsValue> {
     }
 
     {
-        let button_clone = button.clone();
-        let tooltip_clone = tooltip.clone();
-        let arrow_clone = arrow.clone();
+        let show_tooltip = Closure::<dyn Fn()>::new({
+            let button = button.clone();
+            let tooltip = tooltip.clone();
+            let arrow = arrow.clone();
 
-        let show_tooltip = Closure::<dyn Fn()>::new(move || {
-            tooltip_clone
-                .style()
-                .set_property("display", "block")
-                .unwrap();
-            update(&button_clone, &tooltip_clone, &arrow_clone).unwrap();
+            move || {
+                tooltip.style().set_property("display", "block").unwrap();
+                update(&button, &tooltip, &arrow).unwrap();
+            }
         });
 
         button.add_event_listener_with_callback(
@@ -133,13 +132,12 @@ fn run() -> Result<(), JsValue> {
     }
 
     {
-        let tooltip_clone = tooltip.clone();
+        let hide_tooltip = Closure::<dyn Fn()>::new({
+            let tooltip = tooltip.clone();
 
-        let hide_tooltip = Closure::<dyn Fn()>::new(move || {
-            tooltip_clone
-                .style()
-                .set_property("display", "none")
-                .unwrap();
+            move || {
+                tooltip.style().set_property("display", "none").unwrap();
+            }
         });
 
         button.add_event_listener_with_callback(

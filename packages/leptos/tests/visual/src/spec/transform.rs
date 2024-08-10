@@ -54,14 +54,15 @@ pub fn Transform() -> impl IntoView {
                 let context_element = document()
                     .get_element_by_id("virtual-context")
                     .expect("Element should exist.");
-                let virtual_context_clone = context_element.clone();
 
                 Some(
                     (Box::new(
-                        DefaultVirtualElement::new(Box::new(move || {
-                            context_element.get_bounding_client_rect().into()
+                        DefaultVirtualElement::new(Box::new({
+                            let context_element = context_element.clone();
+
+                            move || context_element.get_bounding_client_rect().into()
                         }))
-                        .context_element(virtual_context_clone),
+                        .context_element(context_element),
                     ) as Box<dyn VirtualElement<web_sys::Element>>)
                         .into(),
                 )
