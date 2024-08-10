@@ -1,8 +1,8 @@
 # Platform
 
-Use Floating UI’s positioning logic on any platform that can execute Rust.
+Use Floating UI's positioning logic on any platform that can execute Rust.
 
-Floating UI’s core is essentially a bunch of mathematical calculations performed on rectangles. These calculations are pure and agnostic, allowing Floating UI to work on any platform that can execute Rust.
+Floating UI's core is essentially a bunch of mathematical calculations performed on rectangles. These calculations are pure and agnostic, allowing Floating UI to work on any platform that can execute Rust.
 
 To make it work with a given platform, methods are used to allow it to hook into measurement APIs, for instance, to measure the bounding box of a given element.
 
@@ -13,9 +13,9 @@ Possible platforms other than the DOM include Native, Canvas/WebGL, etc.
 
 ## Custom Platform Struct
 
-If you’re building a platform from scratch, e.g. your own tiny custom DOM platform, you’ll be using the `floating-ui-core` package — see [Methods](#methods).
+If you're building a platform from scratch, e.g. your own tiny custom DOM platform, you'll be using the `floating-ui-core` package - see [Methods](#methods).
 
-If you’re extending or customizing the existing DOM methods, and are using `floating-ui-dom`, this is accessible via the `Platform` import — see [Extending the DOM Platform](#extending-the-dom-platform).
+If you're extending or customizing the existing DOM methods, and are using `floating-ui-dom`, this is accessible via the `Platform` import - see [Extending the DOM Platform](#extending-the-dom-platform).
 
 ## Shadow DOM Fix
 
@@ -38,7 +38,7 @@ This data can come from anywhere, and the library will perform the right computa
 
 ## Methods
 
-A `platform` is a struct implementing the `Platform` trait, which consists of 3 required and 7 optional methods. These methods allow the platform to interface with Floating UI’s logic.
+A `platform` is a struct implementing the `Platform` trait, which consists of 3 required and 7 optional methods. These methods allow the platform to interface with Floating UI's logic.
 
 The `Platform<Element, Window>` trait has two generic types that reflect the element and window of the platform. The DOM platform uses `web_sys::Element` and `web_sys::Window`.
 
@@ -65,7 +65,7 @@ pub fn get_element_rects(
 
 **`reference`**
 
-The `x` and `y` values of a reference `Rect` should be its coordinates relative to the floating element’s `offset_parent` element if required rather than the viewport.
+The `x` and `y` values of a reference `Rect` should be its coordinates relative to the floating element's `offset_parent` element if required rather than the viewport.
 
 **`floating`**
 
@@ -106,7 +106,7 @@ pub fn get_clipping_rect(
 
 ### Optional Methods
 
-Depending on the platform you’re working with, these may or may not be necessary.
+Depending on the platform you're working with, these may or may not be necessary.
 
 #### `convert_offset_parent_relative_rect_to_viewport_relative_rect`
 

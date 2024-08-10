@@ -45,8 +45,8 @@ use floating_ui_dom::compute_position;
 
 At its most basic, the function accepts two elements:
 
--   **Reference element** — also known as the anchor element, this is the element that is being _referred_ to for positioning. Often this is a button that triggers a floating popover like a tooltip or menu.
--   **Floating element** — this is the element that floats next to the reference element, remaining anchored to it. This is the popover or tooltip itself.
+-   **Reference element** - also known as the anchor element, this is the element that is being _referred_ to for positioning. Often this is a button that triggers a floating popover like a tooltip or menu.
+-   **Floating element** - this is the element that floats next to the reference element, remaining anchored to it. This is the popover or tooltip itself.
 
 ```rust,ignore
 # use floating_ui_utils::Rect;
@@ -83,8 +83,8 @@ By default, the floating element will be placed at the bottom center of the refe
 
 At its most basic, the function accepts two elements:
 
--   **Reference element** — also known as the anchor element, this is the element that is being _referred_ to for positioning. Often this is a button that triggers a floating popover like a tooltip or menu.
--   **Floating element** — this is the element that floats next to the reference element, remaining anchored to it. This is the popover or tooltip itself.
+-   **Reference element** - also known as the anchor element, this is the element that is being _referred_ to for positioning. Often this is a button that triggers a floating popover like a tooltip or menu.
+-   **Floating element** - this is the element that floats next to the reference element, remaining anchored to it. This is the popover or tooltip itself.
 
 ```html
 <button id="button">My reference element</button>
@@ -235,7 +235,7 @@ The `Start` and `End` alignments are [logical](https://developer.mozilla.org/en-
 
 **Note**
 
-You aren’t limited to just these 12 placements though. [`Offset`](./middleware/offset.md) allows you to create any placement.
+You aren't limited to just these 12 placements though. [`Offset`](./middleware/offset.md) allows you to create any placement.
 
 ### `strategy`
 
@@ -264,8 +264,8 @@ Ensure your initial layout matches the strategy:
 
 These strategies are differentiated as follows:
 
--   `Strategy::Absolute` — the floating element is positioned relative to its nearest positioned ancestor. With most layouts, this usually requires the browser to do the least work when updating the position.
--   `Strategy::Fixed` — the floating element is positioned relative to its nearest containing block (usually the viewport). This is useful when the reference element is also fixed to reduce jumpiness with positioning while scrolling. It will in many cases also [“break” the floating element out of a clipping ancestor](https://floating-ui.com/docs/misc#clipping).
+-   `Strategy::Absolute` - the floating element is positioned relative to its nearest positioned ancestor. With most layouts, this usually requires the browser to do the least work when updating the position.
+-   `Strategy::Fixed` - the floating element is positioned relative to its nearest containing block (usually the viewport). This is useful when the reference element is also fixed to reduce jumpiness with positioning while scrolling. It will in many cases also [“break” the floating element out of a clipping ancestor](https://floating-ui.com/docs/misc#clipping).
 
 ### `middleware`
 
