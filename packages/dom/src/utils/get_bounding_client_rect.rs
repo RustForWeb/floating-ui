@@ -1,5 +1,5 @@
 use floating_ui_utils::{
-    dom::{get_computed_style, get_window, DomElementOrWindow},
+    dom::{get_computed_style, get_frame_element, get_window, DomElementOrWindow},
     rect_to_client_rect, ClientRectObject, Coords, Rect,
 };
 
@@ -59,11 +59,9 @@ pub fn get_bounding_client_rect(
         if offset_parent.is_some() {
             let mut current_window = window;
             loop {
-                let current_iframe = &current_window
-                    .frame_element()
-                    .expect("Window should have frame element option.");
+                let current_iframe = get_frame_element(&current_window);
 
-                if let Some(current_iframe) = current_iframe {
+                if let Some(current_iframe) = current_iframe.as_ref() {
                     if offset_window
                         .as_ref()
                         .is_some_and(|offset_window| offset_window != &current_window)
