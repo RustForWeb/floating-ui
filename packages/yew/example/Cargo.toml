@@ -1,0 +1,19 @@
+[package]
+name = "floating-ui-yew-example"
+description = "Example for Floating UI Yew."
+publish = false
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+console_error_panic_hook = "0.1.7"
+console_log = "1.0.0"
+floating-ui-yew = { path = ".." }
+yew = { version = "0.21.0", features = ["csr"] }
+log = "0.4.21"
+wasm-bindgen.workspace = true
+web-sys.workspace = true

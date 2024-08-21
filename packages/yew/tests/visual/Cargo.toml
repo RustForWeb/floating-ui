@@ -1,0 +1,21 @@
+[package]
+name = "floating-ui-yew-test-visual"
+description = "Visual tests for Floating UI Yew."
+publish = false
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+console_log = "1.0.0"
+console_error_panic_hook = "0.1.7"
+convert_case = "0.6.0"
+floating-ui-yew = { path = "../.." }
+yew = { version = "0.21.0", features = ["csr"] }
+yew-router = "0.18.0"
+log = "0.4.21"
+wasm-bindgen.workspace = true
+web-sys.workspace = true
