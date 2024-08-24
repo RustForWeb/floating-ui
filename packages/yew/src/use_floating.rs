@@ -1,18 +1,23 @@
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
 use floating_ui_dom::{
     compute_position, ComputePositionConfig, MiddlewareData, OwnedElementOrVirtual, Placement,
     Strategy, VirtualElement,
 };
 use web_sys::wasm_bindgen::JsCast;
-use yew::{hook, use_callback, use_effect_with, use_memo, use_state, Callback, NodeRef};
+use yew::{
+    hook, use_callback, use_effect_with, use_memo, use_mut_ref, use_state, Callback, NodeRef,
+};
 
 use crate::{
-    types::{FloatingStyles, UseFloatingOptions, UseFloatingReturn},
+    types::{
+        FloatingStyles, ShallowRc, UseFloatingOptions, UseFloatingReturn,
+        WhileElementsMountedCleanupFn,
+    },
     utils::{get_dpr::get_dpr, round_by_dpr::round_by_dpr},
 };
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum VirtualElementOrNodeRef {
     VirtualElement(Box<dyn VirtualElement<web_sys::Element>>),
     NodeRef(NodeRef),
@@ -46,26 +51,6 @@ impl From<NodeRef> for VirtualElementOrNodeRef {
     }
 }
 
-impl PartialEq for VirtualElementOrNodeRef {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            // Virtual element does not implement PartialEq, so always return false.
-            // TODO: implement PartialEq for virtual elements.
-            (Self::VirtualElement(a), Self::VirtualElement(b)) => false,
-            (Self::NodeRef(a), Self::NodeRef(b)) => a == b,
-            _ => false,
-        }
-    }
-}
-
-struct ShallowRc<T: ?Sized>(Rc<T>);
-
-impl<T: ?Sized> PartialEq for ShallowRc<T> {
-    fn eq(&self, other: &Self) -> bool {
-        Rc::ptr_eq(&self.0, &other.0)
-    }
-}
-
 /// Computes the `x` and `y` coordinates that will place the floating element next to a reference element.
 #[hook]
 pub fn use_floating(
@@ -73,9 +58,7 @@ pub fn use_floating(
     floating: NodeRef,
     options: UseFloatingOptions,
 ) -> UseFloatingReturn {
-    use std::rc::Rc;
-
-    let while_elements_mounted_option = options.while_elements_mounted.map(ShallowRc);
+    let while_elements_mounted_option = options.while_elements_mounted.map(ShallowRc::from);
     let open_option = use_memo(options.open, |open| open.unwrap_or(true));
     let middleware_option = use_memo(options.middleware, |middleware| {
         middleware.clone().unwrap_or_default()
@@ -191,30 +174,82 @@ pub fn use_floating(
         },
     );
 
-    let cleanup = use_callback((), |_, ()| {});
+    let while_elements_mounted_cleanup: Rc<
+        RefCell<Option<ShallowRc<WhileElementsMountedCleanupFn>>>,
+    > = use_mut_ref(|| None);
+
+    let cleanup = use_callback(
+        (while_elements_mounted_cleanup.clone()),
+        |_, (while_elements_mounted_cleanup)| {
+            if let Some(while_elements_mounted_cleanup) = while_elements_mounted_cleanup.take() {
+                while_elements_mounted_cleanup();
+            }
+        },
+    );
 
     let attach = use_callback(
-        (while_elements_mounted_option, update.clone(), cleanup),
-        |_, (while_elements_mounted_option, update, cleanup)| {
+        (
+            reference.clone(),
+            floating.clone(),
+            while_elements_mounted_option,
+            update.clone(),
+            cleanup.clone(),
+            while_elements_mounted_cleanup,
+        ),
+        |_,
+         (
+            reference,
+            floating,
+            while_elements_mounted_option,
+            update,
+            cleanup,
+            while_elements_mounted_cleanup,
+        )| {
             cleanup.emit(());
 
             if let Some(while_elements_mounted) = while_elements_mounted_option {
+                if let Some(reference_element) = reference.get() {
+                    if let Some(floating_element) = floating.get() {
+                        while_elements_mounted_cleanup.replace(Some(ShallowRc::from(
+                            (**while_elements_mounted)(
+                                (&reference_element).into(),
+                                floating_element
+                                    .dyn_ref()
+                                    .expect("Floating element should be an Element."),
+                                Rc::new({
+                                    let update = update.clone();
+
+                                    move || {
+                                        update.emit(());
+                                    }
+                                }),
+                            ),
+                        )));
+                    }
+                }
             } else {
                 update.emit(());
             }
         },
     );
 
-    let reset = use_callback((), |_, ()| {});
+    let reset = use_callback(
+        (open_option.clone(), is_positioned.clone()),
+        |_, (open_option, is_positioned)| {
+            if **open_option {
+                is_positioned.set(false);
+            }
+        },
+    );
 
     use_effect_with(
         (
             placement_option,
             strategy_option,
-            // middleware_option,
+            middleware_option,
             update.clone(),
         ),
-        |(_, _, update)| {
+        |(_, _, _, update)| {
             update.emit(());
         },
     );
@@ -225,6 +260,12 @@ pub fn use_floating(
 
     use_effect_with((open_option, reset), |(_, reset)| {
         reset.emit(());
+    });
+
+    use_effect_with((), move |_| {
+        move || {
+            cleanup.emit(());
+        }
     });
 
     UseFloatingReturn {

@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{ops::Deref, rc::Rc};
 
 use floating_ui_dom::{
     auto_update, AutoUpdateOptions, ElementOrVirtual, Middleware, MiddlewareData, Placement,
@@ -8,9 +8,9 @@ use web_sys::{Element, Window};
 use yew::{Callback, UseStateHandle};
 
 pub type WhileElementsMountedFn =
-    dyn Fn(ElementOrVirtual, &Element, Rc<dyn Fn()>) -> WhileElementsMountedCleanupFn;
+    dyn Fn(ElementOrVirtual, &Element, Rc<dyn Fn()>) -> Rc<WhileElementsMountedCleanupFn>;
 
-pub type WhileElementsMountedCleanupFn = Box<dyn Fn()>;
+pub type WhileElementsMountedCleanupFn = dyn Fn();
 
 /// Options for [`use_floating`][`crate::use_floating::use_floating`].
 #[derive(Clone, Default)]
@@ -86,7 +86,7 @@ impl UseFloatingOptions {
     /// Set `while_elements_mounted` option to [`auto_update`] with [`AutoUpdateOptions::default`].
     pub fn while_elements_mounted_auto_update(self) -> Self {
         let auto_update_rc: Rc<WhileElementsMountedFn> = Rc::new(|reference, floating, update| {
-            auto_update(reference, floating, update, AutoUpdateOptions::default())
+            auto_update(reference, floating, update, AutoUpdateOptions::default()).into()
         });
 
         self.while_elements_mounted(auto_update_rc)
@@ -108,7 +108,7 @@ impl UseFloatingOptions {
     ) -> Self {
         let auto_update_rc: Rc<WhileElementsMountedFn> =
             Rc::new(move |reference, floating, update| {
-                auto_update(reference, floating, update, options.clone())
+                auto_update(reference, floating, update, options.clone()).into()
             });
 
         self.while_elements_mounted(auto_update_rc)
@@ -209,4 +209,26 @@ pub struct UseFloatingReturn {
 
     /// The function to update floating position manually.
     pub update: Callback<()>,
+}
+
+pub struct ShallowRc<T: ?Sized>(Rc<T>);
+
+impl<T: ?Sized> Deref for ShallowRc<T> {
+    type Target = Rc<T>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<T: ?Sized> From<Rc<T>> for ShallowRc<T> {
+    fn from(value: Rc<T>) -> Self {
+        Self(value)
+    }
+}
+
+impl<T: ?Sized> PartialEq for ShallowRc<T> {
+    fn eq(&self, other: &Self) -> bool {
+        Rc::ptr_eq(&self.0, &other.0)
+    }
 }
