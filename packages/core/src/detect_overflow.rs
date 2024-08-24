@@ -9,7 +9,7 @@ use crate::types::{
 };
 
 /// Options for [`detect_overflow`].
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct DetectOverflowOptions<Element> {
     /// The clipping element(s) or area in which overflow will be checked.
     ///
@@ -87,7 +87,7 @@ impl<Element> Default for DetectOverflowOptions<Element> {
 /// - `0` = lies flush with the boundary
 ///
 /// See <https://floating-ui.com/docs/detectOverflow> for the original documentation.
-pub fn detect_overflow<Element: Clone, Window: Clone>(
+pub fn detect_overflow<Element: Clone + 'static, Window: Clone + 'static>(
     state: MiddlewareState<Element, Window>,
     options: DetectOverflowOptions<Element>,
 ) -> SideObject {

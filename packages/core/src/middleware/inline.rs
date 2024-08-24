@@ -67,7 +67,7 @@ fn get_rects_by_line(rects: Vec<ClientRectObject>) -> Vec<ClientRectObject> {
 pub const INLINE_NAME: &str = "inline";
 
 /// Options for [`Inline`].
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct InlineOptions {
     /// Viewport-relative `x` coordinate to choose a `ClientRect`.
     ///
@@ -115,6 +115,7 @@ impl InlineOptions {
 /// Provides improved positioning for inline reference elements that can span over multiple lines, such as hyperlinks or range selections.
 ///
 /// See <https://floating-ui.com/docs/inline> for the original documentation.
+#[derive(PartialEq)]
 pub struct Inline<'a, Element: Clone, Window: Clone> {
     options: Derivable<'a, Element, Window, InlineOptions>,
 }
@@ -148,8 +149,8 @@ impl<'a, Element: Clone, Window: Clone> Clone for Inline<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone + 'static, Window: Clone> Middleware<Element, Window>
-    for Inline<'a, Element, Window>
+impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
+    Middleware<Element, Window> for Inline<'static, Element, Window>
 {
     fn name(&self) -> &'static str {
         INLINE_NAME

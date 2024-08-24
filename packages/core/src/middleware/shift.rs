@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use dyn_clone::DynClone;
+use dyn_derive::dyn_trait;
 use floating_ui_utils::{clamp, get_opposite_axis, get_side_axis, Axis, Coords, Side};
 use serde::{Deserialize, Serialize};
 
@@ -17,15 +17,14 @@ use crate::{
 pub const SHIFT_NAME: &str = "shift";
 
 /// Limiter used by [`Shift`] middleware. Limits the shifting done in order to prevent detachment.
-pub trait Limiter<Element: Clone, Window: Clone>: DynClone {
+#[dyn_trait]
+pub trait Limiter<Element: Clone + 'static, Window: Clone + 'static>: Clone + PartialEq {
     fn compute(&self, state: MiddlewareState<Element, Window>) -> Coords;
 }
 
-dyn_clone::clone_trait_object!(<Element, Window> Limiter<Element, Window>);
-
 /// Options for [`Shift`] middleware.
-#[derive(Clone)]
-pub struct ShiftOptions<Element: Clone, Window: Clone> {
+#[derive(Clone, PartialEq)]
+pub struct ShiftOptions<Element: Clone + 'static, Window: Clone + 'static> {
     /// Options for [`detect_overflow`].
     ///
     /// Defaults to [`DetectOverflowOptions::default`].
@@ -94,7 +93,8 @@ pub struct ShiftData {
 /// Optimizes the visibility of the floating element by shifting it in order to keep it in view when it will overflow the clipping boundary.
 ///
 /// See <https://floating-ui.com/docs/shift> for the original documentation.
-pub struct Shift<'a, Element: Clone, Window: Clone> {
+#[derive(PartialEq)]
+pub struct Shift<'a, Element: Clone + 'static, Window: Clone + 'static> {
     options: Derivable<'a, Element, Window, ShiftOptions<Element, Window>>,
 }
 
@@ -131,7 +131,9 @@ impl<'a, Element: Clone, Window: Clone> Clone for Shift<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Shift<'a, Element, Window> {
+impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
+    Middleware<Element, Window> for Shift<'static, Element, Window>
+{
     fn name(&self) -> &'static str {
         SHIFT_NAME
     }
@@ -229,10 +231,12 @@ impl<'a, Element: Clone, Window: Clone>
 }
 
 /// Default [`Limiter`], which doesn't limit shifting.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct DefaultLimiter;
 
-impl<Element: Clone, Window: Clone> Limiter<Element, Window> for DefaultLimiter {
+impl<Element: Clone + 'static, Window: Clone + 'static> Limiter<Element, Window>
+    for DefaultLimiter
+{
     fn compute(&self, state: MiddlewareState<Element, Window>) -> Coords {
         Coords {
             x: state.x,
@@ -242,7 +246,7 @@ impl<Element: Clone, Window: Clone> Limiter<Element, Window> for DefaultLimiter 
 }
 
 /// Axes configuration for [`LimitShiftOffset`].
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct LimitShiftOffsetValues {
     pub main_axis: Option<f64>,
 
@@ -264,7 +268,7 @@ impl LimitShiftOffsetValues {
 }
 
 /// Offset configuration for [`LimitShiftOptions`].
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum LimitShiftOffset {
     Value(f64),
     Values(LimitShiftOffsetValues),
@@ -277,7 +281,7 @@ impl Default for LimitShiftOffset {
 }
 
 /// Options for [`LimitShift`] limiter.
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct LimitShiftOptions<'a, Element: Clone, Window: Clone> {
     pub offset: Option<Derivable<'a, Element, Window, LimitShiftOffset>>,
 
@@ -335,7 +339,7 @@ impl<'a, Element: Clone, Window: Clone> Default for LimitShiftOptions<'a, Elemen
 }
 
 /// Built-in [`Limiter`], that will stop [`Shift`] at a certain point.
-#[derive(Clone, Default)]
+#[derive(Clone, Default, PartialEq)]
 pub struct LimitShift<'a, Element: Clone, Window: Clone> {
     options: LimitShiftOptions<'a, Element, Window>,
 }
@@ -346,8 +350,8 @@ impl<'a, Element: Clone, Window: Clone> LimitShift<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Limiter<Element, Window>
-    for LimitShift<'a, Element, Window>
+impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Limiter<Element, Window>
+    for LimitShift<'static, Element, Window>
 {
     fn compute(&self, state: MiddlewareState<Element, Window>) -> Coords {
         let MiddlewareState {

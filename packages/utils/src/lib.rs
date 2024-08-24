@@ -9,7 +9,7 @@
 #[cfg(feature = "dom")]
 pub mod dom;
 
-use dyn_clone::DynClone;
+use dyn_derive::dyn_trait;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -365,7 +365,8 @@ pub struct ElementRects {
 /// Custom positioning reference element.
 ///
 /// See <https://floating-ui.com/docs/virtual-elements> for the original documentation.
-pub trait VirtualElement<Element>: DynClone {
+#[dyn_trait]
+pub trait VirtualElement<Element>: Clone {
     fn get_bounding_client_rect(&self) -> ClientRectObject;
 
     fn get_client_rects(&self) -> Option<Vec<ClientRectObject>>;
@@ -373,37 +374,33 @@ pub trait VirtualElement<Element>: DynClone {
     fn context_element(&self) -> Option<Element>;
 }
 
-dyn_clone::clone_trait_object!(<Element> VirtualElement<Element>);
-
-pub trait GetBoundingClientRectCloneable: DynClone {
+#[dyn_trait]
+pub trait GetBoundingClientRectCloneable: Clone {
     fn call(&self) -> ClientRectObject;
 }
 
 impl<F> GetBoundingClientRectCloneable for F
 where
-    F: Fn() -> ClientRectObject + Clone,
+    F: Fn() -> ClientRectObject + Clone + 'static,
 {
     fn call(&self) -> ClientRectObject {
         self()
     }
 }
 
-dyn_clone::clone_trait_object!(GetBoundingClientRectCloneable);
-
-pub trait GetClientRectsCloneable: DynClone {
+#[dyn_trait]
+pub trait GetClientRectsCloneable: Clone {
     fn call(&self) -> Vec<ClientRectObject>;
 }
 
 impl<F> GetClientRectsCloneable for F
 where
-    F: Fn() -> Vec<ClientRectObject> + Clone,
+    F: Fn() -> Vec<ClientRectObject> + Clone + 'static,
 {
     fn call(&self) -> Vec<ClientRectObject> {
         self()
     }
 }
-
-dyn_clone::clone_trait_object!(GetClientRectsCloneable);
 
 #[derive(Clone)]
 pub struct DefaultVirtualElement<Element: Clone> {
@@ -449,7 +446,7 @@ impl<Element: Clone> DefaultVirtualElement<Element> {
 //     }
 // }
 
-impl<Element: Clone> VirtualElement<Element> for DefaultVirtualElement<Element> {
+impl<Element: Clone + 'static> VirtualElement<Element> for DefaultVirtualElement<Element> {
     fn get_bounding_client_rect(&self) -> ClientRectObject {
         (self.get_bounding_client_rect).call()
     }
@@ -471,7 +468,7 @@ pub enum ElementOrVirtual<'a, Element: Clone> {
     VirtualElement(Box<dyn VirtualElement<Element>>),
 }
 
-impl<'a, Element: Clone> ElementOrVirtual<'a, Element> {
+impl<'a, Element: Clone + 'static> ElementOrVirtual<'a, Element> {
     pub fn resolve(self) -> Option<Element> {
         match self {
             ElementOrVirtual::Element(element) => Some(element.clone()),
@@ -511,7 +508,7 @@ pub enum OwnedElementOrVirtual<Element> {
     VirtualElement(Box<dyn VirtualElement<Element>>),
 }
 
-impl<Element> OwnedElementOrVirtual<Element> {
+impl<Element: 'static> OwnedElementOrVirtual<Element> {
     pub fn resolve(self) -> Option<Element> {
         match self {
             OwnedElementOrVirtual::Element(element) => Some(element),

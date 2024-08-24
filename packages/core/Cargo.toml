@@ -11,6 +11,8 @@ version.workspace = true
 
 [dependencies]
 dyn-clone.workspace = true
+dyn_derive = "0.3.4"
+dyn_std = "0.3.3"
 floating-ui-utils = { path = "../utils", version = "0.0.9" }
 serde.workspace = true
 serde_json.workspace = true

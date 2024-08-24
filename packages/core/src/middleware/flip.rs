@@ -25,7 +25,7 @@ pub enum FallbackStrategy {
 }
 
 /// Options for [`Flip`] middleware.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct FlipOptions<Element: Clone> {
     /// Options for [`detect_overflow`].
     ///
@@ -139,6 +139,7 @@ pub struct FlipData {
 /// Alternative to [`AutoPlacement`][`crate::middleware::AutoPlacement`].
 ///
 /// See <https://floating-ui.com/docs/flip> for the original documentation.
+#[derive(PartialEq)]
 pub struct Flip<'a, Element: Clone, Window: Clone> {
     options: Derivable<'a, Element, Window, FlipOptions<Element>>,
 }
@@ -174,7 +175,9 @@ impl<'a, Element: Clone, Window: Clone> Clone for Flip<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Flip<'a, Element, Window> {
+impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, Window>
+    for Flip<'static, Element, Window>
+{
     fn name(&self) -> &'static str {
         FLIP_NAME
     }

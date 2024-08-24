@@ -64,7 +64,7 @@ fn get_placement_list(
 pub const AUTO_PLACEMENT_NAME: &str = "autoPlacement";
 
 /// Options for [`AutoPlacement`] middleware.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct AutoPlacementOptions<Element: Clone> {
     /// Options for [`detect_overflow`].
     ///
@@ -154,6 +154,7 @@ pub struct AutoPlacementData {
 /// Alternative to [`Flip`][`crate::middleware::Flip`].
 ///
 /// See <https://floating-ui.com/docs/autoPlacement> for the original documentation.
+#[derive(PartialEq)]
 pub struct AutoPlacement<'a, Element: Clone, Window: Clone> {
     options: Derivable<'a, Element, Window, AutoPlacementOptions<Element>>,
 }
@@ -191,8 +192,8 @@ impl<'a, Element: Clone, Window: Clone> AutoPlacement<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window>
-    for AutoPlacement<'a, Element, Window>
+impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, Window>
+    for AutoPlacement<'static, Element, Window>
 {
     fn name(&self) -> &'static str {
         AUTO_PLACEMENT_NAME

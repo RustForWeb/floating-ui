@@ -69,7 +69,7 @@ fn convert_value_to_coords<Element: Clone, Window: Clone>(
 pub const OFFSET_NAME: &str = "offset";
 
 /// Axes configuration for [`OffsetOptions`].
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct OffsetOptionsValues {
     /// The axis that runs along the side of the floating element. Represents the distance (gutter or margin) between the reference and floating element.
     ///
@@ -113,7 +113,7 @@ impl OffsetOptionsValues {
 /// Options for [`Offset`] middleware.
 ///
 /// A number (shorthand for [`main_axis`][`OffsetOptionsValues::main_axis`] or distance) or an axes configuration ([`OffsetOptionsValues`]).
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum OffsetOptions {
     Value(f64),
     Values(OffsetOptionsValues),
@@ -135,6 +135,7 @@ pub struct OffsetData {
 /// Modifies the placement by translating the floating element along the specified axes.
 ///
 /// See <https://floating-ui.com/docs/offset> for the original documentation.
+#[derive(PartialEq)]
 pub struct Offset<'a, Element: Clone, Window: Clone> {
     options: Derivable<'a, Element, Window, OffsetOptions>,
 }
@@ -168,8 +169,8 @@ impl<'a, Element: Clone, Window: Clone> Clone for Offset<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window>
-    for Offset<'a, Element, Window>
+impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, Window>
+    for Offset<'static, Element, Window>
 {
     fn name(&self) -> &'static str {
         OFFSET_NAME

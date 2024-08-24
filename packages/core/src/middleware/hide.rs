@@ -26,7 +26,7 @@ fn is_any_side_fully_clipped(overflow: &SideObject) -> bool {
 pub const HIDE_NAME: &str = "hide";
 
 /// Fallback strategy used by [`Hide`] middleware.
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub enum HideStrategy {
     #[default]
     ReferenceHidden,
@@ -34,7 +34,7 @@ pub enum HideStrategy {
 }
 
 /// Options for [`Hide`] middleware.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct HideOptions<Element: Clone> {
     /// Options for [`detect_overflow`].
     ///
@@ -83,6 +83,7 @@ pub struct HideData {
 /// such as when it is not in the same clipping context as the reference element.
 ///
 /// See <https://floating-ui.com/docs/hide> for the original documentation.
+#[derive(PartialEq)]
 pub struct Hide<'a, Element: Clone, Window: Clone> {
     options: Derivable<'a, Element, Window, HideOptions<Element>>,
 }
@@ -118,7 +119,9 @@ impl<'a, Element: Clone, Window: Clone> Clone for Hide<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Hide<'a, Element, Window> {
+impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, Window>
+    for Hide<'static, Element, Window>
+{
     fn name(&self) -> &'static str {
         HIDE_NAME
     }

@@ -12,6 +12,8 @@ version.workspace = true
 [dependencies]
 cfg-if.workspace = true
 dyn-clone.workspace = true
+dyn_derive = "0.3.4"
+dyn_std = "0.3.3"
 serde.workspace = true
 web-sys = { workspace = true, optional = true }
 

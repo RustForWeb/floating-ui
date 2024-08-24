@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use floating_ui_dom::{
     compute_position, ComputePositionConfig, MiddlewareData, OwnedElementOrVirtual, Placement,
     Strategy, VirtualElement,
@@ -56,6 +58,14 @@ impl PartialEq for VirtualElementOrNodeRef {
     }
 }
 
+struct ShallowRc<T: ?Sized>(Rc<T>);
+
+impl<T: ?Sized> PartialEq for ShallowRc<T> {
+    fn eq(&self, other: &Self) -> bool {
+        Rc::ptr_eq(&self.0, &other.0)
+    }
+}
+
 /// Computes the `x` and `y` coordinates that will place the floating element next to a reference element.
 #[hook]
 pub fn use_floating(
@@ -65,13 +75,11 @@ pub fn use_floating(
 ) -> UseFloatingReturn {
     use std::rc::Rc;
 
-    let while_elements_mounted_option = options.while_elements_mounted;
+    let while_elements_mounted_option = options.while_elements_mounted.map(ShallowRc);
     let open_option = use_memo(options.open, |open| open.unwrap_or(true));
-    // TODO: implement PartialEq for middleware.
-    // let middleware_option = use_memo(options.middleware, |middleware| {
-    //     middleware.unwrap_or_default()
-    // });
-    let middleware_option = options.middleware;
+    let middleware_option = use_memo(options.middleware, |middleware| {
+        middleware.clone().unwrap_or_default()
+    });
     let placement_option = use_memo(options.placement, |placement| {
         placement.unwrap_or(Placement::Bottom)
     });
@@ -135,7 +143,7 @@ pub fn use_floating(
             floating.clone(),
             placement_option.clone(),
             strategy_option.clone(),
-            // middleware_option.clone(),
+            middleware_option.clone(),
             x.clone(),
             y.clone(),
             strategy.clone(),
@@ -149,7 +157,7 @@ pub fn use_floating(
             floating,
             placement_option,
             strategy_option,
-            // middleware_option,
+            middleware_option,
             x,
             y,
             strategy,
@@ -162,7 +170,7 @@ pub fn use_floating(
                     let config = ComputePositionConfig {
                         placement: Some(**placement_option),
                         strategy: Some(**strategy_option),
-                        middleware: middleware_option.clone(),
+                        middleware: Some((**middleware_option).clone()),
                     };
 
                     let position = compute_position(
@@ -186,23 +194,14 @@ pub fn use_floating(
     let cleanup = use_callback((), |_, ()| {});
 
     let attach = use_callback(
-        (
-            // while_elements_mounted_option,
-            update.clone(),
-            cleanup,
-        ),
-        |_,
-         (
-            // while_elements_mounted_option,
-            update,
-            cleanup,
-        )| {
+        (while_elements_mounted_option, update.clone(), cleanup),
+        |_, (while_elements_mounted_option, update, cleanup)| {
             cleanup.emit(());
 
-            // if let Some(while_elements_mounted) = while_elements_mounted_option {
-            // } else {
-            //     update.emit(());
-            // }
+            if let Some(while_elements_mounted) = while_elements_mounted_option {
+            } else {
+                update.emit(());
+            }
         },
     );
 

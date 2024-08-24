@@ -147,10 +147,12 @@ mod tests {
 
     #[test]
     fn test_returned_data() {
-        #[derive(Clone)]
+        #[derive(Clone, PartialEq)]
         struct CustomMiddleware {}
 
-        impl<Element: Clone, Window: Clone> Middleware<Element, Window> for CustomMiddleware {
+        impl<Element: Clone + 'static, Window: Clone + 'static> Middleware<Element, Window>
+            for CustomMiddleware
+        {
             fn name(&self) -> &'static str {
                 "custom"
             }
@@ -194,10 +196,12 @@ mod tests {
 
     #[test]
     fn test_middleware() {
-        #[derive(Clone)]
+        #[derive(Clone, PartialEq)]
         struct TestMiddleware {}
 
-        impl<Element: Clone, Window: Clone> Middleware<Element, Window> for TestMiddleware {
+        impl<Element: Clone + 'static, Window: Clone + 'static> Middleware<Element, Window>
+            for TestMiddleware
+        {
             fn name(&self) -> &'static str {
                 "test"
             }
@@ -242,10 +246,12 @@ mod tests {
 
     #[test]
     fn test_middleware_data() {
-        #[derive(Clone)]
+        #[derive(Clone, PartialEq)]
         struct TestMiddleware {}
 
-        impl<Element: Clone, Window: Clone> Middleware<Element, Window> for TestMiddleware {
+        impl<Element: Clone + 'static, Window: Clone + 'static> Middleware<Element, Window>
+            for TestMiddleware
+        {
             fn name(&self) -> &'static str {
                 "test"
             }

@@ -53,6 +53,17 @@ where
     }
 }
 
+impl<Ref, RefEl> PartialEq for ArrowOptions<Ref, RefEl>
+where
+    Ref: NodeRefAsElement<RefEl> + Copy + 'static,
+    RefEl: ElementDescriptor + Clone + 'static,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.element.get_untracked_as_element() == other.element.get_untracked_as_element()
+            && self.padding == other.padding
+    }
+}
+
 /// Provides data to position an inner element of the floating element so that it appears centered to the reference element.
 ///
 /// See <https://floating-ui.com/docs/arrow> for the original documentation.
@@ -106,5 +117,15 @@ where
                 reset: None,
             }
         }
+    }
+}
+
+impl<Ref, RefEl> PartialEq for Arrow<Ref, RefEl>
+where
+    Ref: NodeRefAsElement<RefEl> + Copy + 'static,
+    RefEl: ElementDescriptor + Clone + 'static,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.options == other.options
     }
 }

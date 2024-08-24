@@ -1,3 +1,5 @@
+use std::ptr;
+
 use floating_ui_utils::{get_side_axis, Alignment, Axis, Rect, Side};
 
 use crate::{
@@ -65,10 +67,24 @@ impl<'a, Element: Clone, Window: Clone> Default for SizeOptions<'a, Element, Win
     }
 }
 
+impl<'a, Element: Clone + PartialEq, Window: Clone + PartialEq> PartialEq
+    for SizeOptions<'a, Element, Window>
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.detect_overflow == other.detect_overflow
+            && match (self.apply, other.apply) {
+                (Some(a), Some(b)) => ptr::eq(a, b),
+                (None, None) => true,
+                _ => false,
+            }
+    }
+}
+
 /// Provides data that allows you to change the size of the floating element -
 /// for instance, prevent it from overflowing the clipping boundary or match the width of the reference element.
 ///
 /// See <https://floating-ui.com/docs/size> for the original documentation.
+#[derive(PartialEq)]
 pub struct Size<'a, Element: Clone, Window: Clone> {
     options: Derivable<'a, Element, Window, SizeOptions<'a, Element, Window>>,
 }
@@ -106,7 +122,9 @@ impl<'a, Element: Clone, Window: Clone> Clone for Size<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Size<'a, Element, Window> {
+impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, Window>
+    for Size<'static, Element, Window>
+{
     fn name(&self) -> &'static str {
         SIZE_NAME
     }

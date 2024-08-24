@@ -1,7 +1,7 @@
-use std::collections::HashMap;
 use std::fmt::Debug;
+use std::{collections::HashMap, ptr};
 
-use dyn_clone::DynClone;
+use dyn_derive::dyn_trait;
 use serde::{de::DeserializeOwned, Serialize};
 
 use floating_ui_utils::{
@@ -45,6 +45,18 @@ impl<'a, Element: Clone, Window: Clone, T: Clone> From<DerivableFn<'a, Element, 
 {
     fn from(value: DerivableFn<'a, Element, Window, T>) -> Self {
         Derivable::Fn(value)
+    }
+}
+
+impl<'a, Element: Clone, Window: Clone, T: Clone + PartialEq> PartialEq
+    for Derivable<'a, Element, Window, T>
+{
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Value(a), Self::Value(b)) => a == b,
+            (Self::Fn(a), Self::Fn(b)) => ptr::eq(a, b),
+            _ => false,
+        }
     }
 }
 
@@ -154,7 +166,7 @@ impl MiddlewareData {
 
 /// Options for [`compute_position`][crate::compute_position::compute_position].
 #[derive(Clone)]
-pub struct ComputePositionConfig<'a, Element, Window> {
+pub struct ComputePositionConfig<'a, Element: 'static, Window: 'static> {
     /// Object to interface with the current platform.
     pub platform: &'a dyn Platform<Element, Window>,
 
@@ -253,15 +265,14 @@ pub struct MiddlewareReturn {
 }
 
 /// Middleware used by [`compute_position`][`crate::compute_position::compute_position`].
-pub trait Middleware<Element: Clone, Window: Clone>: DynClone {
+#[dyn_trait]
+pub trait Middleware<Element: Clone + 'static, Window: Clone + 'static>: Clone + PartialEq {
     /// The name of this middleware.
     fn name(&self) -> &'static str;
 
     /// Executes this middleware.
     fn compute(&self, state: MiddlewareState<Element, Window>) -> MiddlewareReturn;
 }
-
-dyn_clone::clone_trait_object!(<Element, Window> Middleware<Element, Window>);
 
 /// Middleware with options.
 pub trait MiddlewareWithOptions<Element: Clone, Window: Clone, O: Clone> {

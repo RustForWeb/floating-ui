@@ -12,7 +12,7 @@ use crate::types::{
 pub const ARROW_NAME: &str = "arrow";
 
 /// Options for [`Arrow`].
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ArrowOptions<Element: Clone> {
     /// The arrow element to be positioned.
     pub element: Element,
@@ -57,6 +57,7 @@ pub struct ArrowData {
 /// Provides data to position an inner element of the floating element so that it appears centered to the reference element.
 ///
 /// See <https://floating-ui.com/docs/arrow> for the original documentation.
+#[derive(PartialEq)]
 pub struct Arrow<'a, Element: Clone, Window: Clone> {
     options: Derivable<'a, Element, Window, ArrowOptions<Element>>,
 }
@@ -92,7 +93,9 @@ impl<'a, Element: Clone, Window: Clone> Clone for Arrow<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Middleware<Element, Window> for Arrow<'a, Element, Window> {
+impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, Window>
+    for Arrow<'static, Element, Window>
+{
     fn name(&self) -> &'static str {
         ARROW_NAME
     }
