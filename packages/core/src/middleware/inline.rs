@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use floating_ui_utils::{
     get_padding_object, get_side_axis, rect_to_client_rect, Axis, ClientRectObject, Coords,
     DefaultVirtualElement, ElementOrVirtual, Padding, Rect, Side,
@@ -116,11 +118,11 @@ impl InlineOptions {
 ///
 /// See <https://floating-ui.com/docs/inline> for the original documentation.
 #[derive(PartialEq)]
-pub struct Inline<'a, Element: Clone, Window: Clone> {
+pub struct Inline<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, InlineOptions>,
 }
 
-impl<'a, Element: Clone, Window: Clone> Inline<'a, Element, Window> {
+impl<'a, Element: Clone + 'static, Window: Clone> Inline<'a, Element, Window> {
     /// Constructs a new instance of this middleware.
     pub fn new(options: InlineOptions) -> Self {
         Inline {
@@ -274,7 +276,7 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
 
         let reset_rects = platform.get_element_rects(GetElementRectsArgs {
             reference: ElementOrVirtual::VirtualElement(Box::new(DefaultVirtualElement::new(
-                Box::new(get_bounding_client_rect),
+                Rc::new(get_bounding_client_rect),
             ))),
             floating: elements.floating,
             strategy,

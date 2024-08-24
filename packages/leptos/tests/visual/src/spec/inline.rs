@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{rc::Rc, time::Duration};
 
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
@@ -110,12 +110,12 @@ pub fn Inline() -> impl IntoView {
                 if let Some(range) = range {
                     reference_signal.set(
                         (Box::new(
-                            DefaultVirtualElement::new(Box::new({
+                            DefaultVirtualElement::new(Rc::new({
                                 let range = range.clone();
 
                                 move || range.get_bounding_client_rect().into()
                             }))
-                            .get_client_rects(Box::new({
+                            .get_client_rects(Rc::new({
                                 move || {
                                     ClientRectObject::from_dom_rect_list(
                                         range

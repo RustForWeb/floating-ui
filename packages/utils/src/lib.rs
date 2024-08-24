@@ -9,6 +9,8 @@
 #[cfg(feature = "dom")]
 pub mod dom;
 
+use std::rc::Rc;
+
 use dyn_derive::dyn_trait;
 use serde::{Deserialize, Serialize};
 
@@ -366,7 +368,7 @@ pub struct ElementRects {
 ///
 /// See <https://floating-ui.com/docs/virtual-elements> for the original documentation.
 #[dyn_trait]
-pub trait VirtualElement<Element>: Clone {
+pub trait VirtualElement<Element: 'static>: Clone + PartialEq {
     fn get_bounding_client_rect(&self) -> ClientRectObject;
 
     fn get_client_rects(&self) -> Option<Vec<ClientRectObject>>;
@@ -404,13 +406,13 @@ where
 
 #[derive(Clone)]
 pub struct DefaultVirtualElement<Element: Clone> {
-    pub get_bounding_client_rect: Box<dyn GetBoundingClientRectCloneable>,
-    pub get_client_rects: Option<Box<dyn GetClientRectsCloneable>>,
+    pub get_bounding_client_rect: Rc<dyn GetBoundingClientRectCloneable>,
+    pub get_client_rects: Option<Rc<dyn GetClientRectsCloneable>>,
     pub context_element: Option<Element>,
 }
 
 impl<Element: Clone> DefaultVirtualElement<Element> {
-    pub fn new(get_bounding_client_rect: Box<dyn GetBoundingClientRectCloneable>) -> Self {
+    pub fn new(get_bounding_client_rect: Rc<dyn GetBoundingClientRectCloneable>) -> Self {
         DefaultVirtualElement {
             get_bounding_client_rect,
             get_client_rects: None,
@@ -420,13 +422,13 @@ impl<Element: Clone> DefaultVirtualElement<Element> {
 
     pub fn get_bounding_client_rect(
         mut self,
-        get_bounding_client_rect: Box<dyn GetBoundingClientRectCloneable>,
+        get_bounding_client_rect: Rc<dyn GetBoundingClientRectCloneable>,
     ) -> Self {
         self.get_bounding_client_rect = get_bounding_client_rect;
         self
     }
 
-    pub fn get_client_rects(mut self, get_client_rects: Box<dyn GetClientRectsCloneable>) -> Self {
+    pub fn get_client_rects(mut self, get_client_rects: Rc<dyn GetClientRectsCloneable>) -> Self {
         self.get_client_rects = Some(get_client_rects);
         self
     }
@@ -437,16 +439,9 @@ impl<Element: Clone> DefaultVirtualElement<Element> {
     }
 }
 
-// impl<Element: Clone> Clone for DefaultVirtualElement<Element> {
-//     fn clone(&self) -> Self {
-//         Self {
-//             get_bounding_client_rect: dyn_clone::clone_box(&*self.get_bounding_client_rect),
-//             context_element: self.context_element.clone(),
-//         }
-//     }
-// }
-
-impl<Element: Clone + 'static> VirtualElement<Element> for DefaultVirtualElement<Element> {
+impl<Element: Clone + PartialEq + 'static> VirtualElement<Element>
+    for DefaultVirtualElement<Element>
+{
     fn get_bounding_client_rect(&self) -> ClientRectObject {
         (self.get_bounding_client_rect).call()
     }
@@ -462,8 +457,24 @@ impl<Element: Clone + 'static> VirtualElement<Element> for DefaultVirtualElement
     }
 }
 
+impl<Element: Clone + PartialEq + 'static> PartialEq for DefaultVirtualElement<Element> {
+    fn eq(&self, other: &Self) -> bool {
+        Rc::ptr_eq(
+            &self.get_bounding_client_rect,
+            &other.get_bounding_client_rect,
+        ) && match (
+            self.get_client_rects.as_ref(),
+            other.get_client_rects.as_ref(),
+        ) {
+            (Some(a), Some(b)) => Rc::ptr_eq(a, b),
+            (None, None) => true,
+            _ => false,
+        } && self.context_element == other.context_element
+    }
+}
+
 #[derive(Clone)]
-pub enum ElementOrVirtual<'a, Element: Clone> {
+pub enum ElementOrVirtual<'a, Element: Clone + 'static> {
     Element(&'a Element),
     VirtualElement(Box<dyn VirtualElement<Element>>),
 }
@@ -503,7 +514,7 @@ impl<'a, Element: Clone> From<&'a OwnedElementOrVirtual<Element>>
 }
 
 #[derive(Clone)]
-pub enum OwnedElementOrVirtual<Element> {
+pub enum OwnedElementOrVirtual<Element: 'static> {
     Element(Element),
     VirtualElement(Box<dyn VirtualElement<Element>>),
 }

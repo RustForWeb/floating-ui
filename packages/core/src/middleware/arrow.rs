@@ -58,11 +58,11 @@ pub struct ArrowData {
 ///
 /// See <https://floating-ui.com/docs/arrow> for the original documentation.
 #[derive(PartialEq)]
-pub struct Arrow<'a, Element: Clone, Window: Clone> {
+pub struct Arrow<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, ArrowOptions<Element>>,
 }
 
-impl<'a, Element: Clone, Window: Clone> Arrow<'a, Element, Window> {
+impl<'a, Element: Clone + 'static, Window: Clone> Arrow<'a, Element, Window> {
     /// Constructs a new instance of this middleware.
     pub fn new(options: ArrowOptions<Element>) -> Self {
         Arrow {
@@ -85,7 +85,7 @@ impl<'a, Element: Clone, Window: Clone> Arrow<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Clone for Arrow<'a, Element, Window> {
+impl<'a, Element: Clone + 'static, Window: Clone> Clone for Arrow<'a, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             options: self.options.clone(),

@@ -11,7 +11,7 @@ use floating_ui_utils::{
 
 pub type DerivableFn<'a, Element, Window, T> = &'a dyn Fn(MiddlewareState<Element, Window>) -> T;
 
-pub enum Derivable<'a, Element: Clone, Window: Clone, T: Clone> {
+pub enum Derivable<'a, Element: Clone + 'static, Window: Clone, T: Clone> {
     Value(T),
     Fn(DerivableFn<'a, Element, Window, T>),
 }
@@ -61,7 +61,7 @@ impl<'a, Element: Clone, Window: Clone, T: Clone + PartialEq> PartialEq
 }
 
 /// Arguments for [`Platform::get_element_rects`].
-pub struct GetElementRectsArgs<'a, Element: Clone> {
+pub struct GetElementRectsArgs<'a, Element: Clone + 'static> {
     pub reference: ElementOrVirtual<'a, Element>,
     pub floating: &'a Element,
     pub strategy: Strategy,
@@ -78,7 +78,7 @@ pub struct GetClippingRectArgs<'a, Element> {
 /// Arguments for [`Platform::convert_offset_parent_relative_rect_to_viewport_relative_rect`].
 pub struct ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<
     'a,
-    Element: Clone,
+    Element: Clone + 'static,
     Window: Clone,
 > {
     pub elements: Option<Elements<'a, Element>>,
@@ -280,7 +280,7 @@ pub trait MiddlewareWithOptions<Element: Clone, Window: Clone, O: Clone> {
     fn options(&self) -> &Derivable<Element, Window, O>;
 }
 
-pub struct Elements<'a, Element: Clone> {
+pub struct Elements<'a, Element: Clone + 'static> {
     pub reference: ElementOrVirtual<'a, Element>,
     pub floating: &'a Element,
 }
@@ -307,7 +307,7 @@ impl<'a, Element: Clone> Clone for Elements<'a, Element> {
 }
 
 /// State passed to [`Middleware::compute`].
-pub struct MiddlewareState<'a, Element: Clone, Window: Clone> {
+pub struct MiddlewareState<'a, Element: Clone + 'static, Window: Clone> {
     pub x: f64,
     pub y: f64,
     pub initial_placement: Placement,

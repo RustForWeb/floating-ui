@@ -282,7 +282,7 @@ impl Default for LimitShiftOffset {
 
 /// Options for [`LimitShift`] limiter.
 #[derive(Clone, PartialEq)]
-pub struct LimitShiftOptions<'a, Element: Clone, Window: Clone> {
+pub struct LimitShiftOptions<'a, Element: Clone + 'static, Window: Clone> {
     pub offset: Option<Derivable<'a, Element, Window, LimitShiftOffset>>,
 
     pub main_axis: Option<bool>,
@@ -328,7 +328,9 @@ impl<'a, Element: Clone, Window: Clone> LimitShiftOptions<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Default for LimitShiftOptions<'a, Element, Window> {
+impl<'a, Element: Clone + 'static, Window: Clone> Default
+    for LimitShiftOptions<'a, Element, Window>
+{
     fn default() -> Self {
         Self {
             offset: Default::default(),
@@ -340,7 +342,7 @@ impl<'a, Element: Clone, Window: Clone> Default for LimitShiftOptions<'a, Elemen
 
 /// Built-in [`Limiter`], that will stop [`Shift`] at a certain point.
 #[derive(Clone, Default, PartialEq)]
-pub struct LimitShift<'a, Element: Clone, Window: Clone> {
+pub struct LimitShift<'a, Element: Clone + 'static, Window: Clone> {
     options: LimitShiftOptions<'a, Element, Window>,
 }
 

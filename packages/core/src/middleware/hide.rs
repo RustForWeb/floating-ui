@@ -84,7 +84,7 @@ pub struct HideData {
 ///
 /// See <https://floating-ui.com/docs/hide> for the original documentation.
 #[derive(PartialEq)]
-pub struct Hide<'a, Element: Clone, Window: Clone> {
+pub struct Hide<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, HideOptions<Element>>,
 }
 
@@ -111,7 +111,7 @@ impl<'a, Element: Clone, Window: Clone> Hide<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Clone for Hide<'a, Element, Window> {
+impl<'a, Element: Clone + 'static, Window: Clone> Clone for Hide<'a, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             options: self.options.clone(),

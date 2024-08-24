@@ -17,7 +17,7 @@ pub const SIZE_NAME: &str = "size";
 
 /// State passed to [`SizeOptions::apply`].
 #[derive(Clone)]
-pub struct ApplyState<'a, Element: Clone, Window: Clone> {
+pub struct ApplyState<'a, Element: Clone + 'static, Window: Clone> {
     pub state: MiddlewareState<'a, Element, Window>,
     pub available_width: f64,
     pub available_height: f64,
@@ -27,7 +27,7 @@ pub type ApplyFn<Element, Window> = dyn Fn(ApplyState<Element, Window>);
 
 /// Options for [`Size`] middleware.
 #[derive(Clone)]
-pub struct SizeOptions<'a, Element: Clone, Window: Clone> {
+pub struct SizeOptions<'a, Element: Clone + 'static, Window: Clone> {
     /// Options for [`detect_overflow`].
     ///
     /// Defaults to [`DetectOverflowOptions::default`].
@@ -85,11 +85,11 @@ impl<'a, Element: Clone + PartialEq, Window: Clone + PartialEq> PartialEq
 ///
 /// See <https://floating-ui.com/docs/size> for the original documentation.
 #[derive(PartialEq)]
-pub struct Size<'a, Element: Clone, Window: Clone> {
+pub struct Size<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, SizeOptions<'a, Element, Window>>,
 }
 
-impl<'a, Element: Clone, Window: Clone> Size<'a, Element, Window> {
+impl<'a, Element: Clone + 'static, Window: Clone> Size<'a, Element, Window> {
     /// Constructs a new instance of this middleware.
     pub fn new(options: SizeOptions<'a, Element, Window>) -> Self {
         Size {

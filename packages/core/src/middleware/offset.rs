@@ -136,7 +136,7 @@ pub struct OffsetData {
 ///
 /// See <https://floating-ui.com/docs/offset> for the original documentation.
 #[derive(PartialEq)]
-pub struct Offset<'a, Element: Clone, Window: Clone> {
+pub struct Offset<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, OffsetOptions>,
 }
 
@@ -161,7 +161,7 @@ impl<'a, Element: Clone, Window: Clone> Offset<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Clone for Offset<'a, Element, Window> {
+impl<'a, Element: Clone + 'static, Window: Clone> Clone for Offset<'a, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             options: self.options.clone(),

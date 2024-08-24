@@ -1,4 +1,4 @@
-use std::ops::Deref;
+use std::{ops::Deref, rc::Rc};
 
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
@@ -57,7 +57,7 @@ pub fn Transform() -> impl IntoView {
 
                 Some(
                     (Box::new(
-                        DefaultVirtualElement::new(Box::new({
+                        DefaultVirtualElement::new(Rc::new({
                             let context_element = context_element.clone();
 
                             move || context_element.get_bounding_client_rect().into()

@@ -155,11 +155,11 @@ pub struct AutoPlacementData {
 ///
 /// See <https://floating-ui.com/docs/autoPlacement> for the original documentation.
 #[derive(PartialEq)]
-pub struct AutoPlacement<'a, Element: Clone, Window: Clone> {
+pub struct AutoPlacement<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, AutoPlacementOptions<Element>>,
 }
 
-impl<'a, Element: Clone, Window: Clone> Clone for AutoPlacement<'a, Element, Window> {
+impl<'a, Element: Clone + 'static, Window: Clone> Clone for AutoPlacement<'a, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             options: self.options.clone(),
@@ -167,7 +167,7 @@ impl<'a, Element: Clone, Window: Clone> Clone for AutoPlacement<'a, Element, Win
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> AutoPlacement<'a, Element, Window> {
+impl<'a, Element: Clone + 'static, Window: Clone> AutoPlacement<'a, Element, Window> {
     /// Constructs a new instance of this middleware.
     pub fn new(options: AutoPlacementOptions<Element>) -> Self {
         AutoPlacement {

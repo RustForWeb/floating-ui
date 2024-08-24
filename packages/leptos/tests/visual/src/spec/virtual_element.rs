@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use floating_ui_leptos::{
     use_floating, DefaultVirtualElement, Strategy, UseFloatingOptions, UseFloatingReturn,
     VirtualElement,
@@ -15,7 +17,7 @@ pub fn VirtualElement() -> impl IntoView {
         context_element.map(|context_element| {
             let element: &web_sys::Element = context_element.as_ref();
             (Box::new(
-                DefaultVirtualElement::new(Box::new({
+                DefaultVirtualElement::new(Rc::new({
                     let context_element = context_element.clone();
 
                     move || context_element.get_bounding_client_rect().into()
