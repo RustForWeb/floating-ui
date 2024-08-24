@@ -124,7 +124,7 @@ pub trait Platform<Element: Clone, Window: Clone>: Debug {
 }
 
 /// Data stored by middleware.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct MiddlewareData {
     values: HashMap<String, serde_json::Value>,
 }
@@ -210,7 +210,7 @@ impl<'a, Element, Window> ComputePositionConfig<'a, Element, Window> {
 }
 
 /// Return of [`compute_position`][crate::compute_position::compute_position].
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ComputePositionReturn {
     pub x: f64,
     pub y: f64,
@@ -225,26 +225,26 @@ pub struct ComputePositionReturn {
     pub middleware_data: MiddlewareData,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum ResetRects {
     True,
     Value(ElementRects),
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ResetValue {
     pub placement: Option<Placement>,
     pub rects: Option<ResetRects>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Reset {
     True,
     Value(ResetValue),
 }
 
 /// Return of [`Middleware::compute`].
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct MiddlewareReturn {
     pub x: Option<f64>,
     pub y: Option<f64>,
@@ -324,14 +324,14 @@ impl<'a, Element: Clone, Window: Clone> Clone for MiddlewareState<'a, Element, W
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Boundary<Element> {
     ClippingAncestors,
     Element(Element),
     Elements(Vec<Element>),
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum RootBoundary {
     Viewport,
     Document,

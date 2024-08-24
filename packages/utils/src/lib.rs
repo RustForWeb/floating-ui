@@ -264,7 +264,7 @@ impl SideObject {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct PartialSideObject {
     pub top: Option<f64>,
     pub right: Option<f64>,
@@ -272,7 +272,7 @@ pub struct PartialSideObject {
     pub left: Option<f64>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Rect {
     pub x: f64,
     pub y: f64,
@@ -296,13 +296,13 @@ impl Rect {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Padding {
     All(f64),
     PerSide(PartialSideObject),
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ClientRectObject {
     pub x: f64,
     pub y: f64,
@@ -356,7 +356,7 @@ cfg_if::cfg_if! {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ElementRects {
     pub reference: Rect,
     pub floating: Rect,
@@ -534,7 +534,7 @@ impl<Element> From<Box<dyn VirtualElement<Element>>> for OwnedElementOrVirtual<E
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum ElementOrWindow<'a, Element, Window> {
     Element(&'a Element),
     Window(&'a Window),
@@ -551,7 +551,7 @@ impl<'a, Element, Window> From<&'a OwnedElementOrWindow<Element, Window>>
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum OwnedElementOrWindow<Element, Window> {
     Element(Element),
     Window(Window),
