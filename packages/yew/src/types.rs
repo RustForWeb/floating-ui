@@ -1,4 +1,9 @@
-use std::{ops::Deref, rc::Rc};
+use std::{
+    cell::LazyCell,
+    ops::Deref,
+    rc::Rc,
+    sync::{Arc, LazyLock},
+};
 
 use floating_ui_dom::{
     auto_update, AutoUpdateOptions, ElementOrVirtual, Middleware, MiddlewareData, Placement,
@@ -82,6 +87,8 @@ impl UseFloatingOptions {
         self.while_elements_mounted = Some(value);
         self
     }
+
+    // TODO: the while_elements_mounted RC is always recreated, so never equal in PartialEq
 
     /// Set `while_elements_mounted` option to [`auto_update`] with [`AutoUpdateOptions::default`].
     pub fn while_elements_mounted_auto_update(self) -> Self {
@@ -212,6 +219,12 @@ pub struct UseFloatingReturn {
 }
 
 pub struct ShallowRc<T: ?Sized>(Rc<T>);
+
+impl<T: ?Sized> Clone for ShallowRc<T> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+}
 
 impl<T: ?Sized> Deref for ShallowRc<T> {
     type Target = Rc<T>;

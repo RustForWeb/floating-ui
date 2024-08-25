@@ -6,7 +6,7 @@ use floating_ui_dom::{
 };
 use web_sys::wasm_bindgen::JsCast;
 use yew::{
-    hook, use_callback, use_effect_with, use_memo, use_mut_ref, use_state, Callback, NodeRef,
+    hook, use_callback, use_effect_with, use_memo, use_mut_ref, use_state_eq, Callback, NodeRef,
 };
 
 use crate::{
@@ -71,12 +71,12 @@ pub fn use_floating(
     });
     let transform_option = use_memo(options.transform, |transform| transform.unwrap_or(true));
 
-    let x = use_state(|| 0.0);
-    let y = use_state(|| 0.0);
-    let strategy = use_state(|| *strategy_option);
-    let placement = use_state(|| *placement_option);
-    let middleware_data = use_state(MiddlewareData::default);
-    let is_positioned = use_state(|| false);
+    let x = use_state_eq(|| 0.0);
+    let y = use_state_eq(|| 0.0);
+    let strategy = use_state_eq(|| *strategy_option);
+    let placement = use_state_eq(|| *placement_option);
+    let middleware_data = use_state_eq(MiddlewareData::default);
+    let is_positioned = use_state_eq(|| false);
     let floating_styles = use_memo(
         (
             floating.clone(),
@@ -148,6 +148,8 @@ pub fn use_floating(
             middleware_data,
             is_positioned,
         )| {
+            log::info!("update");
+
             if let Some(reference_element) = reference.get() {
                 if let Some(floating_element) = floating.get() {
                     let config = ComputePositionConfig {
@@ -181,11 +183,17 @@ pub fn use_floating(
     let cleanup = use_callback(
         (while_elements_mounted_cleanup.clone()),
         |_, (while_elements_mounted_cleanup)| {
+            log::info!("cleanup");
+
             if let Some(while_elements_mounted_cleanup) = while_elements_mounted_cleanup.take() {
                 while_elements_mounted_cleanup();
             }
         },
     );
+
+    use_effect_with(while_elements_mounted_option.clone(), |_| {
+        log::info!("while_elements_mounted_option changed");
+    });
 
     let attach = use_callback(
         (
@@ -196,7 +204,7 @@ pub fn use_floating(
             cleanup.clone(),
             while_elements_mounted_cleanup,
         ),
-        |_,
+        |_: (),
          (
             reference,
             floating,
@@ -205,6 +213,8 @@ pub fn use_floating(
             cleanup,
             while_elements_mounted_cleanup,
         )| {
+            log::info!("attach");
+
             cleanup.emit(());
 
             if let Some(while_elements_mounted) = while_elements_mounted_option {
@@ -220,7 +230,7 @@ pub fn use_floating(
                                     let update = update.clone();
 
                                     move || {
-                                        update.emit(());
+                                        // update.emit(());
                                     }
                                 }),
                             ),
@@ -236,6 +246,8 @@ pub fn use_floating(
     let reset = use_callback(
         (open_option.clone(), is_positioned.clone()),
         |_, (open_option, is_positioned)| {
+            log::info!("reset");
+
             if **open_option {
                 is_positioned.set(false);
             }
@@ -250,20 +262,36 @@ pub fn use_floating(
             update.clone(),
         ),
         |(_, _, _, update)| {
+            log::info!("update effect");
             update.emit(());
         },
     );
 
+    use_effect_with(reference.clone(), |_| {
+        log::info!("reference changed");
+    });
+
+    use_effect_with(floating.clone(), |_| {
+        log::info!("floating changed");
+    });
+
+    use_effect_with(attach.clone(), |_| {
+        log::info!("attach changed");
+    });
+
     use_effect_with((reference, floating, attach), |(_, _, attach)| {
+        log::info!("attach effect");
         attach.emit(());
     });
 
     use_effect_with((open_option, reset), |(_, reset)| {
+        log::info!("reset effect");
         reset.emit(());
     });
 
     use_effect_with((), move |_| {
         move || {
+            log::info!("destroy cleanup");
             cleanup.emit(());
         }
     });
