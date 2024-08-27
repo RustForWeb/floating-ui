@@ -127,11 +127,13 @@ fn observe_move(element: Element, on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
             }
         });
 
+        let options = IntersectionObserverInit::new();
+        options.set_root_margin(&root_margin);
+        options.set_threshold(&JsValue::from_f64(threshold.clamp(0.0, 1.0)));
+
         let local_io = IntersectionObserver::new_with_options(
             local_observe_closure.as_ref().unchecked_ref(),
-            IntersectionObserverInit::new()
-                .root_margin(&root_margin)
-                .threshold(&JsValue::from_f64(threshold.clamp(0.0, 1.0))),
+            &options,
         )
         .expect("Intersection observer should be created.");
 
@@ -261,11 +263,14 @@ pub fn auto_update(
         };
 
         if ancestor_scoll {
+            let options = AddEventListenerOptions::new();
+            options.set_passive(true);
+
             event_target
                 .add_event_listener_with_callback_and_add_event_listener_options(
                     "scroll",
                     update_closure.as_ref().unchecked_ref(),
-                    AddEventListenerOptions::new().passive(true),
+                    &options,
                 )
                 .expect("Scroll event listener should be added.");
         }

@@ -1,6 +1,6 @@
 [package]
-name = "floating-ui-yew-test-visual"
-description = "Visual tests for Floating UI Yew."
+name = "floating-ui-book"
+description = "Book examples for Floating UI."
 publish = false
 
 authors.workspace = true
@@ -13,9 +13,11 @@ version.workspace = true
 console_error_panic_hook.workspace = true
 console_log.workspace = true
 convert_case = "0.6.0"
-floating-ui-yew = { path = "../.." }
+floating-ui-leptos = { path = "../packages/leptos" }
+leptos = { workspace = true, features = ["csr"] }
 log.workspace = true
-wasm-bindgen.workspace = true
-web-sys.workspace = true
-yew = { workspace = true, features = ["csr"] }
-yew-router.workspace = true
+tailwind_fuse = "0.3.1"
+
+[features]
+default = ["placement"]
+placement = []

@@ -13,7 +13,7 @@ version.workspace = true
 floating-ui-dom = { path = "../dom", version = "0.0.9" }
 # TODO: remove
 log = "0.4.22"
-yew = { version = "0.21.0" }
+yew.workspace = true
 web-sys.workspace = true
 
 [dev-dependencies]

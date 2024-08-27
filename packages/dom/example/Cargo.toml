@@ -13,9 +13,9 @@ version.workspace = true
 crate-type = ["cdylib"]
 
 [dependencies]
-console_error_panic_hook = "0.1.7"
-console_log = "1.0.0"
-log = "0.4.21"
+console_error_panic_hook.workspace = true
+console_log.workspace = true
 floating-ui-dom = { path = ".." }
+log.workspace = true
 wasm-bindgen.workspace = true
 web-sys.workspace = true

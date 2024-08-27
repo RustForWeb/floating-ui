@@ -13,7 +13,7 @@ version.workspace = true
 dyn_derive = "0.3.4"
 dyn_std = "0.3.3"
 floating-ui-dom = { path = "../dom", version = "0.0.9" }
-leptos = { version = "0.6.13" }
+leptos.workspace = true
 paste = "1.0.0"
 web-sys.workspace = true
 

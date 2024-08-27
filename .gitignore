@@ -161,3 +161,6 @@ target/
 
 # mdBook
 book/book/
+
+# Tailwind CSS ouput
+tailwind.output.css
