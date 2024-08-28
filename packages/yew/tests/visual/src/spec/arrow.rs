@@ -88,10 +88,14 @@ pub fn Arrow() -> Html {
             .map(|arrow_data| arrow_data.center_offset)
     });
 
-    let UseScrollReturn { scroll_ref, .. } = use_scroll(UseScrollOptions {
+    let UseScrollReturn {
+        scroll_ref,
+        update_scroll,
+        ..
+    } = use_scroll(UseScrollOptions {
         reference_ref: reference_ref.clone(),
         floating_ref: floating_ref.clone(),
-        update,
+        update: update.clone(),
         rtl: None,
     });
 
@@ -244,8 +248,14 @@ pub fn Arrow() -> Html {
                                 }}
                                 onclick={Callback::from({
                                     let padding = padding.clone();
+                                    let update_scroll = update_scroll.clone();
 
-                                    move |_| padding.set(value)
+                                    move |_| {
+                                        padding.set(value);
+
+                                        // Match React test behaviour
+                                        update_scroll.emit(());
+                                    }
                                 })}
                             >
                                 {format!("{}", value)}
@@ -269,8 +279,14 @@ pub fn Arrow() -> Html {
                                 }}
                                 onclick={Callback::from({
                                     let add_offset = add_offset.clone();
+                                    let update_scroll = update_scroll.clone();
 
-                                    move |_| add_offset.set(value)
+                                    move |_| {
+                                        add_offset.set(value);
+
+                                        // Match React test behaviour
+                                        update_scroll.emit(());
+                                    }
                                 })}
                             >
                                 {format!("{}", value)}
@@ -294,8 +310,14 @@ pub fn Arrow() -> Html {
                                 }}
                                 onclick={Callback::from({
                                     let placement = placement.clone();
+                                    let update_scroll = update_scroll.clone();
 
-                                    move |_| placement.set(value)
+                                    move |_| {
+                                        placement.set(value);
+
+                                        // Match React test behaviour
+                                        update_scroll.emit(());
+                                    }
                                 })}
                             >
                                 {format!("{:?}", value).to_case(Case::Kebab)}
@@ -319,8 +341,12 @@ pub fn Arrow() -> Html {
                                 }}
                                 onclick={Callback::from({
                                     let svg = svg.clone();
+                                    let update = update.clone();
 
-                                    move |_| svg.set(value)
+                                    move |_| {
+                                        svg.set(value);
+                                        update.emit(());
+                                    }
                                 })}
                             >
                                 {format!("{}", value)}
@@ -344,8 +370,12 @@ pub fn Arrow() -> Html {
                                 }}
                                 onclick={Callback::from({
                                     let nested = nested.clone();
+                                    let update = update.clone();
 
-                                    move |_| nested.set(value)
+                                    move |_| {
+                                        nested.set(value);
+                                        update.emit(());
+                                    }
                                 })}
                             >
                                 {format!("{}", value)}
@@ -373,6 +403,7 @@ pub fn Arrow() -> Html {
                                     let floating_size = floating_size.clone();
                                     let placement = placement.clone();
                                     let padding = padding.clone();
+                                    let update_scroll = update_scroll.clone();
 
                                     move |_| {
                                         center_offset.set(value);
@@ -387,6 +418,9 @@ pub fn Arrow() -> Html {
                                             placement.set(Placement::Bottom);
                                             padding.set(0);
                                         }
+
+                                        // Match React test behaviour
+                                        update_scroll.emit(());
                                     }
                                 })}
                             >

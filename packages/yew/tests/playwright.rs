@@ -32,7 +32,7 @@ pub fn playwright() {
     let repository_dom_path = repository_path.join("packages/dom");
     let repository_package_json_path = repository_dom_path.join("package.json");
     let repository_playwright_config_path = repository_dom_path.join("playwright.config.ts");
-    // let repository_arrow_test_path = repository_dom_path.join("test/functional/arrow.test.ts");
+    let repository_arrow_test_path = repository_dom_path.join("test/functional/arrow.test.ts");
 
     let visual_test_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/visual");
 
@@ -135,15 +135,15 @@ pub fn playwright() {
     fs::write(repository_playwright_config_path, config_content)
         .expect("Writing Playwright config file failed.");
 
-    // let arrow_test_content = fs::read_to_string(repository_arrow_test_path.clone())
-    //     .expect("Reading arrow test file failed.")
-    //     .replace(
-    //         // Match React test behaviour
-    //         "await click(page, `[data-testid=\"arrow-padding-${arrowPadding}\"]`);",
-    //         "if (arrowPadding !== 0) { await click(page, `[data-testid=\"arrow-padding-${arrowPadding}\"]`); }",
-    //     );
-    // fs::write(repository_arrow_test_path, arrow_test_content)
-    //     .expect("Writing arrow test file failed.");
+    let arrow_test_content = fs::read_to_string(repository_arrow_test_path.clone())
+        .expect("Reading arrow test file failed.")
+        .replace(
+            // Match React test behaviour
+            "await click(page, `[data-testid=\"arrow-padding-${arrowPadding}\"]`);",
+            "if (arrowPadding !== 0) { await click(page, `[data-testid=\"arrow-padding-${arrowPadding}\"]`); }",
+        );
+    fs::write(repository_arrow_test_path, arrow_test_content)
+        .expect("Writing arrow test file failed.");
 
     let status = Command::new("pnpm")
         .arg("run")

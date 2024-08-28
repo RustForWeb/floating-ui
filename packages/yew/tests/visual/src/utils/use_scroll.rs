@@ -21,6 +21,7 @@ pub struct UseScrollReturn {
     // TODO: remove
     #[allow(unused)]
     pub indicator: Rc<dyn Fn() -> Html>,
+    pub update_scroll: Callback<(), Vec<OverflowAncestor>>,
 }
 
 #[hook]
@@ -89,19 +90,17 @@ pub fn use_scroll(options: UseScrollOptions) -> UseScrollReturn {
         }
     }));
 
-    use_effect_with(
+    let update_scroll = use_callback(
         (
             reference_ref.clone(),
             floating_ref.clone(),
             scroll_ref.clone(),
-            rtl,
-            update.clone(),
-            indicator_update.clone(),
         ),
         {
             let update = update.clone();
+            let local_update = local_update.clone();
 
-            move |(reference_ref, floating_ref, scroll_ref, rtl, _, _)| {
+            move |_, (reference_ref, floating_ref, scroll_ref)| {
                 let mut parents = vec![];
 
                 if let Some(reference) = reference_ref.get() {
@@ -135,7 +134,7 @@ pub fn use_scroll(options: UseScrollOptions) -> UseScrollReturn {
                         let y =
                             scroll_element.scroll_height() / 2 - scroll_element.offset_height() / 2;
                         scroll_element.set_scroll_top(y);
-                        scroll_element.set_scroll_left(match *rtl {
+                        scroll_element.set_scroll_left(match rtl {
                             Some(true) => -x,
                             _ => x,
                         });
@@ -143,6 +142,25 @@ pub fn use_scroll(options: UseScrollOptions) -> UseScrollReturn {
 
                     update.emit(());
                 }
+
+                parents
+            }
+        },
+    );
+
+    use_effect_with(
+        (
+            reference_ref.clone(),
+            floating_ref.clone(),
+            scroll_ref.clone(),
+            rtl,
+        ),
+        {
+            let local_update = local_update.clone();
+            let update_scroll = update_scroll.clone();
+
+            move |_| {
+                let parents = update_scroll.emit(());
 
                 move || {
                     for parent in parents {
@@ -188,5 +206,6 @@ pub fn use_scroll(options: UseScrollOptions) -> UseScrollReturn {
     UseScrollReturn {
         scroll_ref,
         indicator,
+        update_scroll,
     }
 }
