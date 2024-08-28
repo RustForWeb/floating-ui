@@ -148,8 +148,6 @@ pub fn use_floating(
             middleware_data,
             is_positioned,
         )| {
-            log::info!("update");
-
             if let Some(reference_element) = reference.get() {
                 if let Some(floating_element) = floating.get() {
                     let config = ComputePositionConfig {
@@ -181,64 +179,57 @@ pub fn use_floating(
     > = use_mut_ref(|| None);
 
     let cleanup = use_callback(
-        (while_elements_mounted_cleanup.clone()),
+        while_elements_mounted_cleanup.clone(),
         |_, (while_elements_mounted_cleanup)| {
-            log::info!("cleanup");
-
             if let Some(while_elements_mounted_cleanup) = while_elements_mounted_cleanup.take() {
                 while_elements_mounted_cleanup();
             }
         },
     );
 
-    use_effect_with(while_elements_mounted_option.clone(), |_| {
-        log::info!("while_elements_mounted_option changed");
-    });
-
     let attach = use_callback(
         (
             reference.clone(),
             floating.clone(),
             while_elements_mounted_option,
-            update.clone(),
-            cleanup.clone(),
             while_elements_mounted_cleanup,
         ),
-        |_: (),
-         (
-            reference,
-            floating,
-            while_elements_mounted_option,
-            update,
-            cleanup,
-            while_elements_mounted_cleanup,
-        )| {
-            log::info!("attach");
+        {
+            let update = update.clone();
+            let cleanup = cleanup.clone();
 
-            cleanup.emit(());
+            move |_: (),
+                  (
+                reference,
+                floating,
+                while_elements_mounted_option,
+                while_elements_mounted_cleanup,
+            )| {
+                cleanup.emit(());
 
-            if let Some(while_elements_mounted) = while_elements_mounted_option {
-                if let Some(reference_element) = reference.get() {
-                    if let Some(floating_element) = floating.get() {
-                        while_elements_mounted_cleanup.replace(Some(ShallowRc::from(
-                            (**while_elements_mounted)(
-                                (&reference_element).into(),
-                                floating_element
-                                    .dyn_ref()
-                                    .expect("Floating element should be an Element."),
-                                Rc::new({
-                                    let update = update.clone();
+                if let Some(while_elements_mounted) = while_elements_mounted_option {
+                    if let Some(reference_element) = reference.get() {
+                        if let Some(floating_element) = floating.get() {
+                            while_elements_mounted_cleanup.replace(Some(ShallowRc::from(
+                                (**while_elements_mounted)(
+                                    (&reference_element).into(),
+                                    floating_element
+                                        .dyn_ref()
+                                        .expect("Floating element should be an Element."),
+                                    Rc::new({
+                                        let update = update.clone();
 
-                                    move || {
-                                        // update.emit(());
-                                    }
-                                }),
-                            ),
-                        )));
+                                        move || {
+                                            update.emit(());
+                                        }
+                                    }),
+                                ),
+                            )));
+                        }
                     }
+                } else {
+                    update.emit(());
                 }
-            } else {
-                update.emit(());
             }
         },
     );
@@ -246,8 +237,6 @@ pub fn use_floating(
     let reset = use_callback(
         (open_option.clone(), is_positioned.clone()),
         |_, (open_option, is_positioned)| {
-            log::info!("reset");
-
             if **open_option {
                 is_positioned.set(false);
             }
@@ -262,36 +251,20 @@ pub fn use_floating(
             update.clone(),
         ),
         |(_, _, _, update)| {
-            log::info!("update effect");
             update.emit(());
         },
     );
 
-    use_effect_with(reference.clone(), |_| {
-        log::info!("reference changed");
-    });
-
-    use_effect_with(floating.clone(), |_| {
-        log::info!("floating changed");
-    });
-
-    use_effect_with(attach.clone(), |_| {
-        log::info!("attach changed");
-    });
-
     use_effect_with((reference, floating, attach), |(_, _, attach)| {
-        log::info!("attach effect");
         attach.emit(());
     });
 
     use_effect_with((open_option, reset), |(_, reset)| {
-        log::info!("reset effect");
         reset.emit(());
     });
 
     use_effect_with((), move |_| {
         move || {
-            log::info!("destroy cleanup");
             cleanup.emit(());
         }
     });

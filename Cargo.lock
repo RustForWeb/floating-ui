@@ -596,7 +596,6 @@ name = "floating-ui-yew"
 version = "0.0.9"
 dependencies = [
  "floating-ui-dom",
- "log",
  "wasm-bindgen-test",
  "web-sys",
  "yew",

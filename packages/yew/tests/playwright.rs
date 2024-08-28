@@ -1,6 +1,6 @@
 use std::{env, fs, path::Path, process::Command};
 
-const IMPLEMENTED_TESTS: [&str; 0] = [
+const IMPLEMENTED_TESTS: [&str; 1] = [
     // "arrow",
     // "autoPlacement",
     // "autoUpdate",
@@ -12,7 +12,7 @@ const IMPLEMENTED_TESTS: [&str; 0] = [
     // "iframe",
     // "inline",
     // "offset",
-    // "placement",
+    "placement",
     // "relative",
     // "scroll",
     // "scrollbars",

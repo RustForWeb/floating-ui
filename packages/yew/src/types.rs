@@ -87,52 +87,6 @@ impl UseFloatingOptions {
         self.while_elements_mounted = Some(value);
         self
     }
-
-    // TODO: the while_elements_mounted RC is always recreated, so never equal in PartialEq
-
-    /// Set `while_elements_mounted` option to [`auto_update`] with [`AutoUpdateOptions::default`].
-    pub fn while_elements_mounted_auto_update(self) -> Self {
-        let auto_update_rc: Rc<WhileElementsMountedFn> = Rc::new(|reference, floating, update| {
-            auto_update(reference, floating, update, AutoUpdateOptions::default()).into()
-        });
-
-        self.while_elements_mounted(auto_update_rc)
-    }
-
-    /// Set `while_elements_mounted` option to [`auto_update`] with [`AutoUpdateOptions::default`] when `enabled` is `true`.
-    pub fn while_elements_mounted_auto_update_with_enabled(self, enabled: bool) -> Self {
-        if enabled {
-            self.while_elements_mounted_auto_update()
-        } else {
-            self
-        }
-    }
-
-    /// Set `while_elements_mounted` option to [`auto_update`] with `options`.
-    pub fn while_elements_mounted_auto_update_with_options(
-        self,
-        options: AutoUpdateOptions,
-    ) -> Self {
-        let auto_update_rc: Rc<WhileElementsMountedFn> =
-            Rc::new(move |reference, floating, update| {
-                auto_update(reference, floating, update, options.clone()).into()
-            });
-
-        self.while_elements_mounted(auto_update_rc)
-    }
-
-    /// Set `while_elements_mounted` option to [`auto_update`] with `options` when `enabled` is `true`.
-    pub fn while_elements_mounted_auto_update_with_enabled_and_options(
-        self,
-        enabled: bool,
-        options: AutoUpdateOptions,
-    ) -> Self {
-        if enabled {
-            self.while_elements_mounted_auto_update_with_options(options)
-        } else {
-            self
-        }
-    }
 }
 
 /// CSS styles to apply to the floating element to position it.

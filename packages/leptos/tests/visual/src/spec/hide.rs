@@ -334,7 +334,6 @@ pub fn Hide() -> impl IntoView {
                                 false => ""
                             }
                             on:click=move |_| {
-                                log::info!("set hierarchy {:?}", local_hierarchy);
                                 set_hierarchy(local_hierarchy);
 
                                 // Match React test behaviour

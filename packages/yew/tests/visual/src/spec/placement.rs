@@ -1,6 +1,9 @@
+use std::rc::Rc;
+
 use convert_case::{Case, Casing};
 use floating_ui_yew::{
-    use_floating, Placement as PlacementEnum, UseFloatingOptions, UseFloatingReturn,
+    auto_update, use_floating, AutoUpdateOptions, Placement as PlacementEnum, UseFloatingOptions,
+    UseFloatingReturn, WhileElementsMountedFn,
 };
 use wasm_bindgen::JsCast;
 use yew::prelude::*;
@@ -15,16 +18,23 @@ pub fn Placement() -> Html {
     let rtl = use_state_eq(|| false);
     let placement = use_state_eq(|| PlacementEnum::Bottom);
 
+    let auto_update = use_memo((), |_| {
+        let rc: Rc<WhileElementsMountedFn> = Rc::new(|reference, floating, update| {
+            auto_update(reference, floating, update, AutoUpdateOptions::default()).into()
+        });
+        rc
+    });
+
     let UseFloatingReturn {
         floating_styles,
-        // update,
+        update,
         ..
     } = use_floating(
         reference_ref.clone().into(),
         floating_ref.clone(),
         UseFloatingOptions::default()
             .placement(*placement)
-            .while_elements_mounted_auto_update(),
+            .while_elements_mounted((*auto_update).clone()),
     );
 
     let size = use_size(None, None);
@@ -35,7 +45,10 @@ pub fn Placement() -> Html {
             <p>
                 {"The floating element should be correctly positioned when given each of the 12 placements."}
             </p>
-            <div class="container">
+            <div class="container" style={format!("direction: {}", match *rtl {
+                true => "rtl",
+                false => "ltr"
+            })}>
                 <div ref={reference_ref} class="reference">
                     {"Reference"}
                 </div>
@@ -108,10 +121,11 @@ pub fn Placement() -> Html {
                                 }}
                                 onclick={Callback::from({
                                     let rtl = rtl.clone();
+                                    let update = update.clone();
 
                                     move |_| {
                                         rtl.set(value);
-                                        // update();
+                                        update.emit(());
                                     }
                                 })}
                             >

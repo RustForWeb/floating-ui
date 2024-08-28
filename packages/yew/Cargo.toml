@@ -11,8 +11,6 @@ version.workspace = true
 
 [dependencies]
 floating-ui-dom = { path = "../dom", version = "0.0.9" }
-# TODO: remove
-log = "0.4.22"
 yew.workspace = true
 web-sys.workspace = true
 
