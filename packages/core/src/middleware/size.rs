@@ -80,6 +80,8 @@ impl<'a, Element: Clone + PartialEq, Window: Clone + PartialEq> PartialEq
     }
 }
 
+/// Size middleware.
+///
 /// Provides data that allows you to change the size of the floating element -
 /// for instance, prevent it from overflowing the clipping boundary or match the width of the reference element.
 ///

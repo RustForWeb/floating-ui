@@ -90,6 +90,8 @@ pub struct ShiftData {
     pub y: f64,
 }
 
+/// Shift middleware.
+///
 /// Optimizes the visibility of the floating element by shifting it in order to keep it in view when it will overflow the clipping boundary.
 ///
 /// See <https://floating-ui.com/docs/shift> for the original documentation.

@@ -114,6 +114,8 @@ impl InlineOptions {
     }
 }
 
+/// Inline middleware.
+///
 /// Provides improved positioning for inline reference elements that can span over multiple lines, such as hyperlinks or range selections.
 ///
 /// See <https://floating-ui.com/docs/inline> for the original documentation.

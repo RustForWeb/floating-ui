@@ -79,6 +79,8 @@ pub struct HideData {
     pub escaped_offsets: Option<SideObject>,
 }
 
+/// Hide middleware.
+///
 /// Provides data to hide the floating element in applicable situations,
 /// such as when it is not in the same clipping context as the reference element.
 ///

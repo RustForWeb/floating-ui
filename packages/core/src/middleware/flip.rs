@@ -135,6 +135,8 @@ pub struct FlipData {
     pub overflows: Vec<FlipDataOverflow>,
 }
 
+/// Flip middleware.
+///
 /// Optimizes the visibility of the floating element by flipping the `placement` in order to keep it in view when the preferred placement(s) will overflow the clipping boundary.
 /// Alternative to [`AutoPlacement`][`crate::middleware::AutoPlacement`].
 ///

@@ -54,6 +54,8 @@ pub struct ArrowData {
     pub alignment_offset: Option<f64>,
 }
 
+/// Arrow middleware.
+///
 /// Provides data to position an inner element of the floating element so that it appears centered to the reference element.
 ///
 /// See <https://floating-ui.com/docs/arrow> for the original documentation.

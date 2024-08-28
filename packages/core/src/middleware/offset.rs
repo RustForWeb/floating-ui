@@ -132,6 +132,8 @@ pub struct OffsetData {
     pub placement: Placement,
 }
 
+/// Offset middleware.
+///
 /// Modifies the placement by translating the floating element along the specified axes.
 ///
 /// See <https://floating-ui.com/docs/offset> for the original documentation.

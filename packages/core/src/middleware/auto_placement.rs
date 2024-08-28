@@ -150,6 +150,8 @@ pub struct AutoPlacementData {
     pub overflows: Vec<AutoPlacementDataOverflow>,
 }
 
+/// Auto placement middleware.
+///
 /// Optimizes the visibility of the floating element by choosing the placement that has the most space available automatically, without needing to specify a preferred placement.
 /// Alternative to [`Flip`][`crate::middleware::Flip`].
 ///

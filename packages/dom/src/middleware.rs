@@ -13,44 +13,62 @@ pub use floating_ui_core::middleware::{
     INLINE_NAME, OFFSET_NAME, SHIFT_NAME, SIZE_NAME,
 };
 
+/// Arrow middleware.
+///
 /// Provides data to position an inner element of the floating element so that it appears centered to the reference element.
 ///
 /// See <https://floating-ui.com/docs/arrow> for the original documentation.
 pub type Arrow<'a> = CoreArrow<'a, Element, Window>;
 
-/// Optimizes the visibility of the floating element by choosing the placement that has the most space available automatically, without needing to specify a preferred placement.
+/// Auto placement middleware.
+///
+/// Optimizes the visibility of the floating element by choosing the placement that has the most space available automatically,
+/// without needing to specify a preferred placement.
+///
 /// Alternative to [`Flip`].
 ///
 /// See <https://floating-ui.com/docs/autoPlacement> for the original documentation.
 pub type AutoPlacement<'a> = CoreAutoPlacement<'a, Element, Window>;
 
+/// Flip middleware.
+///
 /// Optimizes the visibility of the floating element by flipping the `placement` in order to keep it in view when the preferred placement(s) will overflow the clipping boundary.
 /// Alternative to [`AutoPlacement`].
 ///
 /// See <https://floating-ui.com/docs/flip> for the original documentation.
 pub type Flip<'a> = CoreFlip<'a, Element, Window>;
 
+/// Hide middleware.
+///
 /// Provides data to hide the floating element in applicable situations,
 /// such as when it is not in the same clipping context as the reference element.
 ///
 /// See <https://floating-ui.com/docs/hide> for the original documentation.
 pub type Hide<'a> = CoreHide<'a, Element, Window>;
 
+/// Inline middleware.
+///
 /// Provides improved positioning for inline reference elements that can span over multiple lines, such as hyperlinks or range selections.
 ///
 /// See <https://floating-ui.com/docs/inline> for the original documentation.
 pub type Inline<'a> = CoreInline<'a, Element, Window>;
 
+/// Offset middleware.
+///
 /// Modifies the placement by translating the floating element along the specified axes.
 ///
 /// See <https://floating-ui.com/docs/offset> for the original documentation.
 pub type Offset<'a> = CoreOffset<'a, Element, Window>;
 
+/// Shift middleware.
+///
 /// Optimizes the visibility of the floating element by shifting it in order to keep it in view when it will overflow the clipping boundary.
 ///
 /// See <https://floating-ui.com/docs/shift> for the original documentation.
 pub type Shift<'a> = CoreShift<'a, Element, Window>;
 
+/// Size middleware.
+///
 /// Provides data that allows you to change the size of the floating element -
 /// for instance, prevent it from overflowing the clipping boundary or match the width of the reference element.
 ///
