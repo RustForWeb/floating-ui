@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{fmt::Display, rc::Rc};
 
 use floating_ui_dom::{
     auto_update, AutoUpdateOptions, ElementOrVirtual, Middleware, MiddlewareData, Placement,
@@ -184,31 +184,33 @@ impl FloatingStyles {
     }
 }
 
-impl From<FloatingStyles> for String {
-    fn from(value: FloatingStyles) -> Self {
-        format!(
+impl Display for FloatingStyles {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
             "position: {}; top: {}; left: {};{}{}",
-            match value.position {
+            match self.position {
                 Strategy::Absolute => "absolute",
                 Strategy::Fixed => "fixed",
             },
-            value.top,
-            value.left,
-            value
-                .transform
+            self.top,
+            self.left,
+            self.transform
+                .as_ref()
                 .map_or("".into(), |transform| format!(" transform: {};", transform),),
-            value.will_change.map_or("".into(), |will_change| format!(
-                " will-change: {};",
-                will_change
-            ))
+            self.will_change
+                .as_ref()
+                .map_or("".into(), |will_change| format!(
+                    " will-change: {};",
+                    will_change
+                ))
         )
     }
 }
 
 impl IntoAttribute for FloatingStyles {
     fn into_attribute(self) -> Attribute {
-        let s: String = self.into();
-        Attribute::String(s.into())
+        Attribute::String(self.to_string().into())
     }
 
     fn into_attribute_boxed(self: Box<Self>) -> Attribute {

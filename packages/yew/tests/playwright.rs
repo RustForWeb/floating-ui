@@ -1,7 +1,7 @@
 use std::{env, fs, path::Path, process::Command};
 
-const IMPLEMENTED_TESTS: [&str; 1] = [
-    // "arrow",
+const IMPLEMENTED_TESTS: [&str; 3] = [
+    "arrow",
     // "autoPlacement",
     // "autoUpdate",
     // "border",
@@ -13,7 +13,7 @@ const IMPLEMENTED_TESTS: [&str; 1] = [
     // "inline",
     // "offset",
     "placement",
-    // "relative",
+    "relative",
     // "scroll",
     // "scrollbars",
     // "shadow-dom",

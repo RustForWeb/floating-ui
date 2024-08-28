@@ -6,11 +6,13 @@
 
 mod arrow;
 mod types;
+mod use_auto_update;
 mod use_floating;
 mod utils;
 
-// pub use arrow::*;
+pub use arrow::*;
 pub use types::*;
+pub use use_auto_update::*;
 pub use use_floating::*;
 
 #[doc(no_inline)]

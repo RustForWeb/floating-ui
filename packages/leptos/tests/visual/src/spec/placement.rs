@@ -40,7 +40,7 @@ pub fn Placement() -> impl IntoView {
             <div _ref=reference_ref class="reference">
                 Reference
             </div>
-            <div _ref=floating_ref class="floating" style=move || format!("{} width: {}px; height: {}px;", String::from(floating_styles()), size(), size())>
+            <div _ref=floating_ref class="floating" style=move || format!("{} width: {}px; height: {}px;", floating_styles(), size(), size())>
                 Floating
             </div>
         </div>

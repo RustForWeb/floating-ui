@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-// use crate::spec::arrow::Arrow;
+use crate::spec::arrow::Arrow;
 // use crate::spec::auto_placement::AutoPlacement;
 // use crate::spec::auto_update::AutoUpdate;
 // use crate::spec::border::Border;
@@ -84,6 +84,7 @@ fn switch(routes: Route) -> Html {
 
         Route::Placement => html! { <Placement /> },
         Route::Relative => html! { <Relative /> },
+        Route::Arrow => html! { <Arrow /> },
 
         _ => html! { <h1>{"Not Found"}</h1> },
     }
@@ -93,6 +94,8 @@ fn switch(routes: Route) -> Html {
 pub struct AppWrapperProps {
     pub children: Html,
 }
+
+// TODO: active classes for links
 
 #[function_component]
 pub fn AppWrapper(props: &AppWrapperProps) -> Html {

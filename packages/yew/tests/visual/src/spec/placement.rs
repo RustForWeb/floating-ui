@@ -1,9 +1,7 @@
-use std::rc::Rc;
-
 use convert_case::{Case, Casing};
 use floating_ui_yew::{
-    auto_update, use_floating, AutoUpdateOptions, Placement as PlacementEnum, UseFloatingOptions,
-    UseFloatingReturn, WhileElementsMountedFn,
+    use_auto_update, use_floating, Placement as PlacementEnum, UseFloatingOptions,
+    UseFloatingReturn,
 };
 use wasm_bindgen::JsCast;
 use yew::prelude::*;
@@ -18,12 +16,7 @@ pub fn Placement() -> Html {
     let rtl = use_state_eq(|| false);
     let placement = use_state_eq(|| PlacementEnum::Bottom);
 
-    let auto_update = use_memo((), |_| {
-        let rc: Rc<WhileElementsMountedFn> = Rc::new(|reference, floating, update| {
-            auto_update(reference, floating, update, AutoUpdateOptions::default()).into()
-        });
-        rc
-    });
+    let auto_update = use_auto_update();
 
     let UseFloatingReturn {
         floating_styles,
@@ -55,7 +48,7 @@ pub fn Placement() -> Html {
                 <div
                     ref={floating_ref}
                     class="floating"
-                    style={format!("{} width: {}px; height: {}px;", String::from((*floating_styles).clone()), *size, *size)}
+                    style={format!("{} width: {}px; height: {}px;", floating_styles, *size, *size)}
                 >
                     {"Floating"}
                 </div>

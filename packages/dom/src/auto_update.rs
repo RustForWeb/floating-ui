@@ -154,7 +154,7 @@ fn observe_move(element: Element, on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
 }
 
 /// Options for [`auto_update`].
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct AutoUpdateOptions {
     /// Whether to update the position when an overflow ancestor is scrolled.
     ///

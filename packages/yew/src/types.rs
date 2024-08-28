@@ -1,4 +1,4 @@
-use std::{ops::Deref, rc::Rc};
+use std::{fmt::Display, ops::Deref, rc::Rc};
 
 use floating_ui_dom::{ElementOrVirtual, Middleware, MiddlewareData, Placement, Strategy};
 use web_sys::{Element, Window};
@@ -116,23 +116,26 @@ impl FloatingStyles {
     }
 }
 
-impl From<FloatingStyles> for String {
-    fn from(value: FloatingStyles) -> Self {
-        format!(
+impl Display for FloatingStyles {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
             "position: {}; top: {}; left: {};{}{}",
-            match value.position {
+            match self.position {
                 Strategy::Absolute => "absolute",
                 Strategy::Fixed => "fixed",
             },
-            value.top,
-            value.left,
-            value
-                .transform
+            self.top,
+            self.left,
+            self.transform
+                .as_ref()
                 .map_or("".into(), |transform| format!(" transform: {};", transform),),
-            value.will_change.map_or("".into(), |will_change| format!(
-                " will-change: {};",
-                will_change
-            ))
+            self.will_change
+                .as_ref()
+                .map_or("".into(), |will_change| format!(
+                    " will-change: {};",
+                    will_change
+                ))
         )
     }
 }

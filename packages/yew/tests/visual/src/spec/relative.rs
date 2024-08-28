@@ -73,7 +73,9 @@ pub fn Relative() -> Html {
             <h1>{"Relative"}</h1>
             <p>
                 {"The floating element should be positioned correctly on the bottom when a
-                certain parent node has <code>position: relative</code> applied."}
+                certain parent node has "}
+                <code>{"position: relative"}</code>
+                {" applied."}
             </p>
             <div
                 class="container"

@@ -337,7 +337,7 @@ pub fn get_nearest_overflow_ancestor(node: &Node) -> HtmlElement {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum OverflowAncestor {
     Element(Element),
     Window(Window),
