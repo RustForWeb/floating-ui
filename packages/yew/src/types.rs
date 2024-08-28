@@ -1,14 +1,6 @@
-use std::{
-    cell::LazyCell,
-    ops::Deref,
-    rc::Rc,
-    sync::{Arc, LazyLock},
-};
+use std::{ops::Deref, rc::Rc};
 
-use floating_ui_dom::{
-    auto_update, AutoUpdateOptions, ElementOrVirtual, Middleware, MiddlewareData, Placement,
-    Strategy,
-};
+use floating_ui_dom::{ElementOrVirtual, Middleware, MiddlewareData, Placement, Strategy};
 use web_sys::{Element, Window};
 use yew::{Callback, UseStateHandle};
 

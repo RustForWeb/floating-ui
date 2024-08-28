@@ -5,9 +5,7 @@ use floating_ui_dom::{
     Strategy, VirtualElement,
 };
 use web_sys::wasm_bindgen::JsCast;
-use yew::{
-    hook, use_callback, use_effect_with, use_memo, use_mut_ref, use_state_eq, Callback, NodeRef,
-};
+use yew::{hook, use_callback, use_effect_with, use_memo, use_mut_ref, use_state_eq, NodeRef};
 
 use crate::{
     types::{
@@ -180,7 +178,7 @@ pub fn use_floating(
 
     let cleanup = use_callback(
         while_elements_mounted_cleanup.clone(),
-        |_, (while_elements_mounted_cleanup)| {
+        |_, while_elements_mounted_cleanup| {
             if let Some(while_elements_mounted_cleanup) = while_elements_mounted_cleanup.take() {
                 while_elements_mounted_cleanup();
             }

@@ -4,15 +4,12 @@
 //!
 //! See [the Rust Floating UI book](https://floating-ui.rustforweb.org/frameworks/yew.html) for more documenation.
 
-// TODO: remove
-#![allow(dead_code, unused)]
-
 mod arrow;
 mod types;
 mod use_floating;
 mod utils;
 
-pub use arrow::*;
+// pub use arrow::*;
 pub use types::*;
 pub use use_floating::*;
 

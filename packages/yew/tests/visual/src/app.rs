@@ -12,7 +12,7 @@ use yew_router::prelude::*;
 // use crate::spec::inline::Inline;
 // use crate::spec::offset::Offset;
 use crate::spec::placement::Placement;
-// use crate::spec::relative::Relative;
+use crate::spec::relative::Relative;
 // use crate::spec::scroll::Scroll;
 // use crate::spec::scrollbars::Scrollbars;
 // use crate::spec::shift::Shift;
@@ -83,6 +83,7 @@ fn switch(routes: Route) -> Html {
         Route::New => html! { <New /> },
 
         Route::Placement => html! { <Placement /> },
+        Route::Relative => html! { <Relative /> },
 
         _ => html! { <h1>{"Not Found"}</h1> },
     }
