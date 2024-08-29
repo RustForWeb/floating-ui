@@ -141,6 +141,11 @@ pub fn playwright() {
             // Match React test behaviour
             "await click(page, `[data-testid=\"arrow-padding-${arrowPadding}\"]`);",
             "if (arrowPadding !== 0) { await click(page, `[data-testid=\"arrow-padding-${arrowPadding}\"]`); }",
+        )
+        .replace(
+            // Match React test behaviour
+            "await click(page, `[data-testid=\"centerOffset-true\"]`);",
+            "await click(page, `[data-testid=\"centerOffset-true\"]`);\n  await click(page, `[data-testid=\"centerOffset-true\"]`);",
         );
     fs::write(repository_arrow_test_path, arrow_test_content)
         .expect("Writing arrow test file failed.");
