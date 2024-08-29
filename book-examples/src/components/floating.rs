@@ -6,14 +6,16 @@ use leptos::{
     html::{AnyElement, Div},
     *,
 };
+use tailwind_fuse::tw_merge;
 
 #[component]
 pub fn Floating<CF, CIV, RF, RIV>(
-    content: CF,
+    #[prop(into, optional)] class: MaybeProp<String>,
     #[prop(into, optional)] strategy: MaybeProp<Strategy>,
     #[prop(into, optional)] placement: MaybeProp<Placement>,
     #[prop(into, optional)] middleware: MaybeProp<MiddlewareVec>,
     #[prop(default = false.into(), into)] arrow: MaybeSignal<bool>,
+    content: CF,
     reference: RF,
 ) -> impl IntoView
 where
@@ -43,7 +45,14 @@ where
 
         <div
             node_ref=floating_ref
-            class="z-10 grid place-items-center bg-rose-500 text-base font-semibold text-gray-50"
+            class=move || {
+                let class = class.get();
+
+                tw_merge!(
+                    "z-10 grid place-items-center bg-rose-500 text-base font-semibold text-gray-50",
+                    class
+                )
+            }
             // TODO: style
             style:position=move || floating_styles.get().style_position()
             style:top=move || floating_styles.get().style_top()

@@ -21,7 +21,6 @@ pub fn PlacementDemo() -> impl IntoView {
         <GridItem
             title="Placement"
             description="Places your floating element relative to another element."
-            demo_link="https://codesandbox.io/s/lively-waterfall-rbc1pi?file=/src/index.js"
             chrome=move || view! {
                 <Chrome
                     label="Click the dots"
@@ -139,6 +138,11 @@ pub fn PlacementDemo() -> impl IntoView {
                         }
                     />
                     <Floating
+                        placement=placement
+                        middleware={
+                            let middleware: MiddlewareVec = vec![Box::new(Offset::new(OffsetOptions::Value(5.0)))];
+                            middleware
+                        }
                         content=move || view! {
                             <div
                                 class="text-center text-sm font-bold"
@@ -152,11 +156,6 @@ pub fn PlacementDemo() -> impl IntoView {
                         }
                         reference=move |node_ref| view! {
                             <Reference node_ref=node_ref />
-                        }
-                        placement=placement
-                        middleware={
-                            let middleware: MiddlewareVec = vec![Box::new(Offset::new(OffsetOptions::Value(5.0)))];
-                            middleware
                         }
                     />
                 </Chrome>

@@ -20,17 +20,14 @@ The following frameworks are under consideration:
 -   [Dioxus](https://dioxuslabs.com/)
 -   [Yew](https://yew.rs/)
 
-<!--
 ## Smart Anchor Positioning
 
 Anchor a floating element next to another element while making sure it stays in view by **avoiding collisions**. This lets you position tooltips, popovers, or dropdowns optimally.
 
-TODO: fix infinite loop?
 ```toml,trunk
 package = "floating-ui-book"
-features = ["placement"]
+features = ["arrow", "flip", "placement", "shift", "size", "virtual"]
 ```
--->
 
 ## License
 

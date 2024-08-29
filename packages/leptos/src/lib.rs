@@ -25,7 +25,7 @@ pub use floating_ui_dom::{
     HideStrategy, Inline, InlineOptions, Length, LimitShift, LimitShiftOffset,
     LimitShiftOffsetValues, LimitShiftOptions, Middleware, MiddlewareData, MiddlewareReturn,
     MiddlewareState, MiddlewareVec, MiddlewareWithOptions, Offset, OffsetData, OffsetOptions,
-    OffsetOptionsValues, Padding, Placement, Rect, RootBoundary, Shift, ShiftData, ShiftOptions,
-    Side, Size, SizeOptions, Strategy, VirtualElement, ARROW_NAME, AUTO_PLACEMENT_NAME, FLIP_NAME,
-    HIDE_NAME, INLINE_NAME, OFFSET_NAME, SHIFT_NAME, SIZE_NAME,
+    OffsetOptionsValues, Padding, PartialSideObject, Placement, Rect, RootBoundary, Shift,
+    ShiftData, ShiftOptions, Side, Size, SizeOptions, Strategy, VirtualElement, ARROW_NAME,
+    AUTO_PLACEMENT_NAME, FLIP_NAME, HIDE_NAME, INLINE_NAME, OFFSET_NAME, SHIFT_NAME, SIZE_NAME,
 };

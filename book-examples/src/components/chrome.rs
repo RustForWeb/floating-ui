@@ -34,7 +34,7 @@ pub fn Chrome(
         Signal::derive(move || matches!(scrollable.get(), Scrollable::Y | Scrollable::Both));
     let is_scrollable = Signal::derive(move || scrollable_x.get() || scrollable_y.get());
 
-    Effect::new_isomorphic(move |_| {
+    Effect::new(move |_| {
         if let Some(scrollable) = scrollable_ref.get() {
             if scrollable_y.get() {
                 scrollable.set_scroll_top(
@@ -95,8 +95,8 @@ pub fn Chrome(
                         <div
                             class={scrollable_x.get().then_some("w-[180vw] md:w-[75rem] lg:w-[90rem]")}
                             style:height={match scrollable_y.get() {
-                                true => scroll_height.get(),
-                                false => 1
+                                true => format!("{}px", scroll_height.get()),
+                                false => "1px".into(),
                             }}
                         />
                     </Show>
@@ -107,8 +107,8 @@ pub fn Chrome(
                         <div
                             class={scrollable_x.get().then_some("w-[180vw] md:w-[75rem] lg:w-[90rem]")}
                             style:height={match scrollable_y.get() {
-                                true => scroll_height.get(),
-                                false => 1
+                                true => format!("{}px", scroll_height.get()),
+                                false => "1px".into(),
                             }}
                         />
                     </Show>

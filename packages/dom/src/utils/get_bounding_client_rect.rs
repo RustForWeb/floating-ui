@@ -94,6 +94,8 @@ pub fn get_bounding_client_rect(
                         y += top;
 
                         current_window = get_window(Some(current_iframe));
+                    } else {
+                        break;
                     }
                 } else {
                     break;
