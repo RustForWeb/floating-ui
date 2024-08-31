@@ -89,7 +89,7 @@ pub struct ConvertOffsetParentRelativeRectToViewportRelativeRectArgs<
 
 /// Platform interface methods to work with the current platform.
 ///
-/// See <https://floating-ui.com/docs/platform> for the original documentation.
+/// See [the Rust Floating UI book](https://floating-ui.rustforweb.org/platform.html) for more documentation.
 pub trait Platform<Element: Clone, Window: Clone>: Debug {
     fn get_element_rects(&self, args: GetElementRectsArgs<Element>) -> ElementRects;
 

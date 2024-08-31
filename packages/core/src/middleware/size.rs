@@ -85,7 +85,7 @@ impl<'a, Element: Clone + PartialEq, Window: Clone + PartialEq> PartialEq
 /// Provides data that allows you to change the size of the floating element -
 /// for instance, prevent it from overflowing the clipping boundary or match the width of the reference element.
 ///
-/// See <https://floating-ui.com/docs/size> for the original documentation.
+/// See [the Rust Floating UI book](https://floating-ui.rustforweb.org/middleware/size.html) for more documentation.
 #[derive(PartialEq)]
 pub struct Size<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, SizeOptions<'a, Element, Window>>,

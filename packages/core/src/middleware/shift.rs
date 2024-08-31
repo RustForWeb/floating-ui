@@ -94,7 +94,7 @@ pub struct ShiftData {
 ///
 /// Optimizes the visibility of the floating element by shifting it in order to keep it in view when it will overflow the clipping boundary.
 ///
-/// See <https://floating-ui.com/docs/shift> for the original documentation.
+/// See [the Rust Floating UI book](https://floating-ui.rustforweb.org/middleware/shift.html) for more documentation.
 #[derive(PartialEq)]
 pub struct Shift<'a, Element: Clone + 'static, Window: Clone + 'static> {
     options: Derivable<'a, Element, Window, ShiftOptions<Element, Window>>,

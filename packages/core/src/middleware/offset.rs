@@ -136,7 +136,7 @@ pub struct OffsetData {
 ///
 /// Modifies the placement by translating the floating element along the specified axes.
 ///
-/// See <https://floating-ui.com/docs/offset> for the original documentation.
+/// See [the Rust Floating UI book](https://floating-ui.rustforweb.org/middleware/offset.html) for more documentation.
 #[derive(PartialEq)]
 pub struct Offset<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, OffsetOptions>,

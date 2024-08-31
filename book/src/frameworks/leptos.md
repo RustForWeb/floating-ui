@@ -53,7 +53,7 @@ This will position the floating `Tooltip` element at the bottom center of the `B
 
 ### Disabling Transform
 
-By default, the floating element is positioned using `transform` in the `floating_styles` object. This is the most performant way to position elements, but can be disabled:
+By default, the floating element is positioned using `transform` in the `floating_styles` struct instance. This is the most performant way to position elements, but can be disabled:
 
 ```rust,ignore
 use_floating(reference_ref, floating_ref, UseFloatingOptions::default().transform(false.into()));

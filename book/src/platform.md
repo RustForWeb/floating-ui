@@ -46,7 +46,7 @@ The `Platform<Element, Window>` trait has two generic types that reflect the ele
 
 #### `get_element_rects`
 
-Takes in the elements and the positioning `strategy` and returns the element `Rect` objects.
+Takes in the elements and the positioning `strategy` and returns the element `Rect` struct instances.
 
 ```rust,ignore
 pub fn get_element_rects(

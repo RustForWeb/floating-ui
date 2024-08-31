@@ -220,7 +220,7 @@ cleanup();
 
 ## Options
 
-Passed as a third argument, this is the object to configure the behavior.
+Passed as a third argument, this is the struct instance to configure the behavior.
 
 ```rust,ignore
 compute_position(reference_el, floating_el, ComputePositionConfig::new());
@@ -356,7 +356,6 @@ fn wrapper(reference_el: Element, floating_el: Element, options: Options) -> Com
 `compute_position()` returns the following type:
 
 ```rust,ignore
-
 pub struct ComputePositionReturn {
     pub x: f64,
     pub y: f64,

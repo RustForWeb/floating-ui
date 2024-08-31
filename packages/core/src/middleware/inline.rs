@@ -118,7 +118,7 @@ impl InlineOptions {
 ///
 /// Provides improved positioning for inline reference elements that can span over multiple lines, such as hyperlinks or range selections.
 ///
-/// See <https://floating-ui.com/docs/inline> for the original documentation.
+/// See [the Rust Floating UI book](https://floating-ui.rustforweb.org/middleware/inline.html) for more documentation.
 #[derive(PartialEq)]
 pub struct Inline<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, InlineOptions>,

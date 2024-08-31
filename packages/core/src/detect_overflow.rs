@@ -86,7 +86,7 @@ impl<Element> Default for DetectOverflowOptions<Element> {
 /// - negative = how many pixels left before it will overflow
 /// - `0` = lies flush with the boundary
 ///
-/// See <https://floating-ui.com/docs/detectOverflow> for the original documentation.
+/// See [the Rust Floating UI book](https://floating-ui.rustforweb.org/detect-overflow.html) for more documentation.
 pub fn detect_overflow<Element: Clone + 'static, Window: Clone + 'static>(
     state: MiddlewareState<Element, Window>,
     options: DetectOverflowOptions<Element>,

@@ -155,7 +155,7 @@ pub struct AutoPlacementData {
 /// Optimizes the visibility of the floating element by choosing the placement that has the most space available automatically, without needing to specify a preferred placement.
 /// Alternative to [`Flip`][`crate::middleware::Flip`].
 ///
-/// See <https://floating-ui.com/docs/autoPlacement> for the original documentation.
+/// See [the Rust Floating UI book](https://floating-ui.rustforweb.org/middleware/auto-placement.html) for more documentation.
 #[derive(PartialEq)]
 pub struct AutoPlacement<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, AutoPlacementOptions<Element>>,

@@ -58,7 +58,7 @@ pub struct ArrowData {
 ///
 /// Provides data to position an inner element of the floating element so that it appears centered to the reference element.
 ///
-/// See <https://floating-ui.com/docs/arrow> for the original documentation.
+/// See [the Rust Floating UI book](https://floating-ui.rustforweb.org/middleware/arrow.html) for more documentation.
 #[derive(PartialEq)]
 pub struct Arrow<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, ArrowOptions<Element>>,

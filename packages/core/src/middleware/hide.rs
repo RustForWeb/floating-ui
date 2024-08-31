@@ -84,7 +84,7 @@ pub struct HideData {
 /// Provides data to hide the floating element in applicable situations,
 /// such as when it is not in the same clipping context as the reference element.
 ///
-/// See <https://floating-ui.com/docs/hide> for the original documentation.
+/// See [the Rust Floating UI book](https://floating-ui.rustforweb.org/middleware/hide.html) for more documentation.
 #[derive(PartialEq)]
 pub struct Hide<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, HideOptions<Element>>,

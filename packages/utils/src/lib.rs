@@ -366,7 +366,7 @@ pub struct ElementRects {
 
 /// Custom positioning reference element.
 ///
-/// See <https://floating-ui.com/docs/virtual-elements> for the original documentation.
+/// See [the Rust Floating UI book](https://floating-ui.rustforweb.org/virtual-elements.html) for more documentation.
 #[dyn_trait]
 pub trait VirtualElement<Element: 'static>: Clone + PartialEq {
     fn get_bounding_client_rect(&self) -> ClientRectObject;

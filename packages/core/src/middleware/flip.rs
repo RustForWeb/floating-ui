@@ -140,7 +140,7 @@ pub struct FlipData {
 /// Optimizes the visibility of the floating element by flipping the `placement` in order to keep it in view when the preferred placement(s) will overflow the clipping boundary.
 /// Alternative to [`AutoPlacement`][`crate::middleware::AutoPlacement`].
 ///
-/// See <https://floating-ui.com/docs/flip> for the original documentation.
+/// See [the Rust Floating UI book](https://floating-ui.rustforweb.org/middleware/flip.html) for more documentation.
 #[derive(PartialEq)]
 pub struct Flip<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, FlipOptions<Element>>,
