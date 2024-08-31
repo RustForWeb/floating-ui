@@ -159,7 +159,7 @@ pub fn use_floating(
                         floating_element
                             .dyn_ref()
                             .expect("Floating element should be an Element."),
-                        Some(config),
+                        config,
                     );
                     x.set(position.x);
                     y.set(position.y);

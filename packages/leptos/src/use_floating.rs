@@ -189,11 +189,8 @@ pub fn use_floating<
                         middleware: middleware_option_untracked(),
                     };
 
-                    let position = compute_position(
-                        (&reference_element).into(),
-                        &floating_element,
-                        Some(config),
-                    );
+                    let position =
+                        compute_position((&reference_element).into(), &floating_element, config);
                     set_x.set(position.x);
                     set_y.set(position.y);
                     set_strategy.set(position.strategy);

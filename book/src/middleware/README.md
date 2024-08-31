@@ -524,7 +524,7 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
 }
 ```
 
-Data supplied to `middleware_data` is preserved by doing this, so you can read it at any point after you’ve reset the lifecycle.
+Data supplied to `middleware_data` is preserved by doing this, so you can read it at any point after you've reset the lifecycle.
 
 ## See Also
 

@@ -51,18 +51,16 @@ fn run() -> Result<(), JsValue> {
         } = compute_position(
             button_element.into(),
             tooltip,
-            Some(
-                ComputePositionConfig::default()
-                    .placement(Placement::Top)
-                    .middleware(vec![
-                        Box::new(Offset::new(OffsetOptions::Value(6.0))),
-                        Box::new(Flip::new(FlipOptions::default())),
-                        Box::new(Shift::new(ShiftOptions::default().detect_overflow(
-                            DetectOverflowOptions::default().padding(Padding::All(5.0)),
-                        ))),
-                        Box::new(Arrow::new(ArrowOptions::new(arrow.clone().into()))),
-                    ]),
-            ),
+            ComputePositionConfig::default()
+                .placement(Placement::Top)
+                .middleware(vec![
+                    Box::new(Offset::new(OffsetOptions::Value(6.0))),
+                    Box::new(Flip::new(FlipOptions::default())),
+                    Box::new(Shift::new(ShiftOptions::default().detect_overflow(
+                        DetectOverflowOptions::default().padding(Padding::All(5.0)),
+                    ))),
+                    Box::new(Arrow::new(ArrowOptions::new(arrow.clone().into()))),
+                ]),
         );
 
         let arrow_data: Option<ArrowData> = middleware_data.get_as(ARROW_NAME);

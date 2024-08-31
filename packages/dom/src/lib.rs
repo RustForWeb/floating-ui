@@ -78,10 +78,8 @@ impl ComputePositionConfig {
 pub fn compute_position(
     reference: ElementOrVirtual,
     floating: &Element,
-    config: Option<ComputePositionConfig>,
+    config: ComputePositionConfig,
 ) -> ComputePositionReturn {
-    let config = config.unwrap_or_default();
-
     // TODO: cache
 
     compute_position_core(

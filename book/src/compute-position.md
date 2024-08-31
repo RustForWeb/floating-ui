@@ -121,7 +121,7 @@ Then, ensuring that these two elements are rendered onto the document and can be
 The first argument is the reference element to anchor to, and the second argument is the floating element to be positioned.
 
 ```rust,ignore
-use floating_ui_dom::{compute_position, ComputePositionReturn};
+use floating_ui_dom::{compute_position, ComputePositionConfig, ComputePositionReturn};
 
 let window = web_sys::window().expect("Window should exist.");
 let document = window.document().expect("Window should have document.");
@@ -134,7 +134,7 @@ let tooltip = document
     .expect("Tooltip should exist.")
     .unchecked_into::<web_sys::HtmlElement>();
 
-let ComputePositionReturn {x, y} = compute_position(button, &tooltip, None);
+let ComputePositionReturn {x, y} = compute_position(button, &tooltip, ComputePositionConfig::default());
 
 let style = tooltip.style();
 style.set_property("left", &format!("{x}px")).expect("Property left should be set.");
@@ -181,11 +181,11 @@ Since `compute_position()` is only a single function call, it only positions the
 To ensure it remains anchored to the reference element in a variety of scenarios, such as when resizing or scrolling, wrap the calculation in [`auto_update`](./auto-update.md):
 
 ```rust,ignore
-use floating_ui_dom::{auto_update, compute_position, AutoUpdateOptions, ComputePositionReturn};
+use floating_ui_dom::{auto_update, compute_position, AutoUpdateOptions, ComputePositionConfig, ComputePositionReturn};
 
 // When the floating element is mounted to the DOM:
 let cleanup = auto_update(reference_el, floating_el, Rc::new(|| {
-    let ComputePositionReturn {x, y} = compute_position(reference_el, floating_el, None);
+    let ComputePositionReturn {x, y} = compute_position(reference_el, floating_el, ComputePositionConfig::default());
     // ...
 }), AutoUpdateOptions::default());
 
@@ -223,7 +223,7 @@ cleanup();
 Passed as a third argument, this is the struct instance to configure the behavior.
 
 ```rust,ignore
-compute_position(reference_el, floating_el, ComputePositionConfig::new());
+compute_position(reference_el, floating_el, ComputePositionConfig::default());
 ```
 
 ### `placement`
@@ -250,7 +250,7 @@ pub enum Placement {
 ```
 
 ```rust,ignore
-compute_position(reference_el, floating_el, ComputePositionConfig::new().placement(Placement::BottomStart));
+compute_position(reference_el, floating_el, ComputePositionConfig::default().placement(Placement::BottomStart));
 ```
 
 The `Start` and `End` alignments are [logical](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties_and_values) and will adapt to the writing direction (e.g. RTL) as expected.
@@ -273,7 +273,7 @@ pub enum Strategy {
 ```
 
 ```rust,ignore
-compute_position(reference_el, floating_el, ComputePositionConfig::new().strategy(Strategy::Fixed));
+compute_position(reference_el, floating_el, ComputePositionConfig::default().strategy(Strategy::Fixed));
 ```
 
 Ensure your initial layout matches the strategy:
@@ -347,13 +347,13 @@ fn wrapper(reference_el: Element, floating_el: Element, options: Options) -> Com
         middleware.push(Box::new(Arrow::new(ArrowOptions::new(options.arrow_el))));
     }
 
-    compute_position(reference_el, floating_el, ComputePositionConfig::new().middleware(middleware))
+    compute_position(reference_el, floating_el, ComputePositionConfig::default().middleware(middleware))
 }
 ```
 
 ## Return Value
 
-`compute_position()` returns the following type:
+`compute_position()` returns the following struct:
 
 ```rust,ignore
 pub struct ComputePositionReturn {
