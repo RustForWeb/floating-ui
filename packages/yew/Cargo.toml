@@ -10,7 +10,7 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-floating-ui-dom = { path = "../dom", version = "0.0.9" }
+floating-ui-dom = { path = "../dom", version = "0.1.0" }
 yew.workspace = true
 web-sys.workspace = true
 
