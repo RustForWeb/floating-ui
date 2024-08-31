@@ -14,11 +14,11 @@ Rust Floating UI is available for the following frameworks:
 
 -   [DOM (`web-sys`)](https://rustwasm.github.io/wasm-bindgen/web-sys/index.html)
 -   [Leptos](https://leptos.dev/)
+-   [Yew](https://yew.rs/)
 
 The following frameworks are under consideration:
 
 -   [Dioxus](https://dioxuslabs.com/)
--   [Yew](https://yew.rs/)
 
 ## Smart Anchor Positioning
 

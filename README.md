@@ -16,11 +16,11 @@ Rust Floating UI is available for these Rust frameworks:
 
 -   [DOM](./packages/dom) ([`web-sys`](https://rustwasm.github.io/wasm-bindgen/web-sys/index.html))
 -   [Leptos](./packages/leptos)
+-   [Yew](https://yew.rs/)
 
 The following frameworks are under consideration:
 
 -   [Dioxus](https://dioxuslabs.com/)
--   [Yew](https://yew.rs/)
 
 ## Examples
 
@@ -30,10 +30,12 @@ Each framework has an implementations of the [Floating UI tutorial](https://floa
 
 -   [DOM](./packages/dom/example)
 -   [Leptos](./packages/leptos/example)
+-   [Yew](./packages/yew/example)
 
 Additionally, implementations of [Floating UI tests](https://github.com/floating-ui/floating-ui/tree/master/packages/dom/test) are more complex examples:
 
 -   [Leptos](./packages/leptos/tests)
+-   [Yew](./packages/yew/tests)
 
 ## Documentation
 
@@ -45,6 +47,7 @@ Documentation for the crates is available on [Docs.rs](https://docs.rs/):
 -   [`floating-ui-dom`](https://docs.rs/floating-ui-dom/latest/floating_ui_dom/)
 -   [`floating-ui-leptos`](https://docs.rs/floating-ui-leptos/latest/floating_ui_leptos/)
 -   [`floating-ui-utils`](https://docs.rs/floating-ui-utils/latest/floating_ui_utils/)
+-   [`floating-ui-yew`](https://docs.rs/floating-ui-yew/latest/floating_ui_yew/)
 
 ## Credits
 
