@@ -1,6 +1,7 @@
 # Summary
 
 -   [Introduction](./introduction.md)
+-   [Examples](./examples.md)
 -   [Compute Position](./compute-position.md)
 -   [Auto Update](./auto-update.md)
 -   [Middleware](./middleware/README.md)

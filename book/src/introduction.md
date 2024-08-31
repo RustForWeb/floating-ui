@@ -8,6 +8,10 @@ Rust Floating UI is a Rust port of [Floating UI](https://floating-ui.com/).
 
 [Floating UI](https://floating-ui.com) is a library that helps you create “floating” elements such as tooltips, popovers, dropdowns, and more.
 
+It provides a toolkit of positioning features that let you robustly anchor an absolutely-positioned floating element next to a given reference element. For example, a popover floats next to and remains anchored to its triggering button, even while the page scrolls.
+
+It also provides features to avoid collisions with the viewport, as absolute positioning often leads to unwanted overflow depending on the location of the positioning reference.
+
 ## Frameworks
 
 Rust Floating UI is available for the following frameworks:
@@ -20,15 +24,18 @@ The following frameworks are under consideration:
 
 -   [Dioxus](https://dioxuslabs.com/)
 
-## Smart Anchor Positioning
+See [Frameworks](./frameworks/index.md) for documentation for each framework.
 
-Anchor a floating element next to another element while making sure it stays in view by **avoiding collisions**. This lets you position tooltips, popovers, or dropdowns optimally.
+## Examples
 
-```toml,trunk
-package = "floating-ui-book"
-features = ["arrow", "flip", "placement", "shift", "size", "virtual"]
-```
+See [Examples](./examples.md).
 
 ## License
 
 This project is available under the [MIT license](https://github.com/RustForWeb/floating-ui/blob/main/LICENSE.md).
+
+## Rust For Web
+
+The Rust Floating UI project is part of the [Rust For Web](https://github.com/RustForWeb).
+
+[Rust For Web](https://github.com/RustForWeb) creates and ports web UI libraries for Rust. All projects are free and open source.

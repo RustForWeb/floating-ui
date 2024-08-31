@@ -36,6 +36,17 @@ use floating_ui_dom::compute_position;
 </div>
 
 {{#endtab }}
+{{#tab name="Yew" }}
+
+<div class="warning">
+
+**Non-framework API**
+
+[`use_floating()`](./frameworks/yew.md) should be used instead with a framework. If you are using a base package, change the package with the package switcher above.
+
+</div>
+
+{{#endtab }}
 {{#endtabs }}
 
 ## Usage
@@ -190,6 +201,17 @@ cleanup();
 **Non-framework API**
 
 [`use_floating()`](./frameworks/leptos.md) should be used instead with a framework. If you are using a base package, change the package with the package switcher above.
+
+</div>
+
+{{#endtab }}
+{{#tab name="Yew" }}
+
+<div class="warning">
+
+**Non-framework API**
+
+[`use_floating()`](./frameworks/yew.md) should be used instead with a framework. If you are using a base package, change the package with the package switcher above.
 
 </div>
 
