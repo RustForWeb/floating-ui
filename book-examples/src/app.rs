@@ -6,28 +6,28 @@ pub fn App() -> impl IntoView {
 
     #[cfg(feature = "placement")]
     {
-        use crate::placement::PlacementDemo;
+        use crate::positioning::placement::PlacementDemo;
         views.push(view! {
             <PlacementDemo />
         });
     }
     #[cfg(feature = "shift")]
     {
-        use crate::shift::ShiftDemo;
+        use crate::positioning::shift::ShiftDemo;
         views.push(view! {
             <ShiftDemo />
         });
     }
     #[cfg(feature = "flip")]
     {
-        use crate::flip::FlipDemo;
+        use crate::positioning::flip::FlipDemo;
         views.push(view! {
             <FlipDemo />
         });
     }
     #[cfg(feature = "size")]
     {
-        use crate::size::SizeDemo;
+        use crate::positioning::size::SizeDemo;
         views.push(view! {
             <SizeDemo />
         });

@@ -1,15 +1,7 @@
 mod app;
 mod components;
+mod positioning;
 mod utils;
-
-#[cfg(feature = "flip")]
-mod flip;
-#[cfg(feature = "placement")]
-mod placement;
-#[cfg(feature = "shift")]
-mod shift;
-#[cfg(feature = "size")]
-mod size;
 
 use crate::app::App;
 
