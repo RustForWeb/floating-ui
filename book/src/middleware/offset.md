@@ -121,7 +121,7 @@ Offset::new(OffsetOptions::Values(
 ))
 ```
 
-<!-- Here’s how it looks on the four sides: TOOD: demo -->
+<!-- Here's how it looks on the four sides: TOOD: demo -->
 
 ### `cross_axis`
 
@@ -135,7 +135,7 @@ Offset::new(OffsetOptions::Values(
 ))
 ```
 
-<!-- Here’s how it looks on the four sides: TOOD: demo -->
+<!-- Here's how it looks on the four sides: TOOD: demo -->
 
 ### `alignment_axis`
 
@@ -151,13 +151,13 @@ Offset::new(OffsetOptions::Values(
 ))
 ```
 
-<!-- Here’s how it differentiates from crossAxis: TODO: demo -->
+<!-- Here's how it differentiates from crossAxis: TODO: demo -->
 
 <!-- ## Creating Custom Placements
 
 While you can only choose 12 different placements as part of the core library, you can use the `Offset` middleware to create **any** placement you want.
 
-For example, although the library doesn’t provide a placement for centering on both axes, offset enables this via the function option by allowing you to read the rects:
+For example, although the library doesn't provide a placement for centering on both axes, offset enables this via the function option by allowing you to read the rects:
 
 ```rust,ignore
 Offset::new_derivable_fn()
