@@ -4,6 +4,8 @@ Shifts the floating element to keep it in view.
 
 This prevents the floating element from overflowing along its axis of alignment, thereby preserving the side it's placed on.
 
+Type: `Visibility Optimizer`
+
 <!-- TODO: demo -->
 
 ## Usage
@@ -219,7 +221,7 @@ Shift::new(ShiftOptions::default().limiter(
 
 ### `detect_overflow`
 
-All of `detect_overflow`'s options can be passed. For instance:
+All of [`detect_overflow`](../detect-overflow.md)'s options can be passed. For instance:
 
 ```rust,ignore
 Shift::new(ShiftOptions::default().detect_overflow(
