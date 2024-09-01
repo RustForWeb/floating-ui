@@ -223,7 +223,19 @@ cleanup();
 Passed as a third argument, this is the struct instance to configure the behavior.
 
 ```rust,ignore
-compute_position(reference_el, floating_el, ComputePositionConfig::default());
+compute_position(
+    reference_el,
+    floating_el,
+    ComputePositionConfig::default(),
+);
+```
+
+```rust,ignore
+pub struct ComputePositionConfig<Element, Window> {
+    pub placement: Option<Placement>,
+    pub strategy: Option<Strategy>,
+    pub middleware: Option<Vec<Box<dyn Middleware<Element, Window>>>>,
+}
 ```
 
 ### `placement`
@@ -250,7 +262,11 @@ pub enum Placement {
 ```
 
 ```rust,ignore
-compute_position(reference_el, floating_el, ComputePositionConfig::default().placement(Placement::BottomStart));
+compute_position(
+    reference_el,
+    floating_el,
+    ComputePositionConfig::default().placement(Placement::BottomStart),
+);
 ```
 
 The `Start` and `End` alignments are [logical](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties_and_values) and will adapt to the writing direction (e.g. RTL) as expected.
@@ -273,7 +289,11 @@ pub enum Strategy {
 ```
 
 ```rust,ignore
-compute_position(reference_el, floating_el, ComputePositionConfig::default().strategy(Strategy::Fixed));
+compute_position(
+    reference_el,
+    floating_el,
+    ComputePositionConfig::default().strategy(Strategy::Fixed),
+);
 ```
 
 Ensure your initial layout matches the strategy:

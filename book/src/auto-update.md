@@ -129,11 +129,29 @@ Default: `true`
 
 Whether to update the position when an overflow ancestor is scrolled.
 
+```rust,ignore
+auto_update(
+    reference_el,
+    floating_el,
+    update,
+    AutoUpdateOptions::default().ancestor_scroll(false),
+);
+```
+
 ### `ancestor_resize`
 
 Default: `true`
 
 Whether to update the position when an overflow ancestor is resized. This uses the `resize` event.
+
+```rust,ignore
+auto_update(
+    reference_el,
+    floating_el,
+    update,
+    AutoUpdateOptions::default().ancestor_resize(false),
+);
+```
 
 ### `element_resize`
 
@@ -141,11 +159,29 @@ Default: `true`
 
 Whether to update the position when either the reference or floating elements resized. This uses a `ResizeObserver`.
 
+```rust,ignore
+auto_update(
+    reference_el,
+    floating_el,
+    update,
+    AutoUpdateOptions::default().element_resize(false),
+);
+```
+
 ### `layout_shift`
 
 Default: `true`
 
 Whether to update the position of the floating element if the reference element moved on the screen as the result of layout shift. This uses a `IntersectionObserver`.
+
+```rust,ignore
+auto_update(
+    reference_el,
+    floating_el,
+    update,
+    AutoUpdateOptions::default().layout_shift(false),
+);
+```
 
 ### `animation_frame`
 
@@ -155,6 +191,15 @@ Whether to update the position of the floating element on every animation frame 
 
 -   The reference element is animating on the screen with `transform`s.
 -   Ensure a nested floating element is anchored when it's outside of ancestor floating elements' scrolling contexts.
+
+```rust,ignore
+auto_update(
+    reference_el,
+    floating_el,
+    update,
+    AutoUpdateOptions::default().animation_frame(true),
+);
+```
 
 ## See Also
 
