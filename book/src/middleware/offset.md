@@ -13,12 +13,14 @@ custom placements.
 {{#tab name="Core" }}
 
 ```rust,ignore
+use floating_ui_core::{compute_position, ComputePositionConfig, Offset, OffsetOptions};
+
 compute_position(
     reference_el,
     floating_el,
     ComputePositionConfig::new(platform)
         .middleware(vec![
-            Box::new(Offset::new()),
+            Box::new(Offset::new(OffsetOptions::default())),
         ]),
 );
 ```
@@ -27,12 +29,14 @@ compute_position(
 {{#tab name="DOM" }}
 
 ```rust,ignore
+use floating_ui_dom::{compute_position, ComputePositionConfig, Offset, OffsetOptions};
+
 compute_position(
     reference_el,
     floating_el,
     ComputePositionConfig::default()
         .middleware(vec![
-            Box::new(Offset::new()),
+            Box::new(Offset::new(OffsetOptions::default())),
         ]),
 );
 ```
@@ -41,12 +45,14 @@ compute_position(
 {{#tab name="Leptos" }}
 
 ```rust,ignore
+use floating_ui_leptos::{use_floating, Offset, OffsetOptions, UseFloatingOptions};
+
 use_floating(
     reference_el,
     floating_el,
     UseFloatingOptions::default()
         .middleware(vec![
-            Box::new(Offset::new()),
+            Box::new(Offset::new(OffsetOptions::default())),
         ].into()),
 );
 ```
@@ -55,12 +61,14 @@ use_floating(
 {{#tab name="Yew" }}
 
 ```rust,ignore
+use floating_ui_yew::{use_floating, Offset, OffsetOptions, UseFloatingOptions};
+
 use_floating(
     reference_el,
     floating_el,
     UseFloatingOptions::default()
         .middleware(vec![
-            Box::new(Offset::new()),
+            Box::new(Offset::new(OffsetOptions::default())),
         ]),
 );
 ```
