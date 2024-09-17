@@ -83,11 +83,33 @@ impl<Element: Clone, Window: Clone> Default for ShiftOptions<Element, Window> {
     }
 }
 
+/// Enabled sides stored in [`ShiftData`].
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct ShiftDataEnabled {
+    pub x: bool,
+    pub y: bool,
+}
+
+impl ShiftDataEnabled {
+    pub fn set_axis(mut self, axis: Axis, enabled: bool) -> Self {
+        match axis {
+            Axis::X => {
+                self.x = enabled;
+            }
+            Axis::Y => {
+                self.y = enabled;
+            }
+        }
+        self
+    }
+}
+
 /// Data stored by [`Shift`] middleware.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ShiftData {
     pub x: f64,
     pub y: f64,
+    pub enabled: ShiftDataEnabled,
 }
 
 /// Shift middleware.
@@ -215,6 +237,9 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
                 serde_json::to_value(ShiftData {
                     x: limited_coords.x - x,
                     y: limited_coords.y - y,
+                    enabled: ShiftDataEnabled::default()
+                        .set_axis(main_axis, check_main_axis)
+                        .set_axis(cross_axis, check_cross_axis),
                 })
                 .expect("Data should be valid JSON."),
             ),
