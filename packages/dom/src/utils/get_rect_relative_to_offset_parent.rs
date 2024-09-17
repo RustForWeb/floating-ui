@@ -52,13 +52,26 @@ pub fn get_rect_relative_to_offset_parent(
                 offsets.y = offset_rect.y + offset_parent.client_top() as f64;
             }
             DomElementOrWindow::Window(_) => {
-                offsets.x = get_window_scroll_bar_x(&document_element);
+                // If the <body> scrollbar appears on the left (e.g. RTL systems).
+                // Use Firefox with layout.scrollbar.side = 3 in about:config to test this.
+                offsets.x = get_window_scroll_bar_x(&document_element, None);
             }
         }
     }
 
-    let x = rect.left + scroll.scroll_left - offsets.x;
-    let y = rect.top + scroll.scroll_top - offsets.y;
+    let mut html_x = 0.0;
+    let mut html_y = 0.0;
+
+    if !is_offset_parent_an_element && !is_fixed {
+        let html_rect = document_element.get_bounding_client_rect();
+        html_y = html_rect.top() as f64 + scroll.scroll_top;
+        html_x = html_rect.left()as f64 + scroll.scroll_left
+            // RTL <body> scrollbar.
+            - get_window_scroll_bar_x(&document_element, Some(html_rect));
+    }
+
+    let x = rect.left + scroll.scroll_left - offsets.x - html_x;
+    let y = rect.top + scroll.scroll_top - offsets.y - html_y;
 
     Rect {
         x,
