@@ -4,13 +4,12 @@ use floating_ui_utils::{get_side_axis, Alignment, Axis, Rect, Side};
 
 use crate::{
     detect_overflow::{detect_overflow, DetectOverflowOptions},
+    middleware::shift::{ShiftData, SHIFT_NAME},
     types::{
         Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
         MiddlewareWithOptions, ResetRects, ResetValue,
     },
 };
-
-use super::SHIFT_NAME;
 
 /// Name of the [`Size`] middleware.
 pub const SIZE_NAME: &str = "size";
@@ -138,6 +137,7 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
             placement,
             elements,
             rects,
+            middleware_data,
             platform,
             ..
         } = state;
@@ -189,21 +189,17 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
         let overflow_available_width =
             maximum_clipping_width.min(width - overflow.side(width_side));
 
-        let no_shift = state.middleware_data.get(SHIFT_NAME).is_none();
+        let no_shift = middleware_data.get(SHIFT_NAME).is_none();
 
         let mut available_height = overflow_available_height;
         let mut available_width = overflow_available_width;
 
-        if is_y_axis {
-            available_width = match alignment.is_some() || no_shift {
-                true => overflow_available_width.min(maximum_clipping_width),
-                false => maximum_clipping_width,
-            };
-        } else {
-            available_height = match alignment.is_some() || no_shift {
-                true => overflow_available_height.min(maximum_clipping_height),
-                false => maximum_clipping_height,
-            }
+        let data: Option<ShiftData> = middleware_data.get_as(SHIFT_NAME);
+        if data.as_ref().is_some_and(|data| data.enabled.x) {
+            available_width = maximum_clipping_width;
+        }
+        if data.as_ref().is_some_and(|data| data.enabled.y) {
+            available_height = maximum_clipping_height;
         }
 
         if no_shift && alignment.is_none() {
