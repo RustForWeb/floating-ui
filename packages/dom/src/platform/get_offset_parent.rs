@@ -1,6 +1,7 @@
 use floating_ui_utils::dom::{
-    get_computed_style, get_containing_block, get_parent_node, get_window, is_containing_block,
-    is_element, is_html_element, is_last_traversable_node, is_table_element, is_top_layer,
+    get_computed_style, get_containing_block, get_document_element, get_parent_node, get_window,
+    is_containing_block, is_element, is_html_element, is_last_traversable_node, is_table_element,
+    is_top_layer, DomNodeOrWindow,
 };
 use floating_ui_utils::OwnedElementOrWindow;
 use web_sys::Window;
@@ -24,7 +25,26 @@ pub fn get_true_offset_parent(element: &Element, polyfill: &Option<Polyfill>) ->
         if let Some(polyfill) = polyfill {
             polyfill(element)
         } else {
-            element.offset_parent()
+            let raw_offset_parent = element.offset_parent();
+
+            // Firefox returns the <html> element as the offsetParent if it's non-static, while Chrome and Safari return the <body> element.
+            // The <body> element must be used to perform the correct calculations even if the <html> element is non-static.
+            if let Some(raw_offset_parent) = raw_offset_parent.as_ref() {
+                if get_document_element(Some(DomNodeOrWindow::Node(raw_offset_parent)))
+                    == *raw_offset_parent
+                {
+                    return Some(
+                        raw_offset_parent
+                            .owner_document()
+                            .expect("Element should have owner document.")
+                            .body()
+                            .expect("Document should have body.")
+                            .unchecked_into::<Element>(),
+                    );
+                }
+            }
+
+            raw_offset_parent
         }
     }
 }

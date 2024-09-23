@@ -19,6 +19,7 @@ pub fn Relative() -> impl IntoView {
     let floating_ref = create_node_ref::<Div>();
 
     let (node, set_node) = create_signal(Node::None);
+    let (offset, set_offset) = create_signal(0);
 
     let UseFloatingReturn {
         x,
@@ -38,13 +39,20 @@ pub fn Relative() -> impl IntoView {
                 .document_element()
                 .map(|element| element.unchecked_into::<web_sys::HtmlElement>()),
             Node::Body => document().body(),
-            _ => None,
+            _ => document()
+                .query_selector(".container")
+                .expect("Document should be queried.")
+                .map(|element| element.unchecked_into::<web_sys::HtmlElement>()),
         };
 
         if let Some(element) = element {
             element
                 .style()
                 .set_property("position", "relative")
+                .expect("Style should be updated.");
+            element
+                .style()
+                .set_property("top", &format!("{}px", -offset.get()))
                 .expect("Style should be updated.");
         }
 
@@ -64,6 +72,10 @@ pub fn Relative() -> impl IntoView {
             element
                 .style()
                 .remove_property("position")
+                .expect("Style should be updated.");
+            element
+                .style()
+                .remove_property("top")
                 .expect("Style should be updated.");
         }
     });
@@ -95,6 +107,7 @@ pub fn Relative() -> impl IntoView {
             </div>
         </div>
 
+        <h2>Node</h2>
         <div class="controls">
             <For
                 each=|| ALL_NODES
@@ -113,6 +126,30 @@ pub fn Relative() -> impl IntoView {
                     >
                         {format!("{:?}", local_node).to_case(Case::Camel)}
                     </button>
+                }
+            />
+        </div>
+
+        <h2>Offset</h2>
+        <div class="controls">
+            <For
+                each=|| [0, 100]
+                key=|local_offset| format!("{:?}", local_offset)
+                children=move |local_offset| {
+                    view! {
+                        <button
+                            data-testid=format!("offset-{local_offset}")
+                            style:background-color=move || match offset() == local_offset {
+                                true => "black",
+                                false => ""
+                            }
+                            on:click=move |_| {
+                                set_offset(local_offset);
+                            }
+                        >
+                            {format!("{local_offset}")}
+                        </button>
+                    }
                 }
             />
         </div>

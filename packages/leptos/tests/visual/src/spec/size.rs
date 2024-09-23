@@ -1,16 +1,24 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, ApplyState, DetectOverflowOptions, Flip, FlipOptions, IntoReference,
-    MiddlewareState, MiddlewareVec, Placement, Shift, ShiftOptions, Size, SizeOptions,
-    UseFloatingOptions, UseFloatingReturn,
+    use_floating, ApplyState, DetectOverflowOptions, Flip, FlipOptions, IntoReference, LimitShift,
+    LimitShiftOffset, LimitShiftOptions, MiddlewareState, MiddlewareVec, Placement, Shift,
+    ShiftOptions, Size, SizeOptions, UseFloatingOptions, UseFloatingReturn,
 };
 use leptos::{html::Div, *};
 use wasm_bindgen::JsCast;
 
 use crate::utils::{
     all_placements::ALL_PLACEMENTS,
+    use_resize::use_resize,
     use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn},
 };
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+enum ShiftOrder {
+    None,
+    Before,
+    After,
+}
 
 #[component]
 pub fn Size() -> impl IntoView {
@@ -19,7 +27,10 @@ pub fn Size() -> impl IntoView {
 
     let (rtl, set_rtl) = create_signal(false);
     let (placement, set_placement) = create_signal(Placement::Bottom);
-    let (add_flip_shift, set_add_flip_shift) = create_signal(false);
+    let (add_flip, set_add_flip) = create_signal(false);
+    let (add_shift, set_add_shift) = create_signal(ShiftOrder::None);
+    let (shift_cross_axis, set_shift_cross_axis) = create_signal(false);
+    let (shift_limiter, set_shift_limiter) = create_signal(false);
 
     let has_edge_alignment = move || placement().alignment().is_some();
 
@@ -41,17 +52,23 @@ pub fn Size() -> impl IntoView {
             .middleware(MaybeProp::derive(move || {
                 let mut middleware: MiddlewareVec = vec![];
 
-                if add_flip_shift() {
+                let mut shift_options = ShiftOptions::default()
+                    .detect_overflow(detect_overflow_options.clone())
+                    .cross_axis(shift_cross_axis());
+                if shift_limiter() {
+                    shift_options = shift_options.limiter(Box::new(LimitShift::new(
+                        LimitShiftOptions::default().offset(LimitShiftOffset::Value(50.0)),
+                    )));
+                }
+
+                if add_flip() {
                     middleware.push(Box::new(Flip::new(
                         FlipOptions::default().detect_overflow(detect_overflow_options.clone()),
                     )));
+                }
 
-                    if !has_edge_alignment() {
-                        middleware.push(Box::new(Shift::new(
-                            ShiftOptions::default()
-                                .detect_overflow(detect_overflow_options.clone()),
-                        )));
-                    }
+                if add_shift() == ShiftOrder::Before {
+                    middleware.push(Box::new(Shift::new(shift_options.clone())));
                 }
 
                 middleware.push(Box::new(Size::new(
@@ -82,10 +99,8 @@ pub fn Size() -> impl IntoView {
                         .detect_overflow(detect_overflow_options.clone()),
                 )));
 
-                if add_flip_shift() && has_edge_alignment() {
-                    middleware.push(Box::new(Shift::new(
-                        ShiftOptions::default().detect_overflow(detect_overflow_options.clone()),
-                    )));
+                if add_shift() == ShiftOrder::After {
+                    middleware.push(Box::new(Shift::new(shift_options.clone())));
                 }
 
                 Some(middleware)
@@ -95,10 +110,12 @@ pub fn Size() -> impl IntoView {
     let UseScrollReturn { scroll_ref, .. } = use_scroll(UseScrollOptions {
         reference_ref,
         floating_ref,
-        update,
+        update: update.clone(),
         rtl: rtl.into(),
         disable_ref_updates: None,
     });
+
+    use_resize(scroll_ref, update);
 
     view! {
         <h1>Size</h1>
@@ -107,7 +124,7 @@ pub fn Size() -> impl IntoView {
             true => "rtl",
             false => "ltr",
         }>
-            <div _ref=scroll_ref class="scroll" data-x="" style:position="relative">
+            <div _ref=scroll_ref class="scroll resize" data-x="" style:position="relative">
                 <div _ref=reference_ref class="reference">
                     Reference
                 </div>
@@ -117,11 +134,17 @@ pub fn Size() -> impl IntoView {
                     style:position=move || format!("{:?}", strategy()).to_lowercase()
                     style:top=move || format!("{}px", y())
                     style:left=move || format!("{}px", x())
-                    style:width=move || match add_flip_shift() {
-                        true => "600px",
-                        false => "400px",
+                    style:width=move || match add_shift() != ShiftOrder::None {
+                        true => if add_shift() == ShiftOrder::Before && shift_cross_axis() {
+                            "100px"
+                        } else if add_shift() == ShiftOrder::Before && has_edge_alignment() {
+                            "300px"
+                        } else {
+                            "600px"
+                        },
+                        false => "400px"
                     }
-                    style:height=move || match add_flip_shift() {
+                    style:height=move || match add_shift() != ShiftOrder::None {
                         true => "600px",
                         false => "300px",
                     }
@@ -175,24 +198,86 @@ pub fn Size() -> impl IntoView {
             />
         </div>
 
-        <h2>Add flip and shift</h2>
+        <h2>Add flip</h2>
         <div class="controls">
             <For
                 each=|| [true, false]
                 key=|value| format!("{}", value)
                 children=move |value| view! {
                     <button
-                        data-testid=format!("flipshift-{}", value)
-                        style:background-color=move || match add_flip_shift() == value {
+                        data-testid=format!("flip-{}", value)
+                        style:background-color=move || match add_flip() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_add_flip_shift(value)
+                        on:click=move |_| set_add_flip(value)
                     >
                         {format!("{}", value)}
                     </button>
                 }
             />
         </div>
+
+        <h2>Add shift</h2>
+        <div class="controls">
+            <For
+                each=|| [ShiftOrder::None, ShiftOrder::Before, ShiftOrder::After]
+                key=|value| format!("{:?}", value)
+                children=move |value| view! {
+                    <button
+                        data-testid=format!("shift-{}", format!("{:?}", value).to_case(Case::Camel))
+                        style:background-color=move || match add_shift() == value {
+                            true => "black",
+                            false => ""
+                        }
+                        on:click=move |_| set_add_shift(value)
+                    >
+                        {format!("{:?}", value).to_case(Case::Camel)}
+                    </button>
+                }
+            />
+        </div>
+
+        <Show when=move || add_shift() != ShiftOrder::None>
+            <h3>shift.crossAxis</h3>
+            <div class="controls">
+                <For
+                    each=|| [true, false]
+                    key=|value| format!("{}", value)
+                    children=move |value| view! {
+                        <button
+                            data-testid=format!("shift.crossAxis-{}", value)
+                            style:background-color=move || match shift_cross_axis() == value {
+                                true => "black",
+                                false => ""
+                            }
+                            on:click=move |_| set_shift_cross_axis(value)
+                        >
+                            {format!("{}", value)}
+                        </button>
+                    }
+                />
+            </div>
+
+            <h3>shift.limiter</h3>
+            <div class="controls">
+                <For
+                    each=|| [true, false]
+                    key=|value| format!("{}", value)
+                    children=move |value| view! {
+                        <button
+                            data-testid=format!("shift.limiter-{}", value)
+                            style:background-color=move || match shift_limiter() == value {
+                                true => "black",
+                                false => ""
+                            }
+                            on:click=move |_| set_shift_limiter(value)
+                        >
+                            {format!("{}", value)}
+                        </button>
+                    }
+                />
+            </div>
+        </Show>
     }
 }

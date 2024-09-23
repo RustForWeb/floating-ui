@@ -37,7 +37,7 @@ pub fn get_document_rect(element: &Element) -> Rect {
     .max()
     .expect("Iterator is not empty.") as f64;
 
-    let mut x = -scroll.scroll_left + get_window_scroll_bar_x(element);
+    let mut x = -scroll.scroll_left + get_window_scroll_bar_x(element, None);
     let y = -scroll.scroll_top;
 
     if is_rtl(&body) {

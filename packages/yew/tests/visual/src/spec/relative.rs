@@ -20,6 +20,7 @@ pub fn Relative() -> Html {
     let floating_ref = use_node_ref();
 
     let node = use_state_eq(|| Node::None);
+    let offset = use_state_eq(|| 0);
 
     let UseFloatingReturn {
         x,
@@ -33,7 +34,7 @@ pub fn Relative() -> Html {
         UseFloatingOptions::default(),
     );
 
-    use_effect_with(node.clone(), move |node| {
+    use_effect_with((node.clone(), offset.clone()), move |(node, offset)| {
         let element = match **node {
             Node::Html => window()
                 .expect("Window should exist.")
@@ -46,13 +47,23 @@ pub fn Relative() -> Html {
                 .document()
                 .expect("Document should exist.")
                 .body(),
-            _ => None,
+            _ => window()
+                .expect("Window should exist.")
+                .document()
+                .expect("Document should exist.")
+                .query_selector(".container")
+                .expect("Document should be queried.")
+                .map(|element| element.unchecked_into::<web_sys::HtmlElement>()),
         };
 
         if let Some(element) = element.as_ref() {
             element
                 .style()
                 .set_property("position", "relative")
+                .expect("Style should be updated.");
+            element
+                .style()
+                .set_property("top", &format!("{}px", -**offset))
                 .expect("Style should be updated.");
         }
 
@@ -63,6 +74,10 @@ pub fn Relative() -> Html {
                 element
                     .style()
                     .remove_property("position")
+                    .expect("Style should be updated.");
+                element
+                    .style()
+                    .remove_property("top")
                     .expect("Style should be updated.");
             }
         }
@@ -101,6 +116,7 @@ pub fn Relative() -> Html {
                 </div>
             </div>
 
+            <h2>{"Node"}</h2>
             <div class="controls">
                 {
                     ALL_NODES.into_iter().map(|value| {
@@ -122,6 +138,33 @@ pub fn Relative() -> Html {
                                 })}
                             >
                                 {format!("{:?}", value).to_case(Case::Camel)}
+                            </button>
+                        }
+                    }).collect::<Html>()
+                }
+            </div>
+
+            <h2>{"RTL"}</h2>
+            <div class="controls">
+                {
+                    [0, 100].into_iter().map(|value| {
+                        html! {
+                            <button
+                                key={format!("{}", value)}
+                                data-testid={format!("offset-{}", value)}
+                                style={match *offset == value {
+                                    true => "background-color: black;",
+                                    false => ""
+                                }}
+                                onclick={Callback::from({
+                                    let offset = offset.clone();
+
+                                    move |_| {
+                                        offset.set(value);
+                                    }
+                                })}
+                            >
+                                {format!("{}", value)}
                             </button>
                         }
                     }).collect::<Html>()
