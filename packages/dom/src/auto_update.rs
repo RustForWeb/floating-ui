@@ -1,7 +1,8 @@
 use std::{cell::RefCell, rc::Rc};
 
-use floating_ui_utils::dom::{
-    get_document_element, get_overflow_ancestors, get_window, OverflowAncestor,
+use floating_ui_utils::{
+    dom::{get_document_element, get_overflow_ancestors, get_window, OverflowAncestor},
+    ClientRectObject,
 };
 use web_sys::{
     wasm_bindgen::{closure::Closure, JsCast, JsValue},
@@ -356,24 +357,27 @@ pub fn auto_update(
     }
 
     let frame_id: Rc<RefCell<Option<i32>>> = Rc::new(RefCell::new(None));
-    let mut prev_ref_rect = match animation_frame {
-        true => Some(get_bounding_client_rect(reference, false, false, None)),
-        false => None,
-    };
+    let prev_ref_rect: Rc<RefCell<Option<ClientRectObject>>> =
+        Rc::new(RefCell::new(match animation_frame {
+            true => Some(get_bounding_client_rect(reference, false, false, None)),
+            false => None,
+        }));
 
     let frame_loop_frame_id = frame_id.clone();
     let frame_loop_closure = Rc::new(RefCell::new(None));
     let frame_loop_closure_clone = frame_loop_closure.clone();
 
     *frame_loop_closure_clone.borrow_mut() = Some(Closure::new({
-        let frame_loop_frame_id = frame_loop_frame_id.clone();
+        let owned_reference = owned_reference.clone();
         let update = update.clone();
+        let prev_ref_rect = prev_ref_rect.clone();
+        let frame_loop_frame_id = frame_loop_frame_id.clone();
 
         move || {
             let next_ref_rect =
                 get_bounding_client_rect((&owned_reference).into(), false, false, None);
 
-            if let Some(prev_ref_rect) = &prev_ref_rect {
+            if let Some(prev_ref_rect) = prev_ref_rect.borrow().as_ref() {
                 if next_ref_rect.x != prev_ref_rect.x
                     || next_ref_rect.y != prev_ref_rect.y
                     || next_ref_rect.width != prev_ref_rect.width
@@ -383,7 +387,7 @@ pub fn auto_update(
                 }
             }
 
-            prev_ref_rect = Some(next_ref_rect);
+            prev_ref_rect.replace(Some(next_ref_rect));
             frame_loop_frame_id.replace(Some(request_animation_frame(
                 frame_loop_closure
                     .borrow()
@@ -394,7 +398,21 @@ pub fn auto_update(
     }));
 
     if animation_frame {
-        // In the JS source code the frame loop is called directly.
+        // Frame loop closure can't be called here, so the code below is copied.
+
+        let next_ref_rect = get_bounding_client_rect((&owned_reference).into(), false, false, None);
+
+        if let Some(prev_ref_rect) = prev_ref_rect.borrow().as_ref() {
+            if next_ref_rect.x != prev_ref_rect.x
+                || next_ref_rect.y != prev_ref_rect.y
+                || next_ref_rect.width != prev_ref_rect.width
+                || next_ref_rect.height != prev_ref_rect.height
+            {
+                update();
+            }
+        }
+
+        prev_ref_rect.replace(Some(next_ref_rect));
         frame_loop_frame_id.replace(Some(request_animation_frame(
             frame_loop_closure_clone
                 .borrow()
