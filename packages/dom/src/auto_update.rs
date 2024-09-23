@@ -251,9 +251,12 @@ pub fn auto_update(
         false => vec![],
     };
 
-    let update_closure_update = update.clone();
-    let update_closure: Closure<dyn Fn()> = Closure::new(move || {
-        update_closure_update();
+    let update_closure: Closure<dyn Fn()> = Closure::new({
+        let update = update.clone();
+
+        move || {
+            update();
+        }
     });
 
     for ancestor in &ancestors {
@@ -295,19 +298,23 @@ pub fn auto_update(
 
     if element_resize {
         let reobserve_floating = floating.clone();
-        let reobserve_resize_observer = resize_observer.clone();
-        let reobserve_closure: Rc<Closure<dyn FnMut()>> = Rc::new(Closure::new(move || {
-            reobserve_resize_observer
-                .borrow()
-                .as_ref()
-                .expect("Resize observer should exist.")
-                .observe(&reobserve_floating);
+        let reobserve_closure: Rc<Closure<dyn FnMut()>> = Rc::new(Closure::new({
+            let resize_observer = resize_observer.clone();
+
+            move || {
+                resize_observer
+                    .borrow()
+                    .as_ref()
+                    .expect("Resize observer should exist.")
+                    .observe(&reobserve_floating);
+            }
         }));
 
         let resize_reference_element = reference_element.clone();
-        let resize_update = update.clone();
-        let resize_closure: Closure<dyn Fn(Vec<ResizeObserverEntry>)> =
-            Closure::new(move |entries: Vec<ResizeObserverEntry>| {
+        let resize_closure: Closure<dyn Fn(Vec<ResizeObserverEntry>)> = Closure::new({
+            let update = update.clone();
+
+            move |entries: Vec<ResizeObserverEntry>| {
                 if let Some(first_entry) = entries.first() {
                     if resize_reference_element
                         .as_ref()
@@ -322,8 +329,9 @@ pub fn auto_update(
                     }
                 }
 
-                resize_update();
-            });
+                update();
+            }
+        });
 
         resize_observer.replace(Some(
             ResizeObserver::new(resize_closure.into_js_value().unchecked_ref())
@@ -356,37 +364,42 @@ pub fn auto_update(
     let frame_loop_frame_id = frame_id.clone();
     let frame_loop_closure = Rc::new(RefCell::new(None));
     let frame_loop_closure_clone = frame_loop_closure.clone();
-    let frame_loop_closure_update = update.clone();
 
-    *frame_loop_closure_clone.borrow_mut() = Some(Closure::new(move || {
-        let next_ref_rect = get_bounding_client_rect((&owned_reference).into(), false, false, None);
+    *frame_loop_closure_clone.borrow_mut() = Some(Closure::new({
+        let frame_loop_frame_id = frame_loop_frame_id.clone();
+        let update = update.clone();
 
-        if let Some(prev_ref_rect) = &prev_ref_rect {
-            if next_ref_rect.x != prev_ref_rect.x
-                || next_ref_rect.y != prev_ref_rect.y
-                || next_ref_rect.width != prev_ref_rect.width
-                || next_ref_rect.height != prev_ref_rect.height
-            {
-                frame_loop_closure_update();
+        move || {
+            let next_ref_rect =
+                get_bounding_client_rect((&owned_reference).into(), false, false, None);
+
+            if let Some(prev_ref_rect) = &prev_ref_rect {
+                if next_ref_rect.x != prev_ref_rect.x
+                    || next_ref_rect.y != prev_ref_rect.y
+                    || next_ref_rect.width != prev_ref_rect.width
+                    || next_ref_rect.height != prev_ref_rect.height
+                {
+                    update();
+                }
             }
-        }
 
-        prev_ref_rect = Some(next_ref_rect);
-        frame_loop_frame_id.replace(Some(request_animation_frame(
-            frame_loop_closure
-                .borrow()
-                .as_ref()
-                .expect("Frame loop closure should exist."),
-        )));
+            prev_ref_rect = Some(next_ref_rect);
+            frame_loop_frame_id.replace(Some(request_animation_frame(
+                frame_loop_closure
+                    .borrow()
+                    .as_ref()
+                    .expect("Frame loop closure should exist."),
+            )));
+        }
     }));
 
     if animation_frame {
-        request_animation_frame(
+        frame_loop_frame_id.replace(Some(request_animation_frame(
             frame_loop_closure_clone
                 .borrow()
                 .as_ref()
                 .expect("Frame loop closure should exist."),
-        );
+        )));
     }
 
     update();
