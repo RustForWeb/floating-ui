@@ -394,6 +394,7 @@ pub fn auto_update(
     }));
 
     if animation_frame {
+        // In the JS source code the frame loop is called directly.
         frame_loop_frame_id.replace(Some(request_animation_frame(
             frame_loop_closure_clone
                 .borrow()
