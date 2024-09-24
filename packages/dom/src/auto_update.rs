@@ -313,6 +313,7 @@ pub fn auto_update(
 
         let resize_reference_element = reference_element.clone();
         let resize_closure: Closure<dyn Fn(Vec<ResizeObserverEntry>)> = Closure::new({
+            let reobserve_frame = reobserve_frame.clone();
             let update = update.clone();
 
             move |entries: Vec<ResizeObserverEntry>| {
@@ -451,6 +452,10 @@ pub fn auto_update(
 
         if let Some(cleanup_observe_move) = &cleanup_observe_move {
             cleanup_observe_move();
+        }
+
+        if let Some(reobserve_frame) = reobserve_frame.take() {
+            cancel_animation_frame(reobserve_frame);
         }
 
         if let Some(resize_observer) = resize_observer.take() {
