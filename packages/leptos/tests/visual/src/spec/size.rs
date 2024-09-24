@@ -138,7 +138,7 @@ pub fn Size() -> impl IntoView {
                         true => if add_shift.get() == ShiftOrder::Before && shift_cross_axis.get() {
                             "100px"
                         } else if add_shift.get() == ShiftOrder::Before && has_edge_alignment() {
-                            "300px"
+                            "360px"
                         } else {
                             "600px"
                         },
