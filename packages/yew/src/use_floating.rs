@@ -132,41 +132,51 @@ pub fn use_floating(
             middleware_data.clone(),
             is_positioned.clone(),
         ),
-        move |_,
-              (
-            reference,
-            floating,
-            placement_option,
-            strategy_option,
-            middleware_option,
-            x,
-            y,
-            strategy,
-            placement,
-            middleware_data,
-            is_positioned,
-        )| {
-            if let Some(reference_element) = reference.get() {
-                if let Some(floating_element) = floating.get() {
-                    let config = ComputePositionConfig {
-                        placement: Some(**placement_option),
-                        strategy: Some(**strategy_option),
-                        middleware: Some((**middleware_option).clone()),
-                    };
+        {
+            let open_option = open_option.clone();
 
-                    let position = compute_position(
-                        (&reference_element).into(),
-                        floating_element
-                            .dyn_ref()
-                            .expect("Floating element should be an Element."),
-                        config,
-                    );
-                    x.set(position.x);
-                    y.set(position.y);
-                    strategy.set(position.strategy);
-                    placement.set(position.placement);
-                    middleware_data.set(position.middleware_data);
-                    is_positioned.set(true);
+            move |_,
+                  (
+                reference,
+                floating,
+                placement_option,
+                strategy_option,
+                middleware_option,
+                x,
+                y,
+                strategy,
+                placement,
+                middleware_data,
+                is_positioned,
+            )| {
+                if let Some(reference_element) = reference.get() {
+                    if let Some(floating_element) = floating.get() {
+                        let config = ComputePositionConfig {
+                            placement: Some(**placement_option),
+                            strategy: Some(**strategy_option),
+                            middleware: Some((**middleware_option).clone()),
+                        };
+
+                        let open = *open_option;
+
+                        let position = compute_position(
+                            (&reference_element).into(),
+                            floating_element
+                                .dyn_ref()
+                                .expect("Floating element should be an Element."),
+                            config,
+                        );
+                        x.set(position.x);
+                        y.set(position.y);
+                        strategy.set(position.strategy);
+                        placement.set(position.placement);
+                        middleware_data.set(position.middleware_data);
+                        // The floating element's position may be recomputed while it's closed
+                        // but still mounted (such as when transitioning out). To ensure
+                        // `is_positioned` will be `false` initially on the next open,
+                        // avoid setting it to `true` when `open === false` (must be specified).
+                        is_positioned.set(open);
+                    }
                 }
             }
         },
@@ -243,12 +253,13 @@ pub fn use_floating(
 
     use_effect_with(
         (
+            open_option.clone(),
             placement_option,
             strategy_option,
             middleware_option,
             update.clone(),
         ),
-        |(_, _, _, update)| {
+        |(_, _, _, _, update)| {
             update.emit(());
         },
     );
