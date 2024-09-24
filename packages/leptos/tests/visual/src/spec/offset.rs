@@ -75,7 +75,7 @@ pub fn Offset() -> impl IntoView {
             .middleware(MaybeProp::derive(move || {
                 let options = values()
                     .into_iter()
-                    .find_map(|(name, options)| match name == offset_options() {
+                    .find_map(|(name, options)| match name == offset_options.get() {
                         true => Some(options),
                         false => None,
                     })
@@ -89,7 +89,7 @@ pub fn Offset() -> impl IntoView {
     view! {
         <h1>Offset</h1>
         <p></p>
-        <div class="container" style:direction=move || match rtl() {
+        <div class="container" style:direction=move || match rtl.get() {
             true => "rtl",
             false => "ltr",
         }>
@@ -109,11 +109,11 @@ pub fn Offset() -> impl IntoView {
                 children=move |(name, _)| view! {
                     <button
                         data-testid=move || format!("offset-{}", name)
-                        style:background-color=move || match offset_options() == name {
+                        style:background-color=move || match offset_options.get() == name {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_offset_options(name)
+                        on:click=move |_| set_offset_options.set(name)
                     >
                         {name}
                     </button>
@@ -129,11 +129,11 @@ pub fn Offset() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement() == local_placement {
+                        style:background-color=move || match placement.get() == local_placement {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_placement(local_placement)
+                        on:click=move |_| set_placement.set(local_placement)
                     >
                         {format!("{:?}", local_placement).to_case(Case::Kebab)}
                     </button>
@@ -152,12 +152,12 @@ pub fn Offset() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("rtl-{}", value)
-                            style:background-color=move || match rtl() == value {
+                            style:background-color=move || match rtl.get() == value {
                                 true => "black",
                                 false => ""
                             }
                             on:click=move |_| {
-                                set_rtl(value);
+                                set_rtl.set(value);
                                 rtl_update();
                             }
                         >

@@ -44,14 +44,14 @@ pub fn Flip() -> impl IntoView {
             .while_elements_mounted_auto_update()
             .middleware(MaybeProp::derive(move || {
                 let mut options = FlipOptions::default()
-                    .main_axis(main_axis())
-                    .cross_axis(cross_axis())
-                    .fallback_strategy(fallback_strategy())
-                    .flip_alignment(flip_alignment());
+                    .main_axis(main_axis.get())
+                    .cross_axis(cross_axis.get())
+                    .fallback_strategy(fallback_strategy.get())
+                    .flip_alignment(flip_alignment.get());
 
-                options = match add_shift() {
+                options = match add_shift.get() {
                     true => options.fallback_placements(vec![Placement::Bottom]),
-                    false => match fallback_placements() {
+                    false => match fallback_placements.get() {
                         FallbackPlacements::None => options,
                         FallbackPlacements::Empty => options.fallback_placements(vec![]),
                         FallbackPlacements::All => {
@@ -62,7 +62,7 @@ pub fn Flip() -> impl IntoView {
 
                 let mut middleware: MiddlewareVec = vec![Box::new(Flip::new(options))];
 
-                if add_shift() {
+                if add_shift.get() {
                     middleware.push(Box::new(Shift::new(ShiftOptions::default())));
                 }
 
@@ -94,10 +94,10 @@ pub fn Flip() -> impl IntoView {
                 <div
                     _ref=floating_ref
                     class="floating"
-                    style:position=move || format!("{:?}", strategy()).to_lowercase()
-                    style:top=move || format!("{}px", y())
-                    style:left=move || format!("{}px", x())
-                    style:width=move || match add_shift() {
+                    style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                    style:top=move || format!("{}px", y.get())
+                    style:left=move || format!("{}px", x.get())
+                    style:width=move || match add_shift.get() {
                         true => "400px",
                         false => ""
                     }
@@ -115,11 +115,11 @@ pub fn Flip() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement() == local_placement {
+                        style:background-color=move || match placement.get() == local_placement {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_placement(local_placement)
+                        on:click=move |_| set_placement.set(local_placement)
                     >
                         {format!("{:?}", local_placement).to_case(Case::Kebab)}
                     </button>
@@ -135,11 +135,11 @@ pub fn Flip() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("mainAxis-{}", value)
-                        style:background-color=move || match main_axis() == value {
+                        style:background-color=move || match main_axis.get() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_main_axis(value)
+                        on:click=move |_| set_main_axis.set(value)
                     >
                         {format!("{}", value)}
                     </button>
@@ -155,11 +155,11 @@ pub fn Flip() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("crossAxis-{}", value)
-                        style:background-color=move || match cross_axis() == value {
+                        style:background-color=move || match cross_axis.get() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_cross_axis(value)
+                        on:click=move |_| set_cross_axis.set(value)
                     >
                         {format!("{}", value)}
                     </button>
@@ -179,11 +179,11 @@ pub fn Flip() -> impl IntoView {
                             FallbackPlacements::Empty => "[]",
                             FallbackPlacements::All => "all",
                         })
-                        style:background-color=move || match fallback_placements() == value {
+                        style:background-color=move || match fallback_placements.get() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_fallback_placements(value)
+                        on:click=move |_| set_fallback_placements.set(value)
                     >
                         {match value {
                             FallbackPlacements::None => "undefined".into(),
@@ -203,11 +203,11 @@ pub fn Flip() -> impl IntoView {
                 children=move |local_fallback_strategy| view! {
                     <button
                         data-testid=format!("fallbackStrategy-{}", format!("{:?}", local_fallback_strategy).to_case(Case::Camel))
-                        style:background-color=move || match fallback_strategy() == local_fallback_strategy {
+                        style:background-color=move || match fallback_strategy.get() == local_fallback_strategy {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_fallback_strategy(local_fallback_strategy)
+                        on:click=move |_| set_fallback_strategy.set(local_fallback_strategy)
                     >
                         {format!("{:?}", local_fallback_strategy).to_case(Case::Camel)}
                     </button>
@@ -223,11 +223,11 @@ pub fn Flip() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("flipAlignment-{}", value)
-                        style:background-color=move || match flip_alignment() == value {
+                        style:background-color=move || match flip_alignment.get() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_flip_alignment(value)
+                        on:click=move |_| set_flip_alignment.set(value)
                     >
                         {format!("{}", value)}
                     </button>
@@ -243,11 +243,11 @@ pub fn Flip() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("shift-{}", value)
-                        style:background-color=move || match add_shift() == value {
+                        style:background-color=move || match add_shift.get() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_add_shift(value)
+                        on:click=move |_| set_add_shift.set(value)
                     >
                         {format!("{}", value)}
                     </button>

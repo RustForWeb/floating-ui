@@ -44,7 +44,7 @@ pub fn Inline() -> impl IntoView {
             .while_elements_mounted_auto_update()
             .middleware(MaybeProp::derive(move || {
                 let mut options = InlineOptions::default();
-                if let Some(mouse_coords) = mouse_coords() {
+                if let Some(mouse_coords) = mouse_coords.get() {
                     options = options.coords(mouse_coords);
                 }
 
@@ -59,7 +59,7 @@ pub fn Inline() -> impl IntoView {
     );
 
     let text = move || {
-        match status() {
+        match status.get() {
         ConnectedStatus::One => "test",
         ConnectedStatus::TwoDisjoined => "Nulla rutrum dapibus turpis eu volutpat",
         ConnectedStatus::TwoJoined => "Nulla rutrum dapibus turpis eu volutpat. Duis cursus nisi massa, non dictum",
@@ -68,16 +68,16 @@ pub fn Inline() -> impl IntoView {
     };
 
     let handle_mouse_enter = move |event: MouseEvent| {
-        set_mouse_coords(Some(Coords {
+        set_mouse_coords.set(Some(Coords {
             x: event.client_x() as f64,
             y: event.client_y() as f64,
         }));
-        set_open(true);
+        set_open.set(true);
     };
 
     let handle_mouse_leave = move |_: MouseEvent| {
-        set_mouse_coords(None);
-        set_open(false);
+        set_mouse_coords.set(None);
+        set_open.set(false);
     };
 
     let handle_mouse_up = move |event: MouseEvent| {
@@ -103,7 +103,7 @@ pub fn Inline() -> impl IntoView {
                         });
 
                 if selection.is_some_and(|selection| selection.is_collapsed()) {
-                    set_open(false);
+                    set_open.set(false);
                     return;
                 }
 
@@ -127,7 +127,7 @@ pub fn Inline() -> impl IntoView {
                         ) as Box<dyn VirtualElement<web_sys::Element>>)
                             .into(),
                     );
-                    set_open(true);
+                    set_open.set(true);
                 }
             },
             Duration::from_millis(0),
@@ -147,7 +147,7 @@ pub fn Inline() -> impl IntoView {
             .expect("Window should have selection.")
             .is_some_and(|selection| selection.is_collapsed())
         {
-            set_open(false);
+            set_open.set(false);
         }
     };
 
@@ -181,13 +181,13 @@ pub fn Inline() -> impl IntoView {
                 Duis cursus nisi massa, non dictum turpis interdum at.
             </p>
 
-            <Show when=open>
+            <Show when=move || open.get()>
                <div
                     _ref=floating_ref
                     class="floating"
-                    style:position=move || format!("{:?}", strategy()).to_lowercase()
-                    style:top=move || format!("{}px", y())
-                    style:left=move || format!("{}px", x())
+                    style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                    style:top=move || format!("{}px", y.get())
+                    style:left=move || format!("{}px", x.get())
                     style:pointer-events="none"
                 >
                     Floating
@@ -203,11 +203,11 @@ pub fn Inline() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement() == local_placement {
+                        style:background-color=move || match placement.get() == local_placement {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_placement(local_placement)
+                        on:click=move |_| set_placement.set(local_placement)
                     >
                         {format!("{:?}", local_placement).to_case(Case::Kebab)}
                     </button>
@@ -223,11 +223,11 @@ pub fn Inline() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("open-{}", value)
-                        style:background-color=move || match open() == value {
+                        style:background-color=move || match open.get() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_open(value)
+                        on:click=move |_| set_open.set(value)
                     >
                         {format!("{}", value)}
                     </button>
@@ -248,11 +248,11 @@ pub fn Inline() -> impl IntoView {
                             ConnectedStatus::TwoJoined => "2-joined",
                             ConnectedStatus::Three => "3",
                         })
-                        style:background-color=move || match status() == value {
+                        style:background-color=move || match status.get() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_status(value)
+                        on:click=move |_| set_status.set(value)
                     >
                         {match value {
                             ConnectedStatus::One => "1",

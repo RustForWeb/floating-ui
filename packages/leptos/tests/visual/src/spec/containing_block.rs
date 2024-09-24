@@ -33,15 +33,15 @@ pub fn ContainingBlock() -> impl IntoView {
         <p>The floating element should be correctly positioned.</p>
         <div
             class="container"
-            style:will-change=move || match container_type() {
+            style:will-change=move || match container_type.get() {
                 Some(_) => "",
-                None => will_change()
+                None => will_change.get()
             }
-            style:contain=move || match container_type() {
+            style:contain=move || match container_type.get() {
                 Some(_) => "",
-                None => contain()
+                None => contain.get()
             }
-            style:container-type=move || match container_type() {
+            style:container-type=move || match container_type.get() {
                 Some(container_type) => container_type,
                 _ => "".into()
             }
@@ -64,12 +64,12 @@ pub fn ContainingBlock() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("willchange-{}", local_will_change)
-                            style:background-color=move || match will_change() == local_will_change {
+                            style:background-color=move || match will_change.get() == local_will_change {
                                 true => "black",
                                 false => ""
                             }
                             on:click=move |_| {
-                                set_will_change(local_will_change);
+                                set_will_change.set(local_will_change);
                                 will_change_update();
                             }
                         >
@@ -90,12 +90,12 @@ pub fn ContainingBlock() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("contain-{}", local_contain)
-                            style:background-color=move || match contain() == local_contain {
+                            style:background-color=move || match contain.get() == local_contain {
                                 true => "black",
                                 false => ""
                             }
                             on:click=move |_| {
-                                set_contain(local_contain);
+                                set_contain.set(local_contain);
                                 contain_update();
                             }
                         >
@@ -116,12 +116,12 @@ pub fn ContainingBlock() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("container-type-{}", local_container_type.unwrap_or("normal"))
-                            style:background-color=move || match container_type() == local_container_type.map(|local_container_type| local_container_type.to_string()) {
+                            style:background-color=move || match container_type.get() == local_container_type.map(|local_container_type| local_container_type.to_string()) {
                                 true => "black",
                                 false => ""
                             }
                             on:click=move |_| {
-                                set_container_type(local_container_type.map(|local_container_type| local_container_type.to_string()));
+                                set_container_type.set(local_container_type.map(|local_container_type| local_container_type.to_string()));
                                 container_type_update();
                             }
                         >

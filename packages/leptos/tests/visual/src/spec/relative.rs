@@ -34,7 +34,7 @@ pub fn Relative() -> impl IntoView {
     );
 
     create_effect(move |_| {
-        let element = match node() {
+        let element = match node.get() {
             Node::Html => document()
                 .document_element()
                 .map(|element| element.unchecked_into::<web_sys::HtmlElement>()),
@@ -60,7 +60,7 @@ pub fn Relative() -> impl IntoView {
     });
 
     on_cleanup(move || {
-        let element = match node() {
+        let element = match node.get() {
             Node::Html => document()
                 .document_element()
                 .map(|element| element.unchecked_into::<web_sys::HtmlElement>()),
@@ -88,7 +88,7 @@ pub fn Relative() -> impl IntoView {
         </p>
         <div
             class="container"
-            style:position=move || match node() {
+            style:position=move || match node.get() {
                 Node::OffsetParent => "relative",
                 _ => ""
             }
@@ -99,9 +99,9 @@ pub fn Relative() -> impl IntoView {
             <div
                 _ref=floating_ref
                 class="floating"
-                style:position=move || format!("{:?}", strategy()).to_lowercase()
-                style:top=move || format!("{}px", y())
-                style:left=move || format!("{}px", x())
+                style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                style:top=move || format!("{}px", y.get())
+                style:left=move || format!("{}px", x.get())
             >
                 Floating
             </div>
@@ -118,11 +118,11 @@ pub fn Relative() -> impl IntoView {
                             Node::None => "null".into(),
                             _ => format!("{:?}", local_node).to_case(Case::Camel)
                         })
-                        style:background-color=move || match node() == local_node {
+                        style:background-color=move || match node.get() == local_node {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_node(local_node)
+                        on:click=move |_| set_node.set(local_node)
                     >
                         {format!("{:?}", local_node).to_case(Case::Camel)}
                     </button>
@@ -139,12 +139,12 @@ pub fn Relative() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("offset-{local_offset}")
-                            style:background-color=move || match offset() == local_offset {
+                            style:background-color=move || match offset.get() == local_offset {
                                 true => "black",
                                 false => ""
                             }
                             on:click=move |_| {
-                                set_offset(local_offset);
+                                set_offset.set(local_offset);
                             }
                         >
                             {format!("{local_offset}")}

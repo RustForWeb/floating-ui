@@ -33,14 +33,14 @@ pub fn Placement() -> impl IntoView {
         <p>
             The floating element should be correctly positioned when given each of the 12 placements.
         </p>
-        <div class="container" style:direction=move || match rtl() {
+        <div class="container" style:direction=move || match rtl.get() {
             true => "rtl",
             false => "ltr",
         }>
             <div _ref=reference_ref class="reference">
                 Reference
             </div>
-            <div _ref=floating_ref class="floating" style=move || format!("{} width: {}px; height: {}px;", floating_styles(), size(), size())>
+            <div _ref=floating_ref class="floating" style=move || format!("{} width: {}px; height: {}px;", floating_styles.get(), size.get(), size.get())>
                 Floating
             </div>
         </div>
@@ -54,7 +54,7 @@ pub fn Placement() -> impl IntoView {
                 max="200"
                 prop:value=size
                 on:input=move |event| {
-                    set_size(event_target_value(&event).parse().unwrap())
+                    set_size.set(event_target_value(&event).parse().unwrap())
                 }
             />
         </div>
@@ -66,11 +66,11 @@ pub fn Placement() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement() == local_placement {
+                        style:background-color=move || match placement.get() == local_placement {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_placement(local_placement)
+                        on:click=move |_| set_placement.set(local_placement)
                     >
                         {format!("{:?}", local_placement).to_case(Case::Kebab)}
                     </button>
@@ -89,12 +89,12 @@ pub fn Placement() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("rtl-{}", value)
-                            style:background-color=move || match rtl() == value {
+                            style:background-color=move || match rtl.get() == value {
                                 true => "black",
                                 false => ""
                             }
                             on:click=move |_| {
-                                set_rtl(value);
+                                set_rtl.set(value);
                                 rtl_update();
                             }
                         >

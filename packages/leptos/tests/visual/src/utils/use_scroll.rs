@@ -69,7 +69,7 @@ pub fn use_scroll(
     let local_update_indicator_update = indicator_update_rc.clone();
     let local_update: Rc<Closure<dyn Fn()>> = Rc::new(Closure::new(move || {
         if let Some(scroll) = scroll_ref.get_untracked() {
-            set_scroll(Some((scroll.scroll_left(), scroll.scroll_top())));
+            set_scroll.set(Some((scroll.scroll_left(), scroll.scroll_top())));
         }
 
         local_update_update();
@@ -109,13 +109,13 @@ pub fn use_scroll(
                     .expect("Scroll event listener should be added.");
             }
 
-            set_ancestors(ancestors);
+            set_ancestors.set(ancestors);
 
-            if let Some(scroll) = scroll_ref() {
+            if let Some(scroll) = scroll_ref.get() {
                 let x = scroll.scroll_width() / 2 - scroll.offset_width() / 2;
                 let y = scroll.scroll_height() / 2 - scroll.offset_height() / 2;
                 scroll.set_scroll_top(y);
-                scroll.set_scroll_left(match rtl() {
+                scroll.set_scroll_left(match rtl.get() {
                     Some(true) => -x,
                     _ => x,
                 });
@@ -152,11 +152,11 @@ pub fn use_scroll(
             <div
                 _ref=indicator_floating_ref
                 class="scroll-indicator"
-                style:position=move || format!("{:?}", strategy())
-                style:top=move || format!("{}px", y())
-                style:left=move || format!("{}px", x())
+                style:position=move || format!("{:?}", strategy.get())
+                style:top=move || format!("{}px", y.get())
+                style:left=move || format!("{}px", x.get())
             >
-                {move || scroll().map_or("x: null, y: null".into(), |scroll| format!("x: {}, y: {}", scroll.0, scroll.1))}
+                {move || scroll.get().map_or("x: null, y: null".into(), |scroll| format!("x: {}, y: {}", scroll.0, scroll.1))}
             </div>
         }
     };

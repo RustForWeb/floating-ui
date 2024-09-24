@@ -56,7 +56,7 @@ pub fn Scroll() -> impl IntoView {
             <div
                 _ref=reference_ref
                 class="reference"
-                style=move || match node() {
+                style=move || match node.get() {
                     Node::FloatingScrollParent => "position: relative; top: -350px;",
                     _ => ""
                 }
@@ -71,9 +71,9 @@ pub fn Scroll() -> impl IntoView {
             <div
                 _ref=floating_ref
                 class="floating"
-                style:position=move || format!("{:?}", strategy()).to_lowercase()
-                style:top=move || format!("{}px", y())
-                style:left=move || format!("{}px", x())
+                style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                style:top=move || format!("{}px", y.get())
+                style:left=move || format!("{}px", x.get())
             >
                 Floating
             </div>
@@ -87,7 +87,7 @@ pub fn Scroll() -> impl IntoView {
         </p>
         <div class="container">
             <Show
-                when=move || node() != Node::Body
+                when=move || node.get() != Node::Body
                 fallback=move || view! {
                     {reference_view}
                     {floating_view}
@@ -96,18 +96,18 @@ pub fn Scroll() -> impl IntoView {
                 <div
                     _ref=scroll_ref
                     class="scroll"
-                    style:position=move || match node() {
+                    style:position=move || match node.get() {
                         Node::FloatingScrollParent | Node::SameScrollParent => "relative",
                         _ => "",
                     }
                 >
                     {indicator.clone()}
-                    <Show when=move || node() != Node::FloatingScrollParent>
+                    <Show when=move || node.get() != Node::FloatingScrollParent>
                         {reference_view}
                     </Show>
                     {floating_view}
                 </div>
-                <Show when=move || node() == Node::FloatingScrollParent>
+                <Show when=move || node.get() == Node::FloatingScrollParent>
                     {reference_view}
                 </Show>
             </Show>
@@ -124,12 +124,12 @@ pub fn Scroll() -> impl IntoView {
                     view! {
                         <button
                             data-testid=move || format!("Strategy{:?}", local_strategy).to_case(Case::Kebab)
-                            style:background-color=move || match strategy() == local_strategy {
+                            style:background-color=move || match strategy.get() == local_strategy {
                                 true => "black",
                                 false => ""
                             }
                             on:click=move |_| {
-                                set_strategy(local_strategy);
+                                set_strategy.set(local_strategy);
                                 strategy_update();
                             }
                         >
@@ -151,12 +151,12 @@ pub fn Scroll() -> impl IntoView {
                     view! {
                         <button
                             data-testid=move || format!("scroll-{}", format!("{:?}", local_node).to_case(Case::Camel))
-                            style:background-color=move || match node() == local_node {
+                            style:background-color=move || match node.get() == local_node {
                                 true => "black",
                                 false => ""
                             }
                             on:click=move |_| {
-                                set_node(local_node);
+                                set_node.set(local_node);
                                 node_update();
                             }
                         >
@@ -167,7 +167,7 @@ pub fn Scroll() -> impl IntoView {
             />
         </div>
 
-        <Show when=move || node() == Node::Body>
+        <Show when=move || node.get() == Node::Body>
             <div style:width="1px" style:height="1500px" />
         </Show>
     }

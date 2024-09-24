@@ -74,27 +74,27 @@ pub fn Shift() -> impl IntoView {
             .middleware(MaybeProp::derive(move || {
                 let limit_shift_offset = values()
                     .into_iter()
-                    .find_map(|(name, options)| match name == limit_shift_offset() {
+                    .find_map(|(name, options)| match name == limit_shift_offset.get() {
                         true => Some(options),
                         false => None,
                     })
                     .unwrap();
 
                 let mut shift_options = ShiftOptions::default()
-                    .main_axis(main_axis())
-                    .cross_axis(cross_axis());
+                    .main_axis(main_axis.get())
+                    .cross_axis(cross_axis.get());
 
-                if limit_shift() {
+                if limit_shift.get() {
                     shift_options = shift_options.limiter(Box::new(LimitShift::new(
                         LimitShiftOptions::default()
-                            .main_axis(limit_shift_main_axis())
-                            .cross_axis(limit_shift_cross_axis())
+                            .main_axis(limit_shift_main_axis.get())
+                            .cross_axis(limit_shift_cross_axis.get())
                             .offset_derivable(limit_shift_offset),
                     )))
                 }
 
                 let middleware: MiddlewareVec = vec![
-                    Box::new(Offset::new(OffsetOptions::Value(offset_value() as f64))),
+                    Box::new(Offset::new(OffsetOptions::Value(offset_value.get() as f64))),
                     Box::new(Shift::new(shift_options)),
                 ];
                 Some(middleware)
@@ -120,9 +120,9 @@ pub fn Shift() -> impl IntoView {
                 <div
                     _ref=floating_ref
                     class="floating"
-                    style:position=move || format!("{:?}", strategy()).to_lowercase()
-                    style:top=move || format!("{}px", y())
-                    style:left=move || format!("{}px", x())
+                    style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                    style:top=move || format!("{}px", y.get())
+                    style:left=move || format!("{}px", x.get())
                 >
                     Floating
                 </div>
@@ -137,11 +137,11 @@ pub fn Shift() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement() == local_placement {
+                        style:background-color=move || match placement.get() == local_placement {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_placement(local_placement)
+                        on:click=move |_| set_placement.set(local_placement)
                     >
                         {format!("{:?}", local_placement).to_case(Case::Kebab)}
                     </button>
@@ -157,11 +157,11 @@ pub fn Shift() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("offset-{}", value)
-                        style:background-color=move || match offset_value() == value {
+                        style:background-color=move || match offset_value.get() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_offset_value(value)
+                        on:click=move |_| set_offset_value.set(value)
                     >
                         {format!("{}", value)}
                     </button>
@@ -177,11 +177,11 @@ pub fn Shift() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("mainAxis-{}", value)
-                        style:background-color=move || match main_axis() == value {
+                        style:background-color=move || match main_axis.get() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_main_axis(value)
+                        on:click=move |_| set_main_axis.set(value)
                     >
                         {format!("{}", value)}
                     </button>
@@ -197,11 +197,11 @@ pub fn Shift() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("crossAxis-{}", value)
-                        style:background-color=move || match cross_axis() == value {
+                        style:background-color=move || match cross_axis.get() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_cross_axis(value)
+                        on:click=move |_| set_cross_axis.set(value)
                     >
                         {format!("{}", value)}
                     </button>
@@ -217,11 +217,11 @@ pub fn Shift() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("limitShift-{}", value)
-                        style:background-color=move || match limit_shift() == value {
+                        style:background-color=move || match limit_shift.get() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_limit_shift(value)
+                        on:click=move |_| set_limit_shift.set(value)
                     >
                         {format!("{}", value)}
                     </button>
@@ -229,7 +229,7 @@ pub fn Shift() -> impl IntoView {
             />
         </div>
 
-        <Show when=limit_shift>
+        <Show when=move || limit_shift.get()>
             <h2>limitShift.mainAxis</h2>
             <div class="controls">
                 <For
@@ -238,11 +238,11 @@ pub fn Shift() -> impl IntoView {
                     children=move |value| view! {
                         <button
                             data-testid=format!("limitShift.mainAxis-{}", value)
-                            style:background-color=move || match limit_shift_main_axis() == value {
+                            style:background-color=move || match limit_shift_main_axis.get() == value {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_limit_shift_main_axis(value)
+                            on:click=move |_| set_limit_shift_main_axis.set(value)
                         >
                             {format!("{}", value)}
                         </button>
@@ -258,11 +258,11 @@ pub fn Shift() -> impl IntoView {
                     children=move |value| view! {
                         <button
                             data-testid=format!("limitShift.crossAxis-{}", value)
-                            style:background-color=move || match limit_shift_cross_axis() == value {
+                            style:background-color=move || match limit_shift_cross_axis.get() == value {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_limit_shift_cross_axis(value)
+                            on:click=move |_| set_limit_shift_cross_axis.set(value)
                         >
                             {format!("{}", value)}
                         </button>
@@ -278,11 +278,11 @@ pub fn Shift() -> impl IntoView {
                     children=move |(name, _)| view! {
                         <button
                             data-testid=move || format!("limitShift.offset-{}", name)
-                            style:background-color=move || match limit_shift_offset() == name {
+                            style:background-color=move || match limit_shift_offset.get() == name {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_limit_shift_offset(name)
+                            on:click=move |_| set_limit_shift_offset.set(name)
                         >
                             {name}
                         </button>

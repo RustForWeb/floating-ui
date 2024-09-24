@@ -49,7 +49,7 @@ pub fn Transform() -> impl IntoView {
     let (node, set_node) = create_signal(Node::None);
 
     let reference_signal: MaybeProp<VirtualElementOrNodeRef<NodeRef<AnyElement>, AnyElement>> =
-        MaybeProp::derive(move || match node() {
+        MaybeProp::derive(move || match node.get() {
             Node::Virtual => {
                 let context_element = document()
                     .get_element_by_id("virtual-context")
@@ -89,7 +89,7 @@ pub fn Transform() -> impl IntoView {
     );
 
     create_effect(move |_| {
-        let element = match node() {
+        let element = match node.get() {
             Node::Html => document()
                 .document_element()
                 .map(|element| element.unchecked_into::<web_sys::HtmlElement>()),
@@ -106,7 +106,7 @@ pub fn Transform() -> impl IntoView {
         };
 
         if let Some(element) = element {
-            let transform = match node() {
+            let transform = match node.get() {
                 Node::OffsetParent3d => "scale3d(0.5, 0.2, 0.7) translate3d(2rem, -2rem, 0)",
                 Node::OffsetParentInverse | Node::Virtual => "scale(0.5)",
                 _ => "scale(0.5) translate(2rem, -2rem)",
@@ -117,14 +117,14 @@ pub fn Transform() -> impl IntoView {
                 .set_property("transform", transform)
                 .expect("Style should be updated.");
 
-            if node() == Node::Virtual {}
+            if node.get() == Node::Virtual {}
         }
 
         update();
     });
 
     on_cleanup(move || {
-        let element = match node() {
+        let element = match node.get() {
             Node::Html => document()
                 .document_element()
                 .map(|element| element.unchecked_into::<web_sys::HtmlElement>()),
@@ -157,16 +157,16 @@ pub fn Transform() -> impl IntoView {
             _ref=offset_parent_ref
             class="container"
             style:overflow="hidden"
-            style:position=move || match node() {
+            style:position=move || match node.get() {
                 Node::OffsetParent => "relative",
                 _ => ""
             }
         >
-            <span style:position=move || match node() {
+            <span style:position=move || match node.get() {
                 Node::Inline => "relative",
                 _ => ""
             }>
-                <Show when=move || node() == Node::Virtual>
+                <Show when=move || node.get() == Node::Virtual>
                     <div
                         id="virtual-context"
                         style:width="50px"
@@ -177,7 +177,7 @@ pub fn Transform() -> impl IntoView {
                 {move || view!{
                     <div
                         class="reference"
-                        style:transform=move || match node() {
+                        style:transform=move || match node.get() {
                             Node::Reference | Node::OffsetParentReference => "scale(1.25) translate(2rem, -2rem)",
                             _ => ""
                         }
@@ -188,10 +188,10 @@ pub fn Transform() -> impl IntoView {
                 <div
                     _ref=floating_ref
                     class="floating"
-                    style:position=move || format!("{:?}", strategy()).to_lowercase()
-                    style:top=move || format!("{}px", y())
-                    style:left=move || format!("{}px", x())
-                    style:transform=move || match node() {
+                    style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                    style:top=move || format!("{}px", y.get())
+                    style:left=move || format!("{}px", x.get())
+                    style:transform=move || match node.get() {
                         Node::Floating => "scale(1.25)",
                         _ => ""
                     }
@@ -215,11 +215,11 @@ pub fn Transform() -> impl IntoView {
                             Node::OffsetParentReference => "offsetParent-reference".into(),
                             _ => format!("{:?}", local_node).to_case(Case::Camel)
                         })
-                        style:background-color=move || match node() == local_node {
+                        style:background-color=move || match node.get() == local_node {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_node(local_node)
+                        on:click=move |_| set_node.set(local_node)
                     >
                         {match local_node {
                             Node::OffsetParent3d => "offsetParent-3d".into(),

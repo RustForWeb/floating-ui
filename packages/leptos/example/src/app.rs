@@ -40,22 +40,29 @@ pub fn App() -> impl IntoView {
             .while_elements_mounted_auto_update(),
     );
 
-    let static_side = move || placement().side().opposite();
-    let arrow_data = move || -> Option<ArrowData> { middleware_data().get_as(ARROW_NAME) };
-    let arrow_x =
-        move || arrow_data().and_then(|arrow_data| arrow_data.x.map(|x| format!("{}px", x)));
-    let arrow_y =
-        move || arrow_data().and_then(|arrow_data| arrow_data.y.map(|y| format!("{}px", y)));
+    let static_side = Signal::derive(move || placement.get().side().opposite());
+    let arrow_data =
+        Signal::derive(move || -> Option<ArrowData> { middleware_data.get().get_as(ARROW_NAME) });
+    let arrow_x = Signal::derive(move || {
+        arrow_data
+            .get()
+            .and_then(|arrow_data| arrow_data.x.map(|x| format!("{}px", x)))
+    });
+    let arrow_y = Signal::derive(move || {
+        arrow_data
+            .get()
+            .and_then(|arrow_data| arrow_data.y.map(|y| format!("{}px", y)))
+    });
 
     view! {
         <button
             _ref=reference_ref
             id="button"
             aria-describedby="tooltip"
-            on:mouseenter=move |_| set_open(true)
-            on:mouseleave=move |_| set_open(false)
-            on:focus=move |_| set_open(true)
-            on:blur=move |_| set_open(false)
+            on:mouseenter=move |_| set_open.set(true)
+            on:mouseleave=move |_| set_open.set(false)
+            on:focus=move |_| set_open.set(true)
+            on:blur=move |_| set_open.set(false)
         >
             My button
         </button>
@@ -64,33 +71,33 @@ pub fn App() -> impl IntoView {
             _ref=floating_ref
             id="tooltip"
             role="tooltip"
-            style:display=move || match open() {
+            style:display=move || match open.get() {
                 true => "block",
                 false => "none"
             }
-            style:position=move || floating_styles().style_position()
-            style:top=move || floating_styles().style_top()
-            style:left=move || floating_styles().style_left()
-            style:transform=move || floating_styles().style_transform()
-            style:will-change=move || floating_styles().style_will_change()
+            style:position=move || floating_styles.get().style_position()
+            style:top=move || floating_styles.get().style_top()
+            style:left=move || floating_styles.get().style_left()
+            style:transform=move || floating_styles.get().style_transform()
+            style:will-change=move || floating_styles.get().style_will_change()
         >
             My tooltip with more content
             <div
                 _ref=arrow_ref
                 id="arrow"
-                style:left=move || match static_side() {
+                style:left=move || match static_side.get() {
                     Side::Left => Some("-4px".into()),
-                    _ => arrow_x()
+                    _ => arrow_x.get()
                 }
-                style:top=move || match static_side() {
+                style:top=move || match static_side.get() {
                     Side::Top => Some("-4px".into()),
-                    _ => arrow_y()
+                    _ => arrow_y.get()
                 }
-                style:right=move || match static_side() {
+                style:right=move || match static_side.get() {
                     Side::Right => Some("-4px"),
                     _ => None
                 }
-                style:bottom=move || match static_side() {
+                style:bottom=move || match static_side.get() {
                     Side::Bottom => Some("-4px"),
                     _ => None
                 }

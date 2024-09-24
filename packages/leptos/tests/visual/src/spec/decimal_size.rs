@@ -55,41 +55,41 @@ pub fn DecimalSize() -> impl IntoView {
             the reference and floating elements have a non-integer size (width/height).
         </p>
         <div class="container">
-            <div _ref=reference_ref class="reference" style=move || format!("width: {}px; height: {}px;", size(), size())>
+            <div _ref=reference_ref class="reference" style=move || format!("width: {}px; height: {}px;", size.get(), size.get())>
                 Reference
             </div>
             <div
                 _ref=floating_ref
                 class="floating"
-                style:position=move || format!("{:?}", strategy()).to_lowercase()
-                style:top=move || format!("{}px", y())
-                style:left=move || format!("{}px", x())
-                style:width=move || match truncate() {
+                style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                style:top=move || format!("{}px", y.get())
+                style:left=move || format!("{}px", x.get())
+                style:width=move || match truncate.get() {
                     true => "auto".into(),
-                    false => format!("{}px", size()),
+                    false => format!("{}px", size.get()),
                 }
-                style:height=move || match truncate() {
+                style:height=move || match truncate.get() {
                     true => "auto".into(),
-                    false => format!("{}px", size()),
+                    false => format!("{}px", size.get()),
                 }
-                style:display=move || match truncate() {
+                style:display=move || match truncate.get() {
                     true => "block",
                     false => "",
                 }
-                style:overflow=move || match truncate() {
+                style:overflow=move || match truncate.get() {
                     true => "hidden",
                     false => "",
                 }
-                style:text-overflow=move || match truncate() {
+                style:text-overflow=move || match truncate.get() {
                     true => "ellipsis",
                     false => "",
                 }
-                style:white-space=move || match truncate() {
+                style:white-space=move || match truncate.get() {
                     true => "nowrap",
                     false => "",
                 }
             >
-                {move || match truncate() {
+                {move || match truncate.get() {
                     true => "Long text that will be truncated",
                     false => "Floating",
                 }}
@@ -108,12 +108,12 @@ pub fn DecimalSize() -> impl IntoView {
                                 0.0 => ".0".into(),
                                 _ => local_size.to_string()[1..].to_string()
                             })
-                            style:background-color=move || match size().fract() == local_size {
+                            style:background-color=move || match size.get().fract() == local_size {
                                 true => "black",
                                 false => ""
                             }
                             on:click=move |_| {
-                                set_size(INTEGER + local_size);
+                                set_size.set(INTEGER + local_size);
                                 size_update();
                             }
                         >
@@ -137,12 +137,12 @@ pub fn DecimalSize() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("truncate-{}", value)
-                            style:background-color=move || match truncate() == value {
+                            style:background-color=move || match truncate.get() == value {
                                 true => "black",
                                 false => ""
                             }
                             on:click=move |_| {
-                                set_truncate(value);
+                                set_truncate.set(value);
                                 truncate_update();
                             }
                         >

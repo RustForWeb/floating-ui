@@ -44,7 +44,7 @@ pub fn Scrollbars() -> impl IntoView {
         <div
             class="container"
             style:overflow="scroll"
-            style:direction=move || match rtl() {
+            style:direction=move || match rtl.get() {
                 true => "rtl",
                 false => "ltr",
             }
@@ -55,11 +55,11 @@ pub fn Scrollbars() -> impl IntoView {
             <div
                 _ref=floating_ref
                 class="floating"
-                style:position=move || format!("{:?}", strategy()).to_lowercase()
-                style:top=move || format!("{}px", y())
-                style:left=move || format!("{}px", x())
-                style:width=move || format!("{}px", size())
-                style:height=move || format!("{}px", size())
+                style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                style:top=move || format!("{}px", y.get())
+                style:left=move || format!("{}px", x.get())
+                style:width=move || format!("{}px", size.get())
+                style:height=move || format!("{}px", size.get())
             >
                 Floating
             </div>
@@ -74,7 +74,7 @@ pub fn Scrollbars() -> impl IntoView {
                 max="400"
                 prop:value=size
                 on:input=move |event| {
-                    set_size(event_target_value(&event).parse().unwrap())
+                    set_size.set(event_target_value(&event).parse().unwrap())
                 }
             />
         </div>
@@ -86,11 +86,11 @@ pub fn Scrollbars() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement() == local_placement {
+                        style:background-color=move || match placement.get() == local_placement {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_placement(local_placement)
+                        on:click=move |_| set_placement.set(local_placement)
                     >
                         {format!("{:?}", local_placement).to_case(Case::Kebab)}
                     </button>
@@ -109,12 +109,12 @@ pub fn Scrollbars() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("rtl-{}", value)
-                            style:background-color=move || match rtl() == value {
+                            style:background-color=move || match rtl.get() == value {
                                 true => "black",
                                 false => ""
                             }
                             on:click=move |_| {
-                                set_rtl(value);
+                                set_rtl.set(value);
                                 rtl_update();
                             }
                         >

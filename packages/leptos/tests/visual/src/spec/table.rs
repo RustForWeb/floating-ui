@@ -24,7 +24,7 @@ pub fn Table() -> impl IntoView {
     let (same_parent, set_same_parent) = create_signal(false);
     let (node, set_node) = create_signal(Node::Td);
 
-    let reference_signal = MaybeProp::derive(move || match node() {
+    let reference_signal = MaybeProp::derive(move || match node.get() {
         Node::Table => Some(reference_table_ref.into()),
         Node::Td => Some(reference_td_ref.into()),
         Node::Th => Some(reference_tr_ref.into()),
@@ -44,17 +44,21 @@ pub fn Table() -> impl IntoView {
 
     let same_parent_update = update.clone();
     let node_update = update.clone();
-    _ = watch(same_parent, move |_, _, _| same_parent_update(), false);
-    _ = watch(node, move |_, _, _| node_update(), false);
+    _ = watch(
+        move || same_parent.get(),
+        move |_, _, _| same_parent_update(),
+        false,
+    );
+    _ = watch(move || node.get(), move |_, _, _| node_update(), false);
 
     let floating_view = move || {
         view! {
             <div
                 _ref=floating_ref
                 class="floating"
-                style:position=move || format!("{:?}", strategy()).to_lowercase()
-                style:top=move || format!("{}px", y())
-                style:left=move || format!("{}px", x())
+                style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                style:top=move || format!("{}px", y.get())
+                style:left=move || format!("{}px", x.get())
             >
                 Floating
             </div>
@@ -81,7 +85,7 @@ pub fn Table() -> impl IntoView {
                             {move || view! {
                                 <td>
                                     Reference td
-                                    <Show when=same_parent>
+                                    <Show when=move || same_parent.get()>
                                         {floating_view}
                                     </Show>
                                 </td>
@@ -91,7 +95,7 @@ pub fn Table() -> impl IntoView {
                 </table>
             }.into_any().node_ref(reference_table_ref)}
 
-            <Show when=move || !same_parent()>
+            <Show when=move || !same_parent.get()>
                 {floating_view}
             </Show>
         </div>
@@ -104,11 +108,11 @@ pub fn Table() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("inside-{}", value)
-                        style:background-color=move || match same_parent() == value {
+                        style:background-color=move || match same_parent.get() == value {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_same_parent(value)
+                        on:click=move |_| set_same_parent.set(value)
                     >
                         {format!("{}", value)}
                     </button>
@@ -124,11 +128,11 @@ pub fn Table() -> impl IntoView {
                 children=move |local_node| view! {
                     <button
                         data-testid=move || format!("reference-{}", format!("{:?}", local_node).to_case(Case::Camel))
-                        style:background-color=move || match node() == local_node {
+                        style:background-color=move || match node.get() == local_node {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_node(local_node)
+                        on:click=move |_| set_node.set(local_node)
                     >
                         {format!("{:?}", local_node).to_case(Case::Camel)}
                     </button>

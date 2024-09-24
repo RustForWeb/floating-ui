@@ -68,7 +68,7 @@ pub fn AutoUpdate() -> impl IntoView {
                     cleanup();
                 }
 
-                let size_factor = match layout_shift() {
+                let size_factor = match layout_shift.get() {
                     LayoutShift::Move => 0.9,
                     _ => 1.0,
                 };
@@ -79,11 +79,11 @@ pub fn AutoUpdate() -> impl IntoView {
                     .clone()
                     .style(
                         "width",
-                        format!("{}px", reference_size() as f64 * size_factor),
+                        format!("{}px", reference_size.get() as f64 * size_factor),
                     )
                     .style(
                         "height",
-                        format!("{}px", reference_size() as f64 * size_factor),
+                        format!("{}px", reference_size.get() as f64 * size_factor),
                     );
 
                 let reference: &Element = &reference;
@@ -91,7 +91,9 @@ pub fn AutoUpdate() -> impl IntoView {
                     reference.into(),
                     &floating,
                     effect_update.clone(),
-                    options().layout_shift(layout_shift() != LayoutShift::None),
+                    options
+                        .get()
+                        .layout_shift(layout_shift.get() != LayoutShift::None),
                 )));
             }
         }
@@ -104,21 +106,21 @@ pub fn AutoUpdate() -> impl IntoView {
     });
 
     create_effect(move |_| {
-        if options().element_resize.unwrap() {
-            set_reference_size(100);
-            set_floating_size(50);
+        if options.get().element_resize.unwrap() {
+            set_reference_size.set(100);
+            set_floating_size.set(50);
         } else {
-            set_reference_size(200);
-            set_floating_size(100);
+            set_reference_size.set(200);
+            set_floating_size.set(100);
         }
     });
 
     view! {
         <h1>AutoUpdate</h1>
-        <Show when=move || layout_shift() != LayoutShift::Delete>
+        <Show when=move || layout_shift.get() != LayoutShift::Delete>
             <p>The floating element should update when required.</p>
         </Show>
-        <Show when=move || layout_shift() == LayoutShift::Insert>
+        <Show when=move || layout_shift.get() == LayoutShift::Insert>
             <p>inserted content</p>
         </Show>
         <div
@@ -129,23 +131,23 @@ pub fn AutoUpdate() -> impl IntoView {
                 _ref=reference_ref
                 class="reference"
                 style:position="relative"
-                style:top=move || match layout_shift() {
+                style:top=move || match layout_shift.get() {
                     LayoutShift::Move => "-50px",
                     _ => ""
                 }
-                style:left=move || match layout_shift() {
+                style:left=move || match layout_shift.get() {
                     LayoutShift::Move => "50px",
                     _ => ""
                 }
-                style:width=move || format!("{}px", match layout_shift() {
-                    LayoutShift::Move => reference_size() as f64 * 0.9,
-                    _ => reference_size() as f64
+                style:width=move || format!("{}px", match layout_shift.get() {
+                    LayoutShift::Move => reference_size.get() as f64 * 0.9,
+                    _ => reference_size.get() as f64
                 })
-                style:height=move || format!("{}px", match layout_shift() {
-                    LayoutShift::Move => reference_size() as f64 * 0.9,
-                    _ => reference_size() as f64
+                style:height=move || format!("{}px", match layout_shift.get() {
+                    LayoutShift::Move => reference_size.get() as f64 * 0.9,
+                    _ => reference_size.get() as f64
                 })
-                style:animation=move || match options().animation_frame {
+                style:animation=move || match options.get().animation_frame {
                     Some(true) => "scale 0.5s ease infinite alternate",
                     _ => ""
                 }
@@ -155,11 +157,11 @@ pub fn AutoUpdate() -> impl IntoView {
             <div
                 _ref=floating_ref
                 class="floating"
-                style:position=move || format!("{:?}", strategy()).to_lowercase()
-                style:top=move || format!("{}px", y())
-                style:left=move || format!("{}px", x())
-                style:width=move || format!("{}px", floating_size())
-                style:height=move || format!("{}px", floating_size())
+                style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                style:top=move || format!("{}px", y.get())
+                style:left=move || format!("{}px", x.get())
+                style:width=move || format!("{}px", floating_size.get())
+                style:height=move || format!("{}px", floating_size.get())
             >
                 Floating
             </div>
@@ -174,11 +176,11 @@ pub fn AutoUpdate() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("ancestorScroll-{}", value)
-                            style:background-color=move || match options().ancestor_scroll.unwrap() == value {
+                            style:background-color=move || match options.get().ancestor_scroll.unwrap() == value {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_options(options().ancestor_scroll(value))
+                            on:click=move |_| set_options.set(options.get().ancestor_scroll(value))
                         >
                             {format!("{}", value)}
                         </button>
@@ -196,11 +198,11 @@ pub fn AutoUpdate() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("ancestorResize-{}", value)
-                            style:background-color=move || match options().ancestor_resize.unwrap() == value {
+                            style:background-color=move || match options.get().ancestor_resize.unwrap() == value {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_options(options().ancestor_resize(value))
+                            on:click=move |_| set_options.set(options.get().ancestor_resize(value))
                         >
                             {format!("{}", value)}
                         </button>
@@ -218,11 +220,11 @@ pub fn AutoUpdate() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("elementResize-{}", value)
-                            style:background-color=move || match options().element_resize.unwrap() == value {
+                            style:background-color=move || match options.get().element_resize.unwrap() == value {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_options(options().element_resize(value))
+                            on:click=move |_| set_options.set(options.get().element_resize(value))
                         >
                             {format!("{}", value)}
                         </button>
@@ -239,11 +241,11 @@ pub fn AutoUpdate() -> impl IntoView {
                 children=move |local_layout_shift| view! {
                     <button
                         data-testid=move || format!("layoutShift-{}", format!("{:?}", local_layout_shift).to_case(Case::Camel))
-                        style:background-color=move || match layout_shift() == local_layout_shift {
+                        style:background-color=move || match layout_shift.get() == local_layout_shift {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_layout_shift(local_layout_shift)
+                        on:click=move |_| set_layout_shift.set(local_layout_shift)
                     >
                         {format!("{:?}", local_layout_shift).to_case(Case::Camel)}
                     </button>
@@ -260,11 +262,11 @@ pub fn AutoUpdate() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("animationFrame-{}", value)
-                            style:background-color=move || match options().animation_frame.unwrap() == value {
+                            style:background-color=move || match options.get().animation_frame.unwrap() == value {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_options(options().animation_frame(value))
+                            on:click=move |_| set_options.set(options.get().animation_frame(value))
                         >
                             {format!("{}", value)}
                         </button>
@@ -282,11 +284,11 @@ pub fn AutoUpdate() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("whileElementsMounted-{}", value)
-                            style:background-color=move || match while_elements_mounted() == value {
+                            style:background-color=move || match while_elements_mounted.get() == value {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_while_elements_mounted(value)
+                            on:click=move |_| set_while_elements_mounted.set(value)
                         >
                             {format!("{}", value)}
                         </button>

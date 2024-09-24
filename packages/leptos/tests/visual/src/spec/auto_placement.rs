@@ -67,13 +67,13 @@ pub fn AutoPlacement() -> impl IntoView {
                 let mut middleware: MiddlewareVec =
                     vec![Box::new(AutoPlacement::new(AutoPlacementOptions {
                         detect_overflow: None,
-                        cross_axis: Some(cross_axis()),
-                        alignment: alignment(),
-                        auto_alignment: Some(auto_alignment()),
-                        allowed_placements: allowed_placements().into(),
+                        cross_axis: Some(cross_axis.get()),
+                        alignment: alignment.get(),
+                        auto_alignment: Some(auto_alignment.get()),
+                        allowed_placements: allowed_placements.get().into(),
                     }))];
 
-                if add_shift() {
+                if add_shift.get() {
                     middleware.push(Box::new(Shift::new(ShiftOptions::default())));
                 }
 
@@ -107,7 +107,7 @@ pub fn AutoPlacement() -> impl IntoView {
                 <div
                     _ref=reference_ref
                     class="reference"
-                    style=move || match add_shift() {
+                    style=move || match add_shift.get() {
                         true => "width: 50px; height: 25px;",
                         false => ""
                     }
@@ -117,14 +117,14 @@ pub fn AutoPlacement() -> impl IntoView {
                 <div
                     _ref=floating_ref
                     class="floating"
-                    style:position=move || format!("{:?}", strategy()).to_lowercase()
-                    style:top=move || format!("{}px", y())
-                    style:left=move || format!("{}px", x())
-                    style:width=move || match add_shift() {
+                    style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                    style:top=move || format!("{}px", y.get())
+                    style:left=move || format!("{}px", x.get())
+                    style:width=move || match add_shift.get() {
                         true => "250px",
                         false => ""
                     }
-                    style:height=move || match add_shift() {
+                    style:height=move || match add_shift.get() {
                         true => "250px",
                         false => ""
                     }
@@ -145,11 +145,11 @@ pub fn AutoPlacement() -> impl IntoView {
                             None => "null".into(),
                             Some(local_alignment) => format!("{:?}", local_alignment).to_case(Case::Camel)
                         })
-                        style:background-color=move || match alignment() == local_alignment {
+                        style:background-color=move || match alignment.get() == local_alignment {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_alignment(local_alignment)
+                        on:click=move |_| set_alignment.set(local_alignment)
                     >
                         {match local_alignment {
                             None => "null".into(),
@@ -169,11 +169,11 @@ pub fn AutoPlacement() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("autoAlignment-{}", value)
-                            style:background-color=move || match auto_alignment() == value {
+                            style:background-color=move || match auto_alignment.get() == value {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_auto_alignment(value)
+                            on:click=move |_| set_auto_alignment.set(value)
                         >
                             {format!("{}", value)}
                         </button>
@@ -194,11 +194,11 @@ pub fn AutoPlacement() -> impl IntoView {
                                 AllowedPlacements::None => "undefined".into(),
                                 _ => format!("{:?}", local_allowed_placements).replace("Comma", ",").to_case(Case::Kebab)
                             })
-                            style:background-color=move || match allowed_placements() == local_allowed_placements {
+                            style:background-color=move || match allowed_placements.get() == local_allowed_placements {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_allowed_placements(local_allowed_placements)
+                            on:click=move |_| set_allowed_placements.set(local_allowed_placements)
                         >
                             {match local_allowed_placements {
                                 AllowedPlacements::None => "undefined".into(),
@@ -219,11 +219,11 @@ pub fn AutoPlacement() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("crossAxis-{}", value)
-                            style:background-color=move || match cross_axis() == value {
+                            style:background-color=move || match cross_axis.get() == value {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_cross_axis(value)
+                            on:click=move |_| set_cross_axis.set(value)
                         >
                             {format!("{}", value)}
                         </button>
@@ -241,11 +241,11 @@ pub fn AutoPlacement() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("shift-{}", value)
-                            style:background-color=move || match add_shift() == value {
+                            style:background-color=move || match add_shift.get() == value {
                                 true => "black",
                                 false => ""
                             }
-                            on:click=move |_| set_add_shift(value)
+                            on:click=move |_| set_add_shift.set(value)
                         >
                             {format!("{}", value)}
                         </button>

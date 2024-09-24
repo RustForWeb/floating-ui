@@ -44,7 +44,7 @@ pub fn Border() -> impl IntoView {
     );
 
     create_effect(move |_| {
-        let element = match node() {
+        let element = match node.get() {
             Node::Html => document()
                 .document_element()
                 .map(|element| element.unchecked_into::<web_sys::HtmlElement>()),
@@ -63,7 +63,7 @@ pub fn Border() -> impl IntoView {
     });
 
     on_cleanup(move || {
-        let element = match node() {
+        let element = match node.get() {
             Node::Html => document()
                 .document_element()
                 .map(|element| element.unchecked_into::<web_sys::HtmlElement>()),
@@ -86,20 +86,20 @@ pub fn Border() -> impl IntoView {
         </p>
         <div
             class="container"
-            style:border=move || match node() {
+            style:border=move || match node.get() {
                 Node::OffsetParent | Node::ContentBox => "10px solid black",
                 _ => ""
             }
             style:overflow="hidden"
-            style:padding=move || match node() {
+            style:padding=move || match node.get() {
                 Node::ContentBox => "10px",
                 _ => ""
             }
-            style:position=move || match node() {
+            style:position=move || match node.get() {
                 Node::OffsetParent | Node::ContentBox => "relative",
                 _ => ""
             }
-            style:box-sizing=move || match node() {
+            style:box-sizing=move || match node.get() {
                 Node::ContentBox => "unset",
                 _ => ""
             }
@@ -107,7 +107,7 @@ pub fn Border() -> impl IntoView {
             <div
                 _ref=reference_ref
                 class="reference"
-                style:border=move || match node() {
+                style:border=move || match node.get() {
                     Node::Reference => "10px solid black",
                     _ => ""
                 }
@@ -117,10 +117,10 @@ pub fn Border() -> impl IntoView {
             <div
                 _ref=floating_ref
                 class="floating"
-                style:position=move || format!("{:?}", strategy()).to_lowercase()
-                style:top=move || format!("{}px", y())
-                style:left=move || format!("{}px", x())
-                style:border=move || match node() {
+                style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                style:top=move || format!("{}px", y.get())
+                style:left=move || format!("{}px", x.get())
+                style:border=move || match node.get() {
                     Node::Floating => "10px solid black",
                     _ => ""
                 }
@@ -140,11 +140,11 @@ pub fn Border() -> impl IntoView {
                             Node::ContentBox => "content-box".into(),
                             _ => format!("{:?}", local_node).to_case(Case::Camel)
                         })
-                        style:background-color=move || match node() == local_node {
+                        style:background-color=move || match node.get() == local_node {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_node(local_node)
+                        on:click=move |_| set_node.set(local_node)
                     >
                         {format!("{:?}", local_node).to_case(Case::Camel)}
                     </button>

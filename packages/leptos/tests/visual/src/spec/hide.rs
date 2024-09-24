@@ -19,7 +19,7 @@ pub fn Hide() -> impl IntoView {
 
     let (placement, set_placement) = create_signal(Placement::Bottom);
     let (hierarchy, set_hierarchy) = create_signal('a');
-    let is_fixed_strategy = move || ['j', 'k', 'l', 'm', 'o', 'p', 'q'].contains(&hierarchy());
+    let is_fixed_strategy = move || ['j', 'k', 'l', 'm', 'o', 'p', 'q'].contains(&hierarchy.get());
 
     let UseFloatingReturn {
         x,
@@ -50,7 +50,7 @@ pub fn Hide() -> impl IntoView {
                     )),
                 ];
 
-                if hierarchy() == 'o' {
+                if hierarchy.get() == 'o' {
                     middleware.push(Box::new(Shift::new(ShiftOptions::default())));
                 }
 
@@ -91,7 +91,7 @@ pub fn Hide() -> impl IntoView {
             })),
     );
 
-    let hide_data = move || middleware_data().get_as::<HideData>(HIDE_NAME);
+    let hide_data = move || middleware_data.get().get_as::<HideData>(HIDE_NAME);
     let reference_hidden =
         move || hide_data().map_or(false, |data| data.reference_hidden.unwrap_or(false));
     let escaped = move || hide_data().map_or(false, |data| data.escaped.unwrap_or(false));
@@ -115,7 +115,7 @@ pub fn Hide() -> impl IntoView {
             </div>
         };
 
-        match hierarchy() {
+        match hierarchy.get() {
             'b' => view! {
                 <div style:overflow="hidden" style:height="0px">
                     <div style:position="absolute" style:top="0px" style:left="0px">
@@ -220,9 +220,9 @@ pub fn Hide() -> impl IntoView {
             <div
                 _ref=floating_ref
                 class="floating"
-                style:position=move || format!("{:?}", strategy()).to_lowercase()
-                style:top=move || format!("{}px", y())
-                style:left=move || format!("{}px", x())
+                style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                style:top=move || format!("{}px", y.get())
+                style:left=move || format!("{}px", x.get())
                 style:background-color=move || match reference_hidden() {
                     true => "black",
                     false => match escaped() {
@@ -235,7 +235,7 @@ pub fn Hide() -> impl IntoView {
             </div>
         };
 
-        match hierarchy() {
+        match hierarchy.get() {
             'j' => view! {
                 <div style:overflow="hidden" style:position="relative" style:width="80px" style:height="40px">
                     {base}
@@ -258,9 +258,9 @@ pub fn Hide() -> impl IntoView {
                     <div
                         _ref=floating_ref
                         class="floating"
-                        style:position=move || format!("{:?}", strategy()).to_lowercase()
-                        style:top=move || format!("{}px", y())
-                        style:left=move || format!("{}px", x())
+                        style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+                        style:top=move || format!("{}px", y.get())
+                        style:left=move || format!("{}px", x.get())
                         style:transform="translateZ(0)"
                     >
                         Floating
@@ -307,11 +307,11 @@ pub fn Hide() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement() == local_placement {
+                        style:background-color=move || match placement.get() == local_placement {
                             true => "black",
                             false => ""
                         }
-                        on:click=move |_| set_placement(local_placement)
+                        on:click=move |_| set_placement.set(local_placement)
                     >
                         {format!("{:?}", local_placement).to_case(Case::Kebab)}
                     </button>
@@ -329,12 +329,12 @@ pub fn Hide() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("hierarchy-{}", local_hierarchy)
-                            style:background-color=move || match hierarchy() == local_hierarchy {
+                            style:background-color=move || match hierarchy.get() == local_hierarchy {
                                 true => "black",
                                 false => ""
                             }
                             on:click=move |_| {
-                                set_hierarchy(local_hierarchy);
+                                set_hierarchy.set(local_hierarchy);
 
                                 // Match React test behaviour
                                 if ['j', 'm', 'k', 'l'].contains(&local_hierarchy) {

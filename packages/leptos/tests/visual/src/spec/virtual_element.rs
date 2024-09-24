@@ -64,9 +64,9 @@ pub fn VirtualElement() -> impl IntoView {
         <div
             _ref=floating_ref
             class="floating"
-            style:position=move || format!("{:?}", strategy()).to_lowercase()
-            style:top=move || format!("{}px", y())
-            style:left=move || format!("{}px", x())
+            style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+            style:top=move || format!("{}px", y.get())
+            style:left=move || format!("{}px", x.get())
         >
             Floating
         </div>
