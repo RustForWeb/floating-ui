@@ -178,69 +178,83 @@ pub fn use_floating<
         }
     });
 
-    let update_reference = reference.clone();
-    let update = move || {
-        if let Some(reference) = update_reference.get_untracked() {
-            if let Some(reference_element) = reference.get_untracked() {
-                if let Some(floating_element) = floating.get_untracked_as_element() {
-                    let config = ComputePositionConfig {
-                        placement: Some(placement_option_untracked()),
-                        strategy: Some(strategy_option_untracked()),
-                        middleware: middleware_option_untracked(),
-                    };
+    let update = Rc::new({
+        let reference = reference.clone();
 
-                    let position =
-                        compute_position((&reference_element).into(), &floating_element, config);
-                    set_x.set(position.x);
-                    set_y.set(position.y);
-                    set_strategy.set(position.strategy);
-                    set_placement.set(position.placement);
-                    set_middleware_data.set(position.middleware_data);
-                    set_is_positioned.set(true);
+        move || {
+            if let Some(reference) = reference.get_untracked() {
+                if let Some(reference_element) = reference.get_untracked() {
+                    if let Some(floating_element) = floating.get_untracked_as_element() {
+                        let config = ComputePositionConfig {
+                            placement: Some(placement_option_untracked()),
+                            strategy: Some(strategy_option_untracked()),
+                            middleware: middleware_option_untracked(),
+                        };
+
+                        let open = open_option();
+
+                        let position = compute_position(
+                            (&reference_element).into(),
+                            &floating_element,
+                            config,
+                        );
+                        set_x.set(position.x);
+                        set_y.set(position.y);
+                        set_strategy.set(position.strategy);
+                        set_placement.set(position.placement);
+                        set_middleware_data.set(position.middleware_data);
+                        // The floating element's position may be recomputed while it's closed
+                        // but still mounted (such as when transitioning out). To ensure
+                        // `is_positioned` will be `false` initially on the next open,
+                        // avoid setting it to `true` when `open === false` (must be specified).
+                        set_is_positioned.set(open);
+                    }
                 }
             }
         }
-    };
-    let update_rc = Rc::new(update);
+    });
 
     let while_elements_mounted_cleanup: Rc<RefCell<Option<WhileElementsMountedCleanupFn>>> =
         Rc::new(RefCell::new(None));
 
-    let cleanup_while_elements_mounted_cleanup = while_elements_mounted_cleanup.clone();
-    let cleanup = move || {
-        if let Some(while_elements_mounted_cleanup) = cleanup_while_elements_mounted_cleanup.take()
-        {
-            while_elements_mounted_cleanup();
+    let cleanup = Rc::new({
+        let while_elements_mounted_cleanup = while_elements_mounted_cleanup.clone();
+
+        move || {
+            if let Some(while_elements_mounted_cleanup) = while_elements_mounted_cleanup.take() {
+                while_elements_mounted_cleanup();
+            }
         }
-    };
-    let cleanup_rc = Rc::new(cleanup);
+    });
 
-    let attach_reference = reference.clone();
-    let attach_update_rc = update_rc.clone();
-    let attach_cleanup_rc = cleanup_rc.clone();
     let attach_while_elements_mounted_cleanup = while_elements_mounted_cleanup.clone();
-    let attach = move || {
-        attach_cleanup_rc();
+    let attach = Rc::new({
+        let reference = reference.clone();
+        let update = update.clone();
+        let cleanup = cleanup.clone();
 
-        if let Some(while_elements_mounted) = while_elements_mounted_untracked() {
-            if let Some(reference) = attach_reference.get_untracked() {
-                if let Some(reference_element) = reference.get_untracked() {
-                    if let Some(floating_element) = floating.get_untracked_as_element() {
-                        attach_while_elements_mounted_cleanup.replace(Some(
-                            while_elements_mounted(
-                                (&reference_element).into(),
-                                &floating_element,
-                                attach_update_rc.clone(),
-                            ),
-                        ));
+        move || {
+            cleanup();
+
+            if let Some(while_elements_mounted) = while_elements_mounted_untracked() {
+                if let Some(reference) = reference.get_untracked() {
+                    if let Some(reference_element) = reference.get_untracked() {
+                        if let Some(floating_element) = floating.get_untracked_as_element() {
+                            attach_while_elements_mounted_cleanup.replace(Some(
+                                while_elements_mounted(
+                                    (&reference_element).into(),
+                                    &floating_element,
+                                    update.clone(),
+                                ),
+                            ));
+                        }
                     }
                 }
+            } else {
+                update();
             }
-        } else {
-            attach_update_rc();
         }
-    };
-    let attach_rc = Rc::new(attach);
+    });
 
     let reset = move || {
         if !open_option() {
@@ -248,32 +262,44 @@ pub fn use_floating<
         }
     };
 
-    let reference_attach = attach_rc.clone();
-    create_effect(move |_| {
-        if let Some(reference) = reference.get() {
-            match reference {
-                VirtualElementOrNodeRef::VirtualElement(_) => {
-                    reference_attach();
-                }
-                VirtualElementOrNodeRef::NodeRef(reference, _) => {
-                    if let Some(reference) = reference.get() {
-                        let reference_attach = reference_attach.clone();
-                        _ = reference.on_mount(move |_| {
-                            reference_attach();
-                        });
+    create_effect({
+        let attach = attach.clone();
+
+        move |_| {
+            if let Some(reference) = reference.get() {
+                match reference {
+                    VirtualElementOrNodeRef::VirtualElement(_) => {
+                        attach();
+                    }
+                    VirtualElementOrNodeRef::NodeRef(reference, _) => {
+                        if let Some(reference) = reference.get() {
+                            _ = reference.on_mount({
+                                let attach = attach.clone();
+
+                                move |_| {
+                                    attach();
+                                }
+                            });
+                        }
                     }
                 }
             }
         }
     });
 
-    let floating_attach = attach_rc.clone();
-    create_effect(move |_| {
-        if let Some(floating) = floating.get() {
-            let floating_attach = floating_attach.clone();
-            _ = floating.on_mount(move |_| {
-                floating_attach();
-            });
+    create_effect({
+        let attach = attach.clone();
+
+        move |_| {
+            if let Some(floating) = floating.get() {
+                _ = floating.on_mount({
+                    let attach = attach.clone();
+
+                    move |_| {
+                        attach();
+                    }
+                });
+            }
         }
     });
 
@@ -281,40 +307,60 @@ pub fn use_floating<
         reset();
     });
 
-    let placement_update_rc = update_rc.clone();
-    let strategy_update_rc = update_rc.clone();
-    let middleware_update_rc = update_rc.clone();
+    _ = watch(
+        open_option,
+        {
+            let update = update.clone();
+
+            move |_, _, _| {
+                update();
+            }
+        },
+        false,
+    );
     _ = watch(
         move || options.placement.get(),
-        move |_, _, _| {
-            placement_update_rc();
+        {
+            let update = update.clone();
+
+            move |_, _, _| {
+                update();
+            }
         },
         false,
     );
     _ = watch(
         move || options.strategy.get(),
-        move |_, _, _| {
-            strategy_update_rc();
+        {
+            let update = update.clone();
+
+            move |_, _, _| {
+                update();
+            }
         },
         false,
     );
     _ = watch(
         move || options.middleware.get(),
-        move |_, _, _| {
-            middleware_update_rc();
+        {
+            let update = update.clone();
+
+            move |_, _, _| {
+                update();
+            }
         },
         false,
     );
     _ = watch(
         move || options.while_elements_mounted.get(),
         move |_, _, _| {
-            attach_rc();
+            attach();
         },
         false,
     );
 
     on_cleanup(move || {
-        cleanup_rc();
+        cleanup();
     });
 
     UseFloatingReturn {
@@ -325,7 +371,7 @@ pub fn use_floating<
         middleware_data: middleware_data.into(),
         is_positioned: is_positioned.into(),
         floating_styles: floating_styles.into(),
-        update: update_rc.clone(),
+        update: update.clone(),
     }
 }
 
