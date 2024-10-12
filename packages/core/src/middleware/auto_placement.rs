@@ -161,7 +161,7 @@ pub struct AutoPlacement<'a, Element: Clone + 'static, Window: Clone> {
     options: Derivable<'a, Element, Window, AutoPlacementOptions<Element>>,
 }
 
-impl<'a, Element: Clone + 'static, Window: Clone> Clone for AutoPlacement<'a, Element, Window> {
+impl<Element: Clone + 'static, Window: Clone> Clone for AutoPlacement<'_, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             options: self.options.clone(),
@@ -365,9 +365,9 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
     }
 }
 
-impl<'a, Element: Clone, Window: Clone>
+impl<Element: Clone, Window: Clone>
     MiddlewareWithOptions<Element, Window, AutoPlacementOptions<Element>>
-    for AutoPlacement<'a, Element, Window>
+    for AutoPlacement<'_, Element, Window>
 {
     fn options(&self) -> &Derivable<Element, Window, AutoPlacementOptions<Element>> {
         &self.options

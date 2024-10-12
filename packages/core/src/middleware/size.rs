@@ -57,7 +57,7 @@ impl<'a, Element: Clone, Window: Clone> SizeOptions<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Default for SizeOptions<'a, Element, Window> {
+impl<Element: Clone, Window: Clone> Default for SizeOptions<'_, Element, Window> {
     fn default() -> Self {
         Self {
             detect_overflow: Default::default(),
@@ -66,8 +66,8 @@ impl<'a, Element: Clone, Window: Clone> Default for SizeOptions<'a, Element, Win
     }
 }
 
-impl<'a, Element: Clone + PartialEq, Window: Clone + PartialEq> PartialEq
-    for SizeOptions<'a, Element, Window>
+impl<Element: Clone + PartialEq, Window: Clone + PartialEq> PartialEq
+    for SizeOptions<'_, Element, Window>
 {
     fn eq(&self, other: &Self) -> bool {
         self.detect_overflow == other.detect_overflow
@@ -115,7 +115,7 @@ impl<'a, Element: Clone + 'static, Window: Clone> Size<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Clone for Size<'a, Element, Window> {
+impl<Element: Clone, Window: Clone> Clone for Size<'_, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             options: self.options.clone(),

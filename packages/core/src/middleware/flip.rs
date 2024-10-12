@@ -169,7 +169,7 @@ impl<'a, Element: Clone + 'static, Window: Clone> Flip<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone + 'static, Window: Clone> Clone for Flip<'a, Element, Window> {
+impl<Element: Clone + 'static, Window: Clone> Clone for Flip<'_, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             options: self.options.clone(),
@@ -367,8 +367,8 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> MiddlewareWithOptions<Element, Window, FlipOptions<Element>>
-    for Flip<'a, Element, Window>
+impl<Element: Clone, Window: Clone> MiddlewareWithOptions<Element, Window, FlipOptions<Element>>
+    for Flip<'_, Element, Window>
 {
     fn options(&self) -> &Derivable<Element, Window, FlipOptions<Element>> {
         &self.options

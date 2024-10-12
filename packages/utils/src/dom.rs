@@ -182,7 +182,7 @@ impl<'a> From<&'a HtmlElement> for ElementOrCss<'a> {
     }
 }
 
-impl<'a> From<CssStyleDeclaration> for ElementOrCss<'a> {
+impl From<CssStyleDeclaration> for ElementOrCss<'_> {
     fn from(value: CssStyleDeclaration) -> Self {
         ElementOrCss::Css(value)
     }

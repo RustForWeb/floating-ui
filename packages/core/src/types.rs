@@ -16,7 +16,7 @@ pub enum Derivable<'a, Element: Clone + 'static, Window: Clone, T: Clone> {
     Fn(DerivableFn<'a, Element, Window, T>),
 }
 
-impl<'a, Element: Clone, Window: Clone, T: Clone> Clone for Derivable<'a, Element, Window, T> {
+impl<Element: Clone, Window: Clone, T: Clone> Clone for Derivable<'_, Element, Window, T> {
     fn clone(&self) -> Self {
         match self {
             Self::Value(value) => Self::Value(value.clone()),
@@ -25,7 +25,7 @@ impl<'a, Element: Clone, Window: Clone, T: Clone> Clone for Derivable<'a, Elemen
     }
 }
 
-impl<'a, Element: Clone, Window: Clone, T: Clone> Derivable<'a, Element, Window, T> {
+impl<Element: Clone, Window: Clone, T: Clone> Derivable<'_, Element, Window, T> {
     pub fn evaluate(&self, state: MiddlewareState<Element, Window>) -> T {
         match self {
             Derivable::Value(value) => value.clone(),
@@ -34,7 +34,7 @@ impl<'a, Element: Clone, Window: Clone, T: Clone> Derivable<'a, Element, Window,
     }
 }
 
-impl<'a, Element: Clone, Window: Clone, T: Clone> From<T> for Derivable<'a, Element, Window, T> {
+impl<Element: Clone, Window: Clone, T: Clone> From<T> for Derivable<'_, Element, Window, T> {
     fn from(value: T) -> Self {
         Derivable::Value(value)
     }
@@ -48,8 +48,8 @@ impl<'a, Element: Clone, Window: Clone, T: Clone> From<DerivableFn<'a, Element, 
     }
 }
 
-impl<'a, Element: Clone, Window: Clone, T: Clone + PartialEq> PartialEq
-    for Derivable<'a, Element, Window, T>
+impl<Element: Clone, Window: Clone, T: Clone + PartialEq> PartialEq
+    for Derivable<'_, Element, Window, T>
 {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
@@ -297,7 +297,7 @@ impl<'a, Element: Clone> Elements<'a, Element> {
     }
 }
 
-impl<'a, Element: Clone> Clone for Elements<'a, Element> {
+impl<Element: Clone> Clone for Elements<'_, Element> {
     fn clone(&self) -> Self {
         Self {
             reference: self.reference.clone(),
@@ -319,7 +319,7 @@ pub struct MiddlewareState<'a, Element: Clone + 'static, Window: Clone> {
     pub platform: &'a dyn Platform<Element, Window>,
 }
 
-impl<'a, Element: Clone, Window: Clone> Clone for MiddlewareState<'a, Element, Window> {
+impl<Element: Clone, Window: Clone> Clone for MiddlewareState<'_, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             x: self.x,

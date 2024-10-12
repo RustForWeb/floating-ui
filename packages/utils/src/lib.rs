@@ -479,7 +479,7 @@ pub enum ElementOrVirtual<'a, Element: Clone + 'static> {
     VirtualElement(Box<dyn VirtualElement<Element>>),
 }
 
-impl<'a, Element: Clone + 'static> ElementOrVirtual<'a, Element> {
+impl<Element: Clone + 'static> ElementOrVirtual<'_, Element> {
     pub fn resolve(self) -> Option<Element> {
         match self {
             ElementOrVirtual::Element(element) => Some(element.clone()),
@@ -494,7 +494,7 @@ impl<'a, Element: Clone> From<&'a Element> for ElementOrVirtual<'a, Element> {
     }
 }
 
-impl<'a, Element: Clone> From<Box<dyn VirtualElement<Element>>> for ElementOrVirtual<'a, Element> {
+impl<Element: Clone> From<Box<dyn VirtualElement<Element>>> for ElementOrVirtual<'_, Element> {
     fn from(value: Box<dyn VirtualElement<Element>>) -> Self {
         ElementOrVirtual::VirtualElement(value)
     }

@@ -147,7 +147,7 @@ impl<'a, Element: Clone, Window: Clone> Shift<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Clone for Shift<'a, Element, Window> {
+impl<Element: Clone, Window: Clone> Clone for Shift<'_, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             options: self.options.clone(),
@@ -248,9 +248,9 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
     }
 }
 
-impl<'a, Element: Clone, Window: Clone>
+impl<Element: Clone, Window: Clone>
     MiddlewareWithOptions<Element, Window, ShiftOptions<Element, Window>>
-    for Shift<'a, Element, Window>
+    for Shift<'_, Element, Window>
 {
     fn options(&self) -> &Derivable<Element, Window, ShiftOptions<Element, Window>> {
         &self.options
@@ -355,9 +355,7 @@ impl<'a, Element: Clone, Window: Clone> LimitShiftOptions<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone + 'static, Window: Clone> Default
-    for LimitShiftOptions<'a, Element, Window>
-{
+impl<Element: Clone + 'static, Window: Clone> Default for LimitShiftOptions<'_, Element, Window> {
     fn default() -> Self {
         Self {
             offset: Default::default(),

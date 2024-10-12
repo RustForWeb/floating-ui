@@ -145,7 +145,7 @@ impl<'a, Element: Clone + 'static, Window: Clone> Inline<'a, Element, Window> {
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> Clone for Inline<'a, Element, Window> {
+impl<Element: Clone, Window: Clone> Clone for Inline<'_, Element, Window> {
     fn clone(&self) -> Self {
         Self {
             options: self.options.clone(),
@@ -309,8 +309,8 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
     }
 }
 
-impl<'a, Element: Clone, Window: Clone> MiddlewareWithOptions<Element, Window, InlineOptions>
-    for Inline<'a, Element, Window>
+impl<Element: Clone, Window: Clone> MiddlewareWithOptions<Element, Window, InlineOptions>
+    for Inline<'_, Element, Window>
 {
     fn options(&self) -> &Derivable<Element, Window, InlineOptions> {
         &self.options
