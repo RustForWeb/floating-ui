@@ -9,7 +9,7 @@ use floating_ui_utils::{
 use crate::{
     types::ElementOrVirtual,
     utils::{
-        get_bounding_client_rect::get_bounding_client_rect,
+        get_bounding_client_rect::get_bounding_client_rect, get_html_offset::get_html_offset,
         get_window_scroll_bar_x::get_window_scroll_bar_x,
     },
 };
@@ -59,19 +59,14 @@ pub fn get_rect_relative_to_offset_parent(
         }
     }
 
-    let mut html_x = 0.0;
-    let mut html_y = 0.0;
+    let html_offset = if !is_offset_parent_an_element && !is_fixed {
+        get_html_offset(&document_element, &scroll, None)
+    } else {
+        Coords::new(0.0)
+    };
 
-    if !is_offset_parent_an_element && !is_fixed {
-        let html_rect = document_element.get_bounding_client_rect();
-        html_y = html_rect.top() as f64 + scroll.scroll_top;
-        html_x = html_rect.left()as f64 + scroll.scroll_left
-            // RTL <body> scrollbar.
-            - get_window_scroll_bar_x(&document_element, Some(html_rect));
-    }
-
-    let x = rect.left + scroll.scroll_left - offsets.x - html_x;
-    let y = rect.top + scroll.scroll_top - offsets.y - html_y;
+    let x = rect.left + scroll.scroll_left - offsets.x - html_offset.x;
+    let y = rect.top + scroll.scroll_top - offsets.y - html_offset.y;
 
     Rect {
         x,
