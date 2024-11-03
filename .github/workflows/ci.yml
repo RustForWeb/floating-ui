@@ -27,8 +27,11 @@ jobs:
                   cache-on-failure: true
                   save-if: ${{ github.ref == 'refs/heads/main' }}
 
-            - name: Install Cargo packages
-              run: cargo install trunk
+            - name: Install Cargo Binary Install
+              uses: cargo-bins/cargo-binstall@main
+
+            - name: Install Trunk
+              run: cargo binstall --force -y trunk
 
             - name: Set up Node.js
               uses: actions/setup-node@v4
