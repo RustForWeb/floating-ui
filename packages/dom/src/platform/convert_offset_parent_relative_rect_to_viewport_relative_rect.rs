@@ -9,7 +9,8 @@ use floating_ui_utils::{
 use web_sys::{Element, Window};
 
 use crate::{
-    platform::get_scale::get_scale, utils::get_bounding_client_rect::get_bounding_client_rect,
+    platform::get_scale::get_scale,
+    utils::{get_bounding_client_rect::get_bounding_client_rect, get_html_offset::get_html_offset},
 };
 
 pub fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
@@ -68,9 +69,15 @@ pub fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
         }
     }
 
+    let html_offset = if !is_offset_parent_an_element && !is_fixed {
+        get_html_offset(&document_element, &scroll, Some(true))
+    } else {
+        Coords::new(0.0)
+    };
+
     Rect {
-        x: rect.x * scale.x - scroll.scroll_left * scale.x + offsets.x,
-        y: rect.y * scale.y - scroll.scroll_top * scale.y + offsets.y,
+        x: rect.x * scale.x - scroll.scroll_left * scale.x + offsets.x + html_offset.x,
+        y: rect.y * scale.y - scroll.scroll_top * scale.y + offsets.y + html_offset.y,
         width: rect.width * scale.x,
         height: rect.height * scale.y,
     }
