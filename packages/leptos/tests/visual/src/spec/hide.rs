@@ -92,9 +92,12 @@ pub fn Hide() -> impl IntoView {
     );
 
     let hide_data = move || middleware_data.get().get_as::<HideData>(HIDE_NAME);
-    let reference_hidden =
-        move || hide_data().map_or(false, |data| data.reference_hidden.unwrap_or(false));
-    let escaped = move || hide_data().map_or(false, |data| data.escaped.unwrap_or(false));
+    let reference_hidden = move || {
+        hide_data()
+            .and_then(|data| data.reference_hidden)
+            .unwrap_or(false)
+    };
+    let escaped = move || hide_data().and_then(|data| data.escaped).unwrap_or(false);
 
     let UseScrollReturn {
         scroll_ref,

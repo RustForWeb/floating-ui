@@ -197,7 +197,10 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
         if let Some(data_placement) = data.map(|data| data.placement) {
             if placement == data_placement {
                 let arrow_data: Option<ArrowData> = middleware_data.get_as(ARROW_NAME);
-                if arrow_data.map_or(false, |arrow_data| arrow_data.alignment_offset.is_some()) {
+                if arrow_data
+                    .and_then(|arrow_data| arrow_data.alignment_offset)
+                    .is_some()
+                {
                     return MiddlewareReturn {
                         x: None,
                         y: None,

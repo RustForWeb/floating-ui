@@ -27,7 +27,7 @@ pub fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
             .as_ref()
             .map(|offset_parent| offset_parent.into()),
     );
-    let top_layer = elements.map_or(false, |elements| is_top_layer(elements.floating));
+    let top_layer = elements.is_some_and(|elements| is_top_layer(elements.floating));
 
     if offset_parent
         .as_ref()

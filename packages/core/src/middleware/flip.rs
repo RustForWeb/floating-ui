@@ -212,7 +212,10 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
         // If a reset by the arrow was caused due to an alignment offset being added,
         // we should skip any logic now since `flip()` has already done its work.
         let arrow_data: Option<ArrowData> = middleware_data.get_as(ARROW_NAME);
-        if arrow_data.map_or(false, |arrow_data| arrow_data.alignment_offset.is_some()) {
+        if arrow_data
+            .and_then(|arrow_data| arrow_data.alignment_offset)
+            .is_some()
+        {
             return MiddlewareReturn {
                 x: None,
                 y: None,
