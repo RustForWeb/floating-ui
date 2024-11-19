@@ -376,6 +376,7 @@ pub fn use_floating<
 }
 
 #[cfg(test)]
+#[cfg(target_arch = "wasm32")]
 mod tests {
     use leptos::{html::Div, *};
     use wasm_bindgen_test::*;
