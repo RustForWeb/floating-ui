@@ -1,125 +1,159 @@
-use std::{cell::RefCell, marker::PhantomData, rc::Rc};
+use std::{
+    ops::Deref,
+    rc::Rc,
+    sync::{Arc, Mutex},
+};
 
 use floating_ui_dom::{
     compute_position, ComputePositionConfig, MiddlewareData, OwnedElementOrVirtual, Placement,
     Strategy, VirtualElement,
 };
-use leptos::{
-    create_effect, create_memo, create_signal,
-    html::{AnyElement, ElementDescriptor},
-    on_cleanup, watch, MaybeProp, NodeRef, SignalGet, SignalGetUntracked, SignalSet,
-};
+use leptos::{html::ElementType, prelude::*};
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
+use web_sys::wasm_bindgen::{JsCast, JsValue};
 
 use crate::{
-    node_ref::NodeRefAsElement,
     types::{FloatingStyles, UseFloatingOptions, UseFloatingReturn, WhileElementsMountedCleanupFn},
     utils::{get_dpr::get_dpr, round_by_dpr::round_by_dpr},
 };
 
-pub enum VirtualElementOrNodeRef<NodeRef, El>
-where
-    NodeRef: NodeRefAsElement<El> + Copy + 'static,
-    El: ElementDescriptor + Clone + 'static,
-{
-    VirtualElement(Box<dyn VirtualElement<web_sys::Element>>),
-    NodeRef(NodeRef, PhantomData<El>),
+pub struct Virtual;
+
+impl ElementType for Virtual {
+    type Output = JsValue;
+
+    const TAG: &'static str = "virtual";
+    const SELF_CLOSING: bool = true;
+    const ESCAPE_CHILDREN: bool = true;
+    const NAMESPACE: Option<&'static str> = None;
+
+    fn tag(&self) -> &str {
+        Self::TAG
+    }
 }
 
-impl<NodeRef, El> VirtualElementOrNodeRef<NodeRef, El>
-where
-    NodeRef: NodeRefAsElement<El> + Copy + 'static,
-    El: ElementDescriptor + Clone + 'static,
-{
+#[derive(Clone)]
+pub enum VirtualElementOrNodeRef {
+    VirtualElement(SendWrapper<Box<dyn VirtualElement<web_sys::Element>>>),
+    NodeRef(AnyNodeRef),
+}
+
+impl VirtualElementOrNodeRef {
     pub fn get(&self) -> Option<OwnedElementOrVirtual> {
         match self {
             VirtualElementOrNodeRef::VirtualElement(virtual_element) => {
-                Some(virtual_element.clone().into())
+                Some((**virtual_element).clone().into())
             }
-            VirtualElementOrNodeRef::NodeRef(node_ref, _) => {
-                node_ref.get_as_element().map(|element| element.into())
-            }
+            VirtualElementOrNodeRef::NodeRef(node_ref) => node_ref
+                .get()
+                .and_then(|element| element.dyn_into::<web_sys::Element>().ok())
+                .map(|element| element.into()),
         }
     }
 
     pub fn get_untracked(&self) -> Option<OwnedElementOrVirtual> {
         match self {
             VirtualElementOrNodeRef::VirtualElement(virtual_element) => {
-                Some(virtual_element.clone().into())
+                Some((**virtual_element).clone().into())
             }
-            VirtualElementOrNodeRef::NodeRef(node_ref, _) => node_ref
-                .get_untracked_as_element()
+            VirtualElementOrNodeRef::NodeRef(node_ref) => node_ref
+                .get_untracked()
+                .and_then(|element| element.dyn_into::<web_sys::Element>().ok())
                 .map(|element| element.into()),
         }
     }
 }
 
-impl<NodeRef, El> Clone for VirtualElementOrNodeRef<NodeRef, El>
-where
-    NodeRef: NodeRefAsElement<El> + Copy + 'static,
-    El: ElementDescriptor + Clone + 'static,
-{
-    fn clone(&self) -> Self {
-        match self {
-            Self::VirtualElement(virtual_element) => Self::VirtualElement(virtual_element.clone()),
-            Self::NodeRef(node_ref, phantom) => Self::NodeRef(*node_ref, *phantom),
-        }
-    }
-}
+// impl<E: ElementType> Clone for VirtualElementOrNodeRef<E> {
+//     fn clone(&self) -> Self {
+//         match self {
+//             Self::VirtualElement(virtual_element) => Self::VirtualElement(virtual_element.clone()),
+//             Self::NodeRef(node_ref) => Self::NodeRef(*node_ref),
+//         }
+//     }
+// }
 
-impl From<Box<dyn VirtualElement<web_sys::Element>>>
-    for VirtualElementOrNodeRef<NodeRef<AnyElement>, AnyElement>
-{
+impl From<Box<dyn VirtualElement<web_sys::Element>>> for VirtualElementOrNodeRef {
     fn from(value: Box<dyn VirtualElement<web_sys::Element>>) -> Self {
-        VirtualElementOrNodeRef::VirtualElement(value)
+        VirtualElementOrNodeRef::VirtualElement(SendWrapper::new(value))
     }
 }
 
-impl<NodeRef, El> From<NodeRef> for VirtualElementOrNodeRef<NodeRef, El>
-where
-    NodeRef: NodeRefAsElement<El> + Copy,
-    El: ElementDescriptor + Clone + 'static,
-{
-    fn from(value: NodeRef) -> Self {
-        VirtualElementOrNodeRef::NodeRef(value, PhantomData)
+impl From<AnyNodeRef> for VirtualElementOrNodeRef {
+    fn from(value: AnyNodeRef) -> Self {
+        VirtualElementOrNodeRef::NodeRef(value)
     }
 }
 
-pub trait IntoReference<NodeRef, El>
-where
-    NodeRef: NodeRefAsElement<El> + Copy,
-    El: ElementDescriptor + Clone + 'static,
-{
-    fn into_reference(self) -> MaybeProp<VirtualElementOrNodeRef<NodeRef, El>>;
-}
+#[derive(Clone, Copy)]
+pub struct Reference(MaybeProp<VirtualElementOrNodeRef>);
 
-impl IntoReference<NodeRef<AnyElement>, AnyElement> for Box<dyn VirtualElement<web_sys::Element>> {
-    fn into_reference(self) -> MaybeProp<VirtualElementOrNodeRef<NodeRef<AnyElement>, AnyElement>> {
-        VirtualElementOrNodeRef::VirtualElement(self).into()
+impl Deref for Reference {
+    type Target = MaybeProp<VirtualElementOrNodeRef>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
-impl<NodeRef, El> IntoReference<NodeRef, El> for NodeRef
-where
-    NodeRef: NodeRefAsElement<El> + Copy,
-    El: ElementDescriptor + Clone + 'static,
-{
-    fn into_reference(self) -> MaybeProp<VirtualElementOrNodeRef<NodeRef, El>> {
-        VirtualElementOrNodeRef::NodeRef(self, PhantomData).into()
+impl From<MaybeProp<VirtualElementOrNodeRef>> for Reference {
+    fn from(value: MaybeProp<VirtualElementOrNodeRef>) -> Self {
+        Reference(value)
+    }
+}
+
+impl From<Memo<VirtualElementOrNodeRef>> for Reference {
+    fn from(value: Memo<VirtualElementOrNodeRef>) -> Self {
+        Reference(value.into())
+    }
+}
+
+impl From<ReadSignal<VirtualElementOrNodeRef>> for Reference {
+    fn from(value: ReadSignal<VirtualElementOrNodeRef>) -> Self {
+        Reference(value.into())
+    }
+}
+
+impl From<RwSignal<VirtualElementOrNodeRef>> for Reference {
+    fn from(value: RwSignal<VirtualElementOrNodeRef>) -> Self {
+        Reference(value.into())
+    }
+}
+
+impl From<Signal<VirtualElementOrNodeRef>> for Reference {
+    fn from(value: Signal<VirtualElementOrNodeRef>) -> Self {
+        Reference(value.into())
+    }
+}
+
+impl From<VirtualElementOrNodeRef> for Reference {
+    fn from(value: VirtualElementOrNodeRef) -> Self {
+        Reference(value.into())
+    }
+}
+
+impl From<Box<dyn VirtualElement<web_sys::Element>>> for Reference {
+    fn from(value: Box<dyn VirtualElement<web_sys::Element>>) -> Self {
+        Reference(VirtualElementOrNodeRef::from(value).into())
+    }
+}
+
+impl From<AnyNodeRef> for Reference {
+    fn from(value: AnyNodeRef) -> Self {
+        Reference(VirtualElementOrNodeRef::from(value).into())
     }
 }
 
 /// Computes the `x` and `y` coordinates that will place the floating element next to a reference element.
-pub fn use_floating<
-    Reference: NodeRefAsElement<ReferenceEl> + Copy + 'static,
-    ReferenceEl: ElementDescriptor + Clone + 'static,
-    Floating: NodeRefAsElement<FloatingEl> + Copy + 'static,
-    FloatingEl: ElementDescriptor + Clone + 'static,
->(
-    reference: MaybeProp<VirtualElementOrNodeRef<Reference, ReferenceEl>>,
-    floating: Floating,
+pub fn use_floating<R: Into<Reference>>(
+    reference: R,
+    floating: AnyNodeRef,
     options: UseFloatingOptions,
 ) -> UseFloatingReturn {
-    let open_option = move || options.open.get().unwrap_or(true);
+    let reference: Reference = reference.into();
+
+    let open_option = Signal::derive(move || options.open.get().unwrap_or(true));
     let placement_option_untracked = move || {
         options
             .placement
@@ -132,38 +166,37 @@ pub fn use_floating<
             .get_untracked()
             .unwrap_or(Strategy::Absolute)
     };
-    let options_middleware = options.middleware.clone();
-    let middleware_option_untracked = move || options_middleware.get_untracked();
+    let middleware_option_untracked = move || options.middleware.get_untracked();
     let transform_option = move || options.transform.get().unwrap_or(true);
-    let options_while_elements_mounted = options.while_elements_mounted.clone();
-    let while_elements_mounted_untracked = move || options_while_elements_mounted.get_untracked();
+    let while_elements_mounted_untracked = move || options.while_elements_mounted.get_untracked();
 
-    let (x, set_x) = create_signal(0.0);
-    let (y, set_y) = create_signal(0.0);
-    let (strategy, set_strategy) = create_signal(strategy_option_untracked());
-    let (placement, set_placement) = create_signal(placement_option_untracked());
-    let (middleware_data, set_middleware_data) = create_signal(MiddlewareData::default());
-    let (is_positioned, set_is_positioned) = create_signal(false);
-    let floating_styles = create_memo(move |_| {
+    let (x, set_x) = signal(0.0);
+    let (y, set_y) = signal(0.0);
+    let (strategy, set_strategy) = signal(strategy_option_untracked());
+    let (placement, set_placement) = signal(placement_option_untracked());
+    let (middleware_data, set_middleware_data) = signal(MiddlewareData::default());
+    let (is_positioned, set_is_positioned) = signal(false);
+    let floating_styles = Memo::new(move |_| {
         let initial_styles = FloatingStyles {
             position: strategy.get(),
-            top: "0".into(),
-            left: "0".into(),
+            top: "0".to_owned(),
+            left: "0".to_owned(),
             transform: None,
             will_change: None,
         };
 
-        if let Some(floating_element) = floating.get_as_element() {
+        if let Some(floating_element) = floating
+            .get()
+            .and_then(|floating| floating.dyn_into::<web_sys::Element>().ok())
+        {
             let x_val = round_by_dpr(&floating_element, x.get());
             let y_val = round_by_dpr(&floating_element, y.get());
 
             if transform_option() {
                 FloatingStyles {
                     transform: Some(format!("translate({x_val}px, {y_val}px)")),
-                    will_change: match get_dpr(&floating_element) >= 1.5 {
-                        true => Some("transform".into()),
-                        false => None,
-                    },
+                    will_change: (get_dpr(&floating_element) >= 1.5)
+                        .then_some("transform".to_owned()),
                     ..initial_styles
                 }
             } else {
@@ -179,19 +212,21 @@ pub fn use_floating<
     });
 
     let update = Rc::new({
-        let reference = reference.clone();
-
         move || {
             if let Some(reference) = reference.get_untracked() {
                 if let Some(reference_element) = reference.get_untracked() {
-                    if let Some(floating_element) = floating.get_untracked_as_element() {
+                    if let Some(floating_element) = floating
+                        .get_untracked()
+                        .and_then(|floating| floating.dyn_into::<web_sys::Element>().ok())
+                    {
                         let config = ComputePositionConfig {
                             placement: Some(placement_option_untracked()),
                             strategy: Some(strategy_option_untracked()),
-                            middleware: middleware_option_untracked(),
+                            middleware: middleware_option_untracked()
+                                .map(|middleware| middleware.deref().clone()),
                         };
 
-                        let open = open_option();
+                        let open = open_option.get_untracked();
 
                         let position = compute_position(
                             (&reference_element).into(),
@@ -214,24 +249,28 @@ pub fn use_floating<
         }
     });
 
-    let while_elements_mounted_cleanup: Rc<RefCell<Option<WhileElementsMountedCleanupFn>>> =
-        Rc::new(RefCell::new(None));
+    let while_elements_mounted_cleanup: Arc<
+        Mutex<Option<SendWrapper<WhileElementsMountedCleanupFn>>>,
+    > = Arc::new(Mutex::new(None));
 
-    let cleanup = Rc::new({
+    let cleanup = Arc::new({
         let while_elements_mounted_cleanup = while_elements_mounted_cleanup.clone();
 
         move || {
-            if let Some(while_elements_mounted_cleanup) = while_elements_mounted_cleanup.take() {
+            if let Some(while_elements_mounted_cleanup) = while_elements_mounted_cleanup
+                .lock()
+                .expect("Lock should be acquired.")
+                .as_ref()
+            {
                 while_elements_mounted_cleanup();
             }
         }
     });
 
-    let attach_while_elements_mounted_cleanup = while_elements_mounted_cleanup.clone();
     let attach = Rc::new({
-        let reference = reference.clone();
         let update = update.clone();
         let cleanup = cleanup.clone();
+        let while_elements_mounted_cleanup = while_elements_mounted_cleanup.clone();
 
         move || {
             cleanup();
@@ -239,14 +278,18 @@ pub fn use_floating<
             if let Some(while_elements_mounted) = while_elements_mounted_untracked() {
                 if let Some(reference) = reference.get_untracked() {
                     if let Some(reference_element) = reference.get_untracked() {
-                        if let Some(floating_element) = floating.get_untracked_as_element() {
-                            attach_while_elements_mounted_cleanup.replace(Some(
-                                while_elements_mounted(
+                        if let Some(floating_element) = floating
+                            .get_untracked()
+                            .and_then(|floating| floating.dyn_into::<web_sys::Element>().ok())
+                        {
+                            *while_elements_mounted_cleanup
+                                .lock()
+                                .expect("Lock should be acquired.") =
+                                Some(SendWrapper::new(while_elements_mounted(
                                     (&reference_element).into(),
                                     &floating_element,
                                     update.clone(),
-                                ),
-                            ));
+                                )));
                         }
                     }
                 }
@@ -257,12 +300,12 @@ pub fn use_floating<
     });
 
     let reset = move || {
-        if !open_option() {
+        if !open_option.get_untracked() {
             set_is_positioned.set(false);
         }
     };
 
-    create_effect({
+    Effect::new({
         let attach = attach.clone();
 
         move |_| {
@@ -271,15 +314,13 @@ pub fn use_floating<
                     VirtualElementOrNodeRef::VirtualElement(_) => {
                         attach();
                     }
-                    VirtualElementOrNodeRef::NodeRef(reference, _) => {
-                        if let Some(reference) = reference.get() {
-                            _ = reference.on_mount({
-                                let attach = attach.clone();
-
-                                move |_| {
-                                    attach();
-                                }
-                            });
+                    VirtualElementOrNodeRef::NodeRef(reference) => {
+                        if reference
+                            .get()
+                            .and_then(|reference| reference.dyn_into::<web_sys::Element>().ok())
+                            .is_some()
+                        {
+                            attach();
                         }
                     }
                 }
@@ -287,28 +328,26 @@ pub fn use_floating<
         }
     });
 
-    create_effect({
+    Effect::new({
         let attach = attach.clone();
 
         move |_| {
-            if let Some(floating) = floating.get() {
-                _ = floating.on_mount({
-                    let attach = attach.clone();
-
-                    move |_| {
-                        attach();
-                    }
-                });
+            if floating
+                .get()
+                .and_then(|floating| floating.dyn_into::<web_sys::Element>().ok())
+                .is_some()
+            {
+                attach();
             }
         }
     });
 
-    create_effect(move |_| {
+    Effect::new(move |_| {
         reset();
     });
 
-    _ = watch(
-        open_option,
+    _ = Effect::watch(
+        move || open_option.get(),
         {
             let update = update.clone();
 
@@ -318,7 +357,7 @@ pub fn use_floating<
         },
         false,
     );
-    _ = watch(
+    _ = Effect::watch(
         move || options.placement.get(),
         {
             let update = update.clone();
@@ -329,7 +368,7 @@ pub fn use_floating<
         },
         false,
     );
-    _ = watch(
+    _ = Effect::watch(
         move || options.strategy.get(),
         {
             let update = update.clone();
@@ -340,7 +379,7 @@ pub fn use_floating<
         },
         false,
     );
-    _ = watch(
+    _ = Effect::watch(
         move || options.middleware.get(),
         {
             let update = update.clone();
@@ -351,7 +390,7 @@ pub fn use_floating<
         },
         false,
     );
-    _ = watch(
+    _ = Effect::watch(
         move || options.while_elements_mounted.get(),
         move |_, _, _| {
             attach();
@@ -371,14 +410,15 @@ pub fn use_floating<
         middleware_data: middleware_data.into(),
         is_positioned: is_positioned.into(),
         floating_styles: floating_styles.into(),
-        update: update.clone(),
+        update: SendWrapper::new(update.clone()),
     }
 }
 
-#[cfg(test)]
 #[cfg(target_arch = "wasm32")]
+#[cfg(test)]
 mod tests {
-    use leptos::{html::Div, *};
+    use leptos::prelude::*;
+    use leptos_node_ref::AnyNodeRef;
     use wasm_bindgen_test::*;
 
     use super::*;
@@ -389,29 +429,25 @@ mod tests {
     fn updates_is_positioned_when_position_is_computed() {
         #[component]
         fn Component() -> impl IntoView {
-            let reference = create_node_ref::<Div>();
-            let floating = create_node_ref::<Div>();
-            let UseFloatingReturn { is_positioned, .. } = use_floating(
-                reference.into_reference(),
-                floating,
-                UseFloatingOptions::default(),
-            );
+            let reference = AnyNodeRef::new();
+            let floating = AnyNodeRef::new();
+            let UseFloatingReturn { is_positioned, .. } =
+                use_floating(reference, floating, UseFloatingOptions::default());
 
             view! {
-                <div _ref=reference />
-                <div _ref=floating />
+                <div node_ref=reference />
+                <div node_ref=floating />
                 <div id="test-is-positioned">{is_positioned}</div>
             }
         }
 
-        let document = leptos::document();
-        mount_to(document.body().unwrap(), Component);
+        mount_to_body(Component);
 
         // assert_eq!(
         //     document
         //         .get_element_by_id("test-is-positioned")
         //         .and_then(|element| element.text_content()),
-        //     Some("true".into())
+        //     Some("true".to_owned())
         // );
     }
 }

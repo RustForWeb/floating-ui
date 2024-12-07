@@ -82,9 +82,10 @@ pub fn App() -> Html {
                 role="tooltip"
                 style={format!(
                     "display: {}; {}",
-                    match *open {
-                        true => "block",
-                        false => "none",
+                    if *open {
+                        "block"
+                    } else {
+                        "none"
                     },
                     *floating_styles
                 )}
@@ -96,21 +97,21 @@ pub fn App() -> Html {
                     style={format!(
                         "{}{}{}{}",
                         (match static_side {
-                            Side::Left => Some("-4px".into()),
+                            Side::Left => Some("-4px".to_owned()),
                             _ => (*arrow_x).clone()
-                        }).map(|value| format!("left: {value};")).unwrap_or("".into()),
+                        }).map(|value| format!("left: {value};")).unwrap_or_default(),
                         (match static_side {
-                            Side::Top => Some("-4px".into()),
+                            Side::Top => Some("-4px".to_owned()),
                             _ => (*arrow_y).clone()
-                        }).map(|value| format!("top: {value};")).unwrap_or("".into()),
+                        }).map(|value| format!("top: {value};")).unwrap_or_default(),
                         (match static_side {
                             Side::Right => Some("-4px"),
                             _ => None
-                        }).map(|value| format!("right: {value};")).unwrap_or("".into()),
+                        }).map(|value| format!("right: {value};")).unwrap_or_default(),
                         (match static_side {
                             Side::Bottom => Some("-4px"),
                             _ => None
-                        }).map(|value| format!("left: {value};")).unwrap_or("".into()),
+                        }).map(|value| format!("left: {value};")).unwrap_or_default(),
                     )}
                 />
             </div>

@@ -1,9 +1,12 @@
 use std::ops::Deref;
 
-use leptos::{html::ElementDescriptor, HtmlElement, NodeRef};
+use leptos::{
+    html::{ElementType, HtmlElement},
+    prelude::NodeRef,
+};
 use web_sys::Element;
 
-pub trait NodeRefAsElement<T: ElementDescriptor + Clone + 'static> {
+pub trait NodeRefAsElement<T: ElementType + Clone + 'static> {
     fn get(&self) -> Option<HtmlElement<T>>;
 
     fn get_as_element(&self) -> Option<Element>;

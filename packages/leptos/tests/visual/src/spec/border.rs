@@ -1,6 +1,7 @@
 use convert_case::{Case, Casing};
-use floating_ui_leptos::{use_floating, IntoReference, UseFloatingOptions, UseFloatingReturn};
-use leptos::{html::Div, *};
+use floating_ui_leptos::{use_floating, UseFloatingOptions, UseFloatingReturn};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
 use wasm_bindgen::JsCast;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -26,10 +27,10 @@ const ALL_NODES: [Node; 7] = [
 
 #[component]
 pub fn Border() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (node, set_node) = create_signal(Node::None);
+    let (node, set_node) = signal(Node::None);
 
     let UseFloatingReturn {
         x,
@@ -37,13 +38,9 @@ pub fn Border() -> impl IntoView {
         strategy,
         update,
         ..
-    } = use_floating(
-        reference_ref.into_reference(),
-        floating_ref,
-        UseFloatingOptions::default(),
-    );
+    } = use_floating(reference_ref, floating_ref, UseFloatingOptions::default());
 
-    create_effect(move |_| {
+    Effect::new(move |_| {
         let element = match node.get() {
             Node::Html => document()
                 .document_element()
@@ -105,7 +102,7 @@ pub fn Border() -> impl IntoView {
             }
         >
             <div
-                _ref=reference_ref
+                node_ref=reference_ref
                 class="reference"
                 style:border=move || match node.get() {
                     Node::Reference => "10px solid black",
@@ -115,7 +112,7 @@ pub fn Border() -> impl IntoView {
                 Reference
             </div>
             <div
-                _ref=floating_ref
+                node_ref=floating_ref
                 class="floating"
                 style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                 style:top=move || format!("{}px", y.get())
@@ -136,13 +133,14 @@ pub fn Border() -> impl IntoView {
                 children=move |local_node| view! {
                     <button
                         data-testid=move || format!("border-{}", match local_node {
-                            Node::None => "null".into(),
-                            Node::ContentBox => "content-box".into(),
+                            Node::None => "null".to_owned(),
+                            Node::ContentBox => "content-box".to_owned(),
                             _ => format!("{:?}", local_node).to_case(Case::Camel)
                         })
-                        style:background-color=move || match node.get() == local_node {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if node.get() == local_node {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_node.set(local_node)
                     >

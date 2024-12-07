@@ -1,6 +1,7 @@
 use convert_case::{Case, Casing};
-use floating_ui_leptos::{use_floating, IntoReference, UseFloatingOptions, UseFloatingReturn};
-use leptos::{html::Div, *};
+use floating_ui_leptos::{use_floating, UseFloatingOptions, UseFloatingReturn};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
 use wasm_bindgen::JsCast;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -15,11 +16,11 @@ const ALL_NODES: [Node; 4] = [Node::None, Node::Html, Node::Body, Node::OffsetPa
 
 #[component]
 pub fn Relative() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (node, set_node) = create_signal(Node::None);
-    let (offset, set_offset) = create_signal(0);
+    let (node, set_node) = signal(Node::None);
+    let (offset, set_offset) = signal(0);
 
     let UseFloatingReturn {
         x,
@@ -27,13 +28,9 @@ pub fn Relative() -> impl IntoView {
         strategy,
         update,
         ..
-    } = use_floating(
-        reference_ref.into_reference(),
-        floating_ref,
-        UseFloatingOptions::default(),
-    );
+    } = use_floating(reference_ref, floating_ref, UseFloatingOptions::default());
 
-    create_effect(move |_| {
+    Effect::new(move |_| {
         let element = match node.get() {
             Node::Html => document()
                 .document_element()
@@ -93,11 +90,11 @@ pub fn Relative() -> impl IntoView {
                 _ => ""
             }
         >
-            <div _ref=reference_ref class="reference">
+            <div node_ref=reference_ref class="reference">
                 Reference
             </div>
             <div
-                _ref=floating_ref
+                node_ref=floating_ref
                 class="floating"
                 style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                 style:top=move || format!("{}px", y.get())
@@ -115,12 +112,13 @@ pub fn Relative() -> impl IntoView {
                 children=move |local_node| view! {
                     <button
                         data-testid=move || format!("relative-{}", match local_node {
-                            Node::None => "null".into(),
+                            Node::None => "null".to_owned(),
                             _ => format!("{:?}", local_node).to_case(Case::Camel)
                         })
-                        style:background-color=move || match node.get() == local_node {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if node.get() == local_node {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_node.set(local_node)
                     >
@@ -139,9 +137,10 @@ pub fn Relative() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("offset-{local_offset}")
-                            style:background-color=move || match offset.get() == local_offset {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if offset.get() == local_offset {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| {
                                 set_offset.set(local_offset);

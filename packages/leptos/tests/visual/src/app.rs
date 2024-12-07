@@ -1,5 +1,6 @@
-use leptos::*;
-use leptos_router::{Outlet, Route, Router, Routes, A};
+use leptos::prelude::*;
+use leptos_router::components::{Outlet, ParentRoute, Route, Router, Routes, A};
+use leptos_router::path;
 
 use crate::spec::arrow::Arrow;
 use crate::spec::auto_placement::AutoPlacement;
@@ -57,10 +58,10 @@ pub fn AppWrapper() -> impl IntoView {
             </main>
             <nav>
                 <div class="nav-top">
-                    <A href="/" class="home-button">
+                    <A href="/" attr:class="home-button">
                         Tests
                     </A>
-                    <A href="/new" class="new-button">
+                    <A href="/new" attr:class="new-button">
                         New
                     </A>
                 </div>
@@ -70,7 +71,7 @@ pub fn AppWrapper() -> impl IntoView {
                         key=|path| path.to_string()
                         children=move |path| {
                             view! {
-                                <A href=format!("/{path}") class="nav-link">
+                                <A href=format!("/{path}") attr:class="nav-link">
                                     {path.replace('-', " ")}
                                 </A>
                             }
@@ -99,37 +100,35 @@ pub fn Index() -> impl IntoView {
 pub fn App() -> impl IntoView {
     view! {
         <Router>
-            <Routes>
-                <Route path="/" view=AppWrapper>
-                    <Route path="" view=Index />
+            <Routes fallback=|| view! { <h1>"Not Found"</h1> }>
+                <ParentRoute path=path!("/") view=AppWrapper>
+                    <Route path=path!("") view=Index />
 
-                    <Route path="new" view=New />
-                    <Route path="placement" view=Placement />
-                    <Route path="relative" view=Relative />
-                    <Route path="transform" view=Transform />
-                    <Route path="border" view=Border />
-                    <Route path="scroll" view=Scroll />
-                    <Route path="decimal-size" view=DecimalSize />
-                    <Route path="table" view=Table />
-                    <Route path="scrollbars" view=Scrollbars />
-                    <Route path="shift" view=Shift />
-                    <Route path="flip" view=Flip />
-                    <Route path="size" view=Size />
-                    <Route path="arrow" view=Arrow />
-                    <Route path="offset" view=Offset />
-                    <Route path="hide" view=Hide />
-                    <Route path="autoPlacement" view=AutoPlacement />
-                    <Route path="inline" view=Inline />
-                    <Route path="autoUpdate" view=AutoUpdate />
-                    // <Route path="shadow-DOM" view=ShadowDom />
-                    <Route path="containing-block" view=ContainingBlock />
-                    <Route path="virtual-element" view=VirtualElement />
-                    // <Route path="perf" view=Perf />
-                    // <Route path="iframe" view=Iframe />
-                    // <Route path="top-layer" view=TopLayer />
-
-                    <Route path="/*any" view=|| view! { <h1>"Not Found"</h1> }/>
-                </Route>
+                    <Route path=path!("new") view=New />
+                    <Route path=path!("placement") view=Placement />
+                    <Route path=path!("relative") view=Relative />
+                    <Route path=path!("transform") view=Transform />
+                    <Route path=path!("border") view=Border />
+                    <Route path=path!("scroll") view=Scroll />
+                    <Route path=path!("decimal-size") view=DecimalSize />
+                    <Route path=path!("table") view=Table />
+                    <Route path=path!("scrollbars") view=Scrollbars />
+                    <Route path=path!("shift") view=Shift />
+                    <Route path=path!("flip") view=Flip />
+                    <Route path=path!("size") view=Size />
+                    <Route path=path!("arrow") view=Arrow />
+                    <Route path=path!("offset") view=Offset />
+                    <Route path=path!("hide") view=Hide />
+                    <Route path=path!("autoPlacement") view=AutoPlacement />
+                    <Route path=path!("inline") view=Inline />
+                    <Route path=path!("autoUpdate") view=AutoUpdate />
+                    // <Route path=path!("shadow-DOM") view=ShadowDom />
+                    <Route path=path!("containing-block") view=ContainingBlock />
+                    <Route path=path!("virtual-element") view=VirtualElement />
+                    // <Route path=path!("perf") view=Perf />
+                    // <Route path=path!("iframe") view=Iframe />
+                    // <Route path=path!("top-layer") view=TopLayer />
+                </ParentRoute>
             </Routes>
         </Router>
     }

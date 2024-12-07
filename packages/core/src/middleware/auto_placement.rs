@@ -50,9 +50,10 @@ fn get_placement_list(
         .filter(|placement| match alignment {
             Some(alignment) => {
                 get_alignment(*placement) == Some(alignment)
-                    || (match auto_alignment {
-                        true => get_opposite_alignment_placement(*placement) != *placement,
-                        false => false,
+                    || (if auto_alignment {
+                        get_opposite_alignment_placement(*placement) != *placement
+                    } else {
+                        false
                     })
             }
             None => true,
@@ -229,9 +230,10 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
             .unwrap_or(Vec::from(ALL_PLACEMENTS));
         let auto_alignment = options.auto_alignment.unwrap_or(true);
 
-        let placements = match alignment.is_some() || !has_allowed_placements {
-            true => get_placement_list(alignment, auto_alignment, allowed_placements),
-            false => allowed_placements,
+        let placements: Vec<Placement> = if alignment.is_some() || !has_allowed_placements {
+            get_placement_list(alignment, auto_alignment, allowed_placements)
+        } else {
+            allowed_placements
         };
 
         let overflow = detect_overflow(
@@ -305,11 +307,12 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
 
                     (
                         overflow.placement,
-                        match alignment.is_some() && cross_axis {
+                        if alignment.is_some() && cross_axis {
                             // Check along the main axis and main cross axis side.
-                            true => overflow.overflows[0..2].iter().sum(),
+                            overflow.overflows[0..2].iter().sum()
+                        } else {
                             // Check only the main axis.
-                            false => overflow.overflows[0],
+                            overflow.overflows[0]
                         },
                         overflow.overflows,
                     )

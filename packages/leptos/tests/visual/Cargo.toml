@@ -15,7 +15,9 @@ console_log.workspace = true
 convert_case = "0.6.0"
 floating-ui-leptos = { path = "../.." }
 leptos = { workspace = true, features = ["csr"] }
-leptos_router = { workspace = true, features = ["csr"] }
+leptos_router.workspace = true
+leptos-node-ref.workspace = true
 log.workspace = true
+send_wrapper.workspace = true
 wasm-bindgen.workspace = true
 web-sys.workspace = true

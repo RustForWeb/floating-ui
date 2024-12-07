@@ -39,12 +39,13 @@ pub fn get_css_dimensions(element: &Element) -> CssDimensions {
     let should_fallback = width.round() != offset_width || height.round() != offset_height;
 
     CssDimensions {
-        dimensions: match should_fallback {
-            true => Dimensions {
+        dimensions: if should_fallback {
+            Dimensions {
                 width: offset_width,
                 height: offset_height,
-            },
-            false => Dimensions { width, height },
+            }
+        } else {
+            Dimensions { width, height }
         },
         should_fallback,
     }

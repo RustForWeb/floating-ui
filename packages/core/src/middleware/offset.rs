@@ -30,10 +30,7 @@ fn convert_value_to_coords<Element: Clone, Window: Clone>(
         Side::Left | Side::Top => -1.0,
         Side::Right | Side::Bottom => 1.0,
     };
-    let cross_axis_multi = match rtl && is_vertical {
-        true => -1.0,
-        false => 1.0,
-    };
+    let cross_axis_multi = if rtl && is_vertical { -1.0 } else { 1.0 };
 
     let (main_axis, mut cross_axis, alignment_axis): (f64, f64, Option<f64>) = match options {
         OffsetOptions::Value(value) => (*value, 0.0, None),
@@ -53,15 +50,16 @@ fn convert_value_to_coords<Element: Clone, Window: Clone>(
         }
     }
 
-    match is_vertical {
-        true => Coords {
+    if is_vertical {
+        Coords {
             x: cross_axis * cross_axis_multi,
             y: main_axis * main_axis_multi,
-        },
-        false => Coords {
+        }
+    } else {
+        Coords {
             x: main_axis * main_axis_multi,
             y: cross_axis * cross_axis_multi,
-        },
+        }
     }
 }
 

@@ -2,7 +2,9 @@ use floating_ui_leptos::{
     DetectOverflowOptions, Flip, FlipOptions, MiddlewareVec, Offset, OffsetOptions, Placement,
     RootBoundary,
 };
-use leptos::{html::Div, *};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 
 use crate::{
     components::{Chrome, Floating, GridItem, Reference, Scrollable},
@@ -11,7 +13,7 @@ use crate::{
 
 #[component]
 pub fn FlipDemo() -> impl IntoView {
-    let boundary_ref: NodeRef<Div> = NodeRef::new();
+    let boundary_ref = AnyNodeRef::new();
 
     Effect::new(move |_| {
         if let Some(boundary) = boundary_ref.get() {
@@ -27,7 +29,7 @@ pub fn FlipDemo() -> impl IntoView {
             title="Flip"
             description="Changes the placement of your floating element to keep it in view."
             chrome=move || view! {
-                <div ref={boundary_ref} class="relative overflow-hidden">
+                <div node_ref={boundary_ref} class="relative overflow-hidden">
                     <Chrome
                         label="Scroll down"
                         scrollable=Scrollable::Y
@@ -44,7 +46,7 @@ pub fn FlipDemo() -> impl IntoView {
                                     ))),
                                 ];
 
-                                middleware
+                                SendWrapper::new(middleware)
                             }
                             content=move || view! {
                                 <span class="text-sm font-bold">

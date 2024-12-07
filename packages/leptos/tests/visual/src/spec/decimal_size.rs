@@ -1,8 +1,10 @@
 use floating_ui_leptos::{
-    use_floating, ApplyState, IntoReference, MiddlewareState, MiddlewareVec, Size, SizeOptions,
+    use_floating, ApplyState, MiddlewareState, MiddlewareVec, Size, SizeOptions,
     UseFloatingOptions, UseFloatingReturn,
 };
-use leptos::{html::Div, *};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 use wasm_bindgen::JsCast;
 
 const SIZES: [f64; 4] = [0.0, 0.25, 0.5, 0.75];
@@ -10,11 +12,11 @@ const INTEGER: f64 = 80.0;
 
 #[component]
 pub fn DecimalSize() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (size, set_size) = create_signal(INTEGER);
-    let (truncate, set_truncate) = create_signal(false);
+    let (size, set_size) = signal(INTEGER);
+    let (truncate, set_truncate) = signal(false);
 
     let middleware: MiddlewareVec = vec![Box::new(Size::new(SizeOptions::default().apply(
         &|ApplyState { state, .. }| {
@@ -40,13 +42,16 @@ pub fn DecimalSize() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref.into_reference(),
+        reference_ref,
         floating_ref,
-        UseFloatingOptions::default().middleware(middleware.into()),
+        UseFloatingOptions::default().middleware(SendWrapper::new(middleware).into()),
     );
 
-    let size_update = update.clone();
-    let truncate_update = update.clone();
+    Effect::new(move || {
+        _ = size.get();
+        _ = truncate.get();
+        update();
+    });
 
     view! {
         <h1>Decimal Size</h1>
@@ -55,43 +60,50 @@ pub fn DecimalSize() -> impl IntoView {
             the reference and floating elements have a non-integer size (width/height).
         </p>
         <div class="container">
-            <div _ref=reference_ref class="reference" style=move || format!("width: {}px; height: {}px;", size.get(), size.get())>
+            <div node_ref=reference_ref class="reference" style=move || format!("width: {}px; height: {}px;", size.get(), size.get())>
                 Reference
             </div>
             <div
-                _ref=floating_ref
+                node_ref=floating_ref
                 class="floating"
                 style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                 style:top=move || format!("{}px", y.get())
                 style:left=move || format!("{}px", x.get())
-                style:width=move || match truncate.get() {
-                    true => "auto".into(),
-                    false => format!("{}px", size.get()),
+                style:width=move || if truncate.get() {
+                    "auto".to_owned()
+                } else {
+                    format!("{}px", size.get())
                 }
-                style:height=move || match truncate.get() {
-                    true => "auto".into(),
-                    false => format!("{}px", size.get()),
+                style:height=move || if truncate.get() {
+                    "auto".to_owned()
+                } else {
+                    format!("{}px", size.get())
                 }
-                style:display=move || match truncate.get() {
-                    true => "block",
-                    false => "",
+                style:display=move || if truncate.get() {
+                    "block"
+                } else {
+                    ""
                 }
-                style:overflow=move || match truncate.get() {
-                    true => "hidden",
-                    false => "",
+                style:overflow=move || if truncate.get() {
+                    "hidden"
+                } else {
+                    ""
                 }
-                style:text-overflow=move || match truncate.get() {
-                    true => "ellipsis",
-                    false => "",
+                style:text-overflow=move || if truncate.get() {
+                    "ellipsis"
+                } else {
+                    ""
                 }
-                style:white-space=move || match truncate.get() {
-                    true => "nowrap",
-                    false => "",
+                style:white-space=move || if truncate.get() {
+                    "nowrap"
+                } else {
+                    ""
                 }
             >
-                {move || match truncate.get() {
-                    true => "Long text that will be truncated",
-                    false => "Floating",
+                {move || if truncate.get() {
+                    "Long text that will be truncated"
+                } else {
+                    "Floating"
                 }}
             </div>
         </div>
@@ -100,29 +112,24 @@ pub fn DecimalSize() -> impl IntoView {
             <For
                 each=|| SIZES
                 key=|local_size| format!("{:?}", local_size)
-                children=move |local_size| {
-                    let size_update = size_update.clone();
-                    view! {
-                        <button
-                            data-testid=format!("decimal-size-{}", match local_size {
-                                0.0 => ".0".into(),
-                                _ => local_size.to_string()[1..].to_string()
-                            })
-                            style:background-color=move || match size.get().fract() == local_size {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| {
-                                set_size.set(INTEGER + local_size);
-                                size_update();
-                            }
-                        >
-                            {match local_size {
-                                0.0 => ".0".into(),
-                                _ => local_size.to_string()[1..].to_string()
-                            }}
-                        </button>
-                    }
+                children=move |local_size| view! {
+                    <button
+                        data-testid=format!("decimal-size-{}", match local_size {
+                            0.0 => ".0".to_owned(),
+                            _ => local_size.to_string()[1..].to_string()
+                        })
+                        style:background-color=move || if size.get().fract() == local_size {
+                            "black"
+                        } else {
+                            ""
+                        }
+                        on:click=move |_| set_size.set(INTEGER + local_size)
+                    >
+                        {match local_size {
+                            0.0 => ".0".to_owned(),
+                            _ => local_size.to_string()[1..].to_string()
+                        }}
+                    </button>
                 }
             />
         </div>
@@ -132,23 +139,18 @@ pub fn DecimalSize() -> impl IntoView {
             <For
                 each=|| [true, false]
                 key=|value| format!("{}", value)
-                children=move |value| {
-                    let truncate_update = truncate_update.clone();
-                    view! {
-                        <button
-                            data-testid=format!("truncate-{}", value)
-                            style:background-color=move || match truncate.get() == value {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| {
-                                set_truncate.set(value);
-                                truncate_update();
-                            }
-                        >
-                            {format!("{}", value)}
-                        </button>
-                    }
+                children=move |value| view! {
+                    <button
+                        data-testid=format!("truncate-{}", value)
+                        style:background-color=move || if truncate.get() == value {
+                            "black"
+                        } else {
+                            ""
+                        }
+                        on:click=move |_| set_truncate.set(value)
+                    >
+                        {format!("{}", value)}
+                    </button>
                 }
             />
         </div>

@@ -237,7 +237,7 @@ async fn create_pull_request(
     let octocrab = octocrab::instance();
     let repo = octocrab.repos("RustForWeb", "floating-ui");
 
-    let main_ref = repo.get_ref(&Reference::Branch("main".into())).await?;
+    let main_ref = repo.get_ref(&Reference::Branch("main".to_owned())).await?;
 
     let branch = format!("upstream/{}-{}", upstream_package, new_version);
     let branch_ref = repo.get_ref(&Reference::Branch(branch.clone())).await.ok();

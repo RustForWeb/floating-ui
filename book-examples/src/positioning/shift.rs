@@ -2,7 +2,9 @@ use floating_ui_leptos::{
     Boundary, DetectOverflowOptions, MiddlewareVec, Offset, OffsetOptions, Padding,
     PartialSideObject, Placement, RootBoundary, Shift, ShiftOptions,
 };
-use leptos::{html::Div, *};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 
 use crate::{
     components::{Chrome, Floating, GridItem, Reference, Scrollable},
@@ -11,7 +13,7 @@ use crate::{
 
 #[component]
 pub fn ShiftDemo() -> impl IntoView {
-    let boundary_ref: NodeRef<Div> = NodeRef::new();
+    let boundary_ref = AnyNodeRef::new();
 
     Effect::new(move |_| {
         if let Some(boundary) = boundary_ref.get() {
@@ -27,7 +29,7 @@ pub fn ShiftDemo() -> impl IntoView {
             title="Shift"
             description="Shifts your floating element to keep it in view."
             chrome=move || view! {
-                <div ref={boundary_ref} class="relative overflow-hidden">
+                <div node_ref={boundary_ref} class="relative overflow-hidden">
                     <Chrome
                         label="Scroll the container"
                         scrollable=Scrollable::Y
@@ -47,7 +49,6 @@ pub fn ShiftDemo() -> impl IntoView {
                                     }));
 
                                 if let Some(boundary) = boundary_ref.get() {
-                                    let boundary: &web_sys::Element = &boundary;
                                     detect_overflow_options = detect_overflow_options.boundary(Boundary::Element(boundary.clone()));
                                 }
 
@@ -56,7 +57,7 @@ pub fn ShiftDemo() -> impl IntoView {
                                     Box::new(Shift::new(ShiftOptions::default().detect_overflow(detect_overflow_options))),
                                 ];
 
-                                Some(middleware)
+                                Some(SendWrapper::new(middleware))
                             })
                             content=move || view! {
                                 <div class="grid h-48 w-20 place-items-center text-sm font-bold">

@@ -1,13 +1,12 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, Arrow, ArrowData, ArrowOptions, DetectOverflowOptions, IntoReference,
-    MiddlewareVec, Offset, OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side,
-    UseFloatingOptions, UseFloatingReturn, ARROW_NAME,
+    use_floating, Arrow, ArrowData, ArrowOptions, DetectOverflowOptions, MiddlewareVec, Offset,
+    OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side, UseFloatingOptions,
+    UseFloatingReturn, ARROW_NAME,
 };
-use leptos::{
-    html::{AnyElement, Div},
-    *,
-};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 
 use crate::utils::{
     all_placements::ALL_PLACEMENTS,
@@ -16,18 +15,18 @@ use crate::utils::{
 
 #[component]
 pub fn Arrow() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
-    let arrow_ref = create_node_ref::<AnyElement>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
+    let arrow_ref = AnyNodeRef::new();
 
-    let (placement, set_placement) = create_signal(Placement::Bottom);
-    let (padding, set_padding) = create_signal(0);
-    let (reference_size, set_reference_size) = create_signal(125);
-    let (floating_size, set_floating_size) = create_signal(75);
-    let (svg, set_svg) = create_signal(false);
-    let (center_offset, set_center_offset) = create_signal(false);
-    let (add_offset, set_add_offset) = create_signal(false);
-    let (nested, set_nested) = create_signal(false);
+    let (placement, set_placement) = signal(Placement::Bottom);
+    let (padding, set_padding) = signal(0);
+    let (reference_size, set_reference_size) = signal(125);
+    let (floating_size, set_floating_size) = signal(75);
+    let (svg, set_svg) = signal(false);
+    let (center_offset, set_center_offset) = signal(false);
+    let (add_offset, set_add_offset) = signal(false);
+    let (nested, set_nested) = signal(false);
 
     let UseFloatingReturn {
         update,
@@ -36,15 +35,16 @@ pub fn Arrow() -> impl IntoView {
         floating_styles,
         ..
     } = use_floating(
-        reference_ref.into_reference(),
+        reference_ref,
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())
             .while_elements_mounted_auto_update()
             .middleware(MaybeProp::derive(move || {
-                let mut middleware: MiddlewareVec = match add_offset.get() {
-                    true => vec![Box::new(Offset::new(OffsetOptions::Value(20.0)))],
-                    false => vec![],
+                let mut middleware: MiddlewareVec = if add_offset.get() {
+                    vec![Box::new(Offset::new(OffsetOptions::Value(20.0)))]
+                } else {
+                    vec![]
                 };
 
                 middleware.append(&mut vec![
@@ -56,7 +56,7 @@ pub fn Arrow() -> impl IntoView {
                     )),
                 ]);
 
-                Some(middleware)
+                Some(SendWrapper::new(middleware))
             })),
     );
 
@@ -70,9 +70,6 @@ pub fn Arrow() -> impl IntoView {
     let arrow_y = move || arrow_data().and_then(|arrow_data| arrow_data.y);
     let center_offset_value = move || arrow_data().map(|arrow_data| arrow_data.center_offset);
 
-    let svg_update = update.clone();
-    let nested_update = update.clone();
-
     let UseScrollReturn {
         scroll_ref,
         update_scroll,
@@ -80,33 +77,30 @@ pub fn Arrow() -> impl IntoView {
     } = use_scroll(UseScrollOptions {
         reference_ref,
         floating_ref,
-        update,
+        update: update.clone(),
         rtl: None::<bool>.into(),
         disable_ref_updates: None,
     });
 
-    let placement_update_scroll = update_scroll.clone();
-    let padding_update_scroll = update_scroll.clone();
-    let add_offset_update_scroll = update_scroll.clone();
-    let center_offset_update_scroll = update_scroll.clone();
-
     let floating_view = move || {
         let base = view! {
-            {move || match center_offset.get() {
-                true => center_offset_value().map_or("".into(), |center_offset_value| center_offset_value.to_string()),
-                false => "Floating".into()
+            {move || if center_offset.get() {
+                center_offset_value().map_or("".to_owned(), |center_offset_value| center_offset_value.to_string())
+            } else {
+                "Floating".to_owned()
             }}
 
-            {move || match svg.get() {
-                true => view!{
+            {move || if svg.get() {
+                view!{
                     <svg
+                        node_ref=arrow_ref
                         class="arrow"
                         style:position="absolute"
                         style:top=move || match static_side() {
-                            Side::Top => "-15px".into(),
+                            Side::Top => "-15px".to_owned(),
                             _ => match arrow_y() {
                                 Some(arrow_y) => format!("{}px", arrow_y),
-                                None => "".into()
+                                None => "".to_owned()
                             }
                         }
                         style:right=move || match static_side() {
@@ -118,23 +112,25 @@ pub fn Arrow() -> impl IntoView {
                             _ => ""
                         }
                         style:left=move || match static_side() {
-                            Side::Left => "-15px".into(),
+                            Side::Left => "-15px".to_owned(),
                             _ => match arrow_x() {
                                 Some(arrow_x) => format!("{}px", arrow_x),
-                                None => "".into()
+                                None => "".to_owned()
                             }
                         }
                     />
-                }.into_any().node_ref(arrow_ref),
-                false => view!{
+                }.into_any()
+            } else {
+                view!{
                     <div
+                        node_ref=arrow_ref
                         class="arrow"
                         style:position="absolute"
                         style:top=move || match static_side() {
-                            Side::Top => "-15px".into(),
+                            Side::Top => "-15px".to_owned(),
                             _ => match arrow_y() {
                                 Some(arrow_y) => format!("{}px", arrow_y),
-                                None => "".into()
+                                None => "".to_owned()
                             }
                         }
                         style:right=move || match static_side() {
@@ -146,26 +142,26 @@ pub fn Arrow() -> impl IntoView {
                             _ => ""
                         }
                         style:left=move || match static_side() {
-                            Side::Left => "-15px".into(),
+                            Side::Left => "-15px".to_owned(),
                             _ => match arrow_x() {
                                 Some(arrow_x) => format!("{}px", arrow_x),
-                                None => "".into()
+                                None => "".to_owned()
                             }
                         }
                     />
-                }.into_any().node_ref(arrow_ref)
+                }.into_any()
             }}
         };
 
-        match nested.get() {
-            true => view! {
+        if nested.get() {
+            view! {
                 <div
-                    _ref=floating_ref
+                    node_ref=floating_ref
                     style:position=move || floating_styles.get().style_position()
                     style:top=move || floating_styles.get().style_top()
                     style:left=move || floating_styles.get().style_left()
-                    style:transform=move || floating_styles.get().style_transform()
-                    style:will-change=move || floating_styles.get().style_will_change()
+                    style:transform=move || floating_styles.get().style_transform().unwrap_or_default()
+                    style:will-change=move || floating_styles.get().style_will_change().unwrap_or_default()
                     style:width=move || format!("{}px", floating_size.get())
                     style:height=move || format!("{}px", floating_size.get())
                 >
@@ -173,35 +169,39 @@ pub fn Arrow() -> impl IntoView {
                         {base}
                     </div>
                 </div>
-            },
-            false => view! {
+            }
+            .into_any()
+        } else {
+            view! {
                 <div
-                    _ref=floating_ref
+                    node_ref=floating_ref
                     class="floating"
                     style:position=move || floating_styles.get().style_position()
                     style:top=move || floating_styles.get().style_top()
                     style:left=move || floating_styles.get().style_left()
-                    style:transform=move || floating_styles.get().style_transform()
-                    style:will-change=move || floating_styles.get().style_will_change()
+                    style:transform=move || floating_styles.get().style_transform().unwrap_or_default()
+                    style:will-change=move || floating_styles.get().style_will_change().unwrap_or_default()
                     style:width=move || format!("{}px", floating_size.get())
                     style:height=move || format!("{}px", floating_size.get())
                 >
                     {base}
                 </div>
-            },
+            }
+            .into_any()
         }
     };
 
     view! {
         <h1>Arrow</h1>
         <p></p>
-        <div class="container" style:will-change=move || match svg.get() {
-            true => "transform",
-            false => "",
+        <div class="container" style:will-change=move || if svg.get() {
+            "transform"
+        } else {
+            ""
         }>
-            <div _ref=scroll_ref class="scroll" data-x="" style:position="relative">
+            <div node_ref=scroll_ref class="scroll" data-x="" style:position="relative">
                 <div
-                    _ref=reference_ref
+                    node_ref=reference_ref
                     class="reference"
                     style:width=move || format!("{}px", reference_size.get())
                     style:height=move || format!("{}px", reference_size.get())
@@ -220,9 +220,10 @@ pub fn Arrow() -> impl IntoView {
                 children=move |size| view! {
                     <button
                         data-testid=format!("reference-{size}")
-                        style:background-color=move || match reference_size.get() == size {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if reference_size.get() == size {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_reference_size.set(size)
                     >
@@ -240,9 +241,10 @@ pub fn Arrow() -> impl IntoView {
                 children=move |size| view! {
                     <button
                         data-testid=format!("floating-{size}")
-                        style:background-color=move || match floating_size.get() == size {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if floating_size.get() == size {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_floating_size.set(size)
                     >
@@ -257,23 +259,32 @@ pub fn Arrow() -> impl IntoView {
             <For
                 each=|| [0, 20, 200]
                 key=|size| format!("{:?}", size)
-                children=move |size| {
-                    let padding_update_scroll = padding_update_scroll.clone();
-                    view! {
-                        <button
-                            data-testid=format!("arrow-padding-{size}")
-                            style:background-color=move || match padding.get() == size {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| {
-                                set_padding.set(size);
-                                // Match React test behaviour
-                                padding_update_scroll();
-                            }
-                        >
-                            {format!("{size}")}
-                        </button>
+                children={
+                    let update_scroll = update_scroll.clone();
+
+                    move |size| {
+                        view! {
+                            <button
+                                data-testid=format!("arrow-padding-{size}")
+                                style:background-color=move || if padding.get() == size {
+                                    "black"
+                                } else {
+                                    ""
+                                }
+                                on:click={
+                                    let update_scroll = update_scroll.clone();
+
+                                    move |_| {
+                                        set_padding.set(size);
+
+                                        // Match React test behaviour
+                                        update_scroll();
+                                    }
+                                }
+                            >
+                                {format!("{size}")}
+                            </button>
+                        }
                     }
                 }
             />
@@ -284,23 +295,32 @@ pub fn Arrow() -> impl IntoView {
             <For
                 each=|| [true, false]
                 key=|value| format!("{}", value)
-                children=move |value| {
-                    let add_offset_update_scroll = add_offset_update_scroll.clone();
-                    view! {
-                        <button
-                            data-testid=format!("add-offset-{}", value)
-                            style:background-color=move || match add_offset.get() == value {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| {
-                                set_add_offset.set(value);
-                                // Match React test behaviour
-                                add_offset_update_scroll();
-                            }
-                        >
-                            {format!("{}", value)}
-                        </button>
+                children={
+                    let update_scroll = update_scroll.clone();
+
+                    move |value| {
+                        view! {
+                            <button
+                                data-testid=format!("add-offset-{}", value)
+                                style:background-color=move || if add_offset.get() == value {
+                                    "black"
+                                } else {
+                                    ""
+                                }
+                                on:click={
+                                    let update_scroll = update_scroll.clone();
+
+                                    move |_| {
+                                        set_add_offset.set(value);
+
+                                        // Match React test behaviour
+                                        update_scroll();
+                                    }
+                                }
+                            >
+                                {format!("{}", value)}
+                            </button>
+                        }
                     }
                 }
             />
@@ -311,23 +331,32 @@ pub fn Arrow() -> impl IntoView {
             <For
                 each=|| ALL_PLACEMENTS
                 key=|local_placement| format!("{:?}", local_placement)
-                children=move |local_placement| {
-                    let placement_update_scroll = placement_update_scroll.clone();
-                    view! {
-                        <button
-                            data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                            style:background-color=move || match placement.get() == local_placement {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| {
-                                set_placement.set(local_placement);
-                                // Match React test behaviour
-                                placement_update_scroll();
-                            }
-                        >
-                            {format!("{:?}", local_placement).to_case(Case::Kebab)}
-                        </button>
+                children={
+                    let update_scroll = update_scroll.clone();
+
+                    move |local_placement| {
+                        view! {
+                            <button
+                                data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
+                                style:background-color=move || if placement.get() == local_placement {
+                                    "black"
+                                } else {
+                                    ""
+                                }
+                                on:click={
+                                    let update_scroll = update_scroll.clone();
+
+                                    move |_| {
+                                        set_placement.set(local_placement);
+
+                                        // Match React test behaviour
+                                        update_scroll();
+                                    }
+                                }
+                            >
+                                {format!("{:?}", local_placement).to_case(Case::Kebab)}
+                            </button>
+                        }
                     }
                 }
             />
@@ -338,23 +367,18 @@ pub fn Arrow() -> impl IntoView {
             <For
                 each=|| [true, false]
                 key=|value| format!("{}", value)
-                children=move |value| {
-                    let svg_update = svg_update.clone();
-                    view! {
-                        <button
-                            data-testid=format!("svg-{}", value)
-                            style:background-color=move || match svg.get() == value {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| {
-                                set_svg.set(value);
-                                svg_update();
-                            }
-                        >
-                            {format!("{}", value)}
-                        </button>
-                    }
+                children=move |value| view! {
+                    <button
+                        data-testid=format!("svg-{}", value)
+                        style:background-color=move || if svg.get() == value {
+                            "black"
+                        } else {
+                            ""
+                        }
+                        on:click=move |_| set_svg.set(value)
+                    >
+                        {format!("{}", value)}
+                    </button>
                 }
             />
         </div>
@@ -364,23 +388,18 @@ pub fn Arrow() -> impl IntoView {
             <For
                 each=|| [true, false]
                 key=|value| format!("{}", value)
-                children=move |value| {
-                    let nested_update = nested_update.clone();
-                    view! {
-                        <button
-                            data-testid=format!("nested-{}", value)
-                            style:background-color=move || match nested.get() == value {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| {
-                                set_nested.set(value);
-                                nested_update();
-                            }
-                        >
-                            {format!("{}", value)}
-                        </button>
-                    }
+                children=move |value| view! {
+                    <button
+                        data-testid=format!("nested-{}", value)
+                        style:background-color=move || if nested.get() == value {
+                            "black"
+                        } else {
+                            ""
+                        }
+                        on:click=move |_| set_nested.set(value)
+                    >
+                        {format!("{}", value)}
+                    </button>
                 }
             />
         </div>
@@ -390,34 +409,43 @@ pub fn Arrow() -> impl IntoView {
             <For
                 each=|| [true, false]
                 key=|value| format!("{}", value)
-                children=move |value| {
-                    let center_offset_update_scroll = center_offset_update_scroll.clone();
-                    view! {
-                        <button
-                            data-testid=format!("centerOffset-{}", value)
-                            style:background-color=move || match center_offset.get() == value {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| {
-                                set_center_offset.set(value);
-                                if value {
-                                    set_reference_size.set(25);
-                                    set_floating_size.set(125);
-                                    set_placement.set(Placement::LeftEnd);
-                                    set_padding.set(25);
+                children={
+                    let update_scroll = update_scroll.clone();
+
+                    move |value| {
+                        view! {
+                            <button
+                                data-testid=format!("centerOffset-{}", value)
+                                style:background-color=move || if center_offset.get() == value {
+                                    "black"
                                 } else {
-                                    set_reference_size.set(125);
-                                    set_floating_size.set(75);
-                                    set_placement.set(Placement::Bottom);
-                                    set_padding.set(0);
+                                    ""
                                 }
-                                // Match React test behaviour
-                                center_offset_update_scroll();
-                            }
-                        >
-                            {format!("{}", value)}
-                        </button>
+                                on:click={
+                                    let update_scroll = update_scroll.clone();
+
+                                    move |_| {
+                                        set_center_offset.set(value);
+                                        if value {
+                                            set_reference_size.set(25);
+                                            set_floating_size.set(125);
+                                            set_placement.set(Placement::LeftEnd);
+                                            set_padding.set(25);
+                                        } else {
+                                            set_reference_size.set(125);
+                                            set_floating_size.set(75);
+                                            set_placement.set(Placement::Bottom);
+                                            set_padding.set(0);
+                                        }
+
+                                        // Match React test behaviour
+                                        update_scroll();
+                                    }
+                                }
+                            >
+                                {format!("{}", value)}
+                            </button>
+                        }
                     }
                 }
             />

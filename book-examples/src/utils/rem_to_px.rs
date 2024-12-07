@@ -1,4 +1,4 @@
-use leptos::{document, window};
+use leptos::prelude::*;
 
 pub fn rem_to_px(value: f64) -> f64 {
     document()

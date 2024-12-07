@@ -14,13 +14,15 @@ pub fn get_scale(element_or_virtual: ElementOrVirtual) -> Coords {
             dimensions,
             should_fallback,
         } = get_css_dimensions(&dom_element);
-        let mut x = match should_fallback {
-            true => rect.width().round(),
-            false => rect.width(),
+        let mut x = if should_fallback {
+            rect.width().round()
+        } else {
+            rect.width()
         } / dimensions.width;
-        let mut y = match should_fallback {
-            true => rect.height().round(),
-            false => rect.height(),
+        let mut y = if should_fallback {
+            rect.height().round()
+        } else {
+            rect.height()
         } / dimensions.height;
 
         if x == 0.0 || x.is_nan() || x.is_infinite() {

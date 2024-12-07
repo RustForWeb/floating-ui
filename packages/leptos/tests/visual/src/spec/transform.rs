@@ -1,14 +1,13 @@
-use std::{ops::Deref, rc::Rc};
+use std::rc::Rc;
 
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
     use_floating, DefaultVirtualElement, MiddlewareVec, Shift, ShiftOptions, UseFloatingOptions,
     UseFloatingReturn, VirtualElement, VirtualElementOrNodeRef,
 };
-use leptos::{
-    html::{AnyElement, Div},
-    *,
-};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 use wasm_bindgen::JsCast;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -42,13 +41,13 @@ const ALL_NODES: [Node; 11] = [
 
 #[component]
 pub fn Transform() -> impl IntoView {
-    let reference_ref = create_node_ref::<AnyElement>();
-    let floating_ref = create_node_ref::<Div>();
-    let offset_parent_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
+    let offset_parent_ref = AnyNodeRef::new();
 
-    let (node, set_node) = create_signal(Node::None);
+    let (node, set_node) = signal(Node::None);
 
-    let reference_signal: MaybeProp<VirtualElementOrNodeRef<NodeRef<AnyElement>, AnyElement>> =
+    let reference_signal: MaybeProp<VirtualElementOrNodeRef> =
         MaybeProp::derive(move || match node.get() {
             Node::Virtual => {
                 let context_element = document()
@@ -84,11 +83,11 @@ pub fn Transform() -> impl IntoView {
         reference_signal,
         floating_ref,
         UseFloatingOptions::default()
-            .middleware(middleware.into())
+            .middleware(SendWrapper::new(middleware).into())
             .while_elements_mounted_auto_update(),
     );
 
-    create_effect(move |_| {
+    Effect::new(move |_| {
         let element = match node.get() {
             Node::Html => document()
                 .document_element()
@@ -101,7 +100,7 @@ pub fn Transform() -> impl IntoView {
             | Node::Virtual
             | Node::Inline => offset_parent_ref
                 .get()
-                .map(|offset_parent| offset_parent.deref().clone().into()),
+                .map(|offset_parent| offset_parent.unchecked_into::<web_sys::HtmlElement>()),
             _ => None,
         };
 
@@ -136,7 +135,7 @@ pub fn Transform() -> impl IntoView {
             | Node::Virtual
             | Node::Inline => offset_parent_ref
                 .get()
-                .map(|offset_parent| offset_parent.deref().clone().into()),
+                .map(|offset_parent| offset_parent.unchecked_into::<web_sys::HtmlElement>()),
             _ => None,
         };
 
@@ -154,7 +153,7 @@ pub fn Transform() -> impl IntoView {
             The floating element should be positioned correctly on the bottom when a certain node has been transformed.
         </p>
         <div
-            _ref=offset_parent_ref
+            node_ref=offset_parent_ref
             class="container"
             style:overflow="hidden"
             style:position=move || match node.get() {
@@ -174,19 +173,18 @@ pub fn Transform() -> impl IntoView {
                         style:background="black"
                     />
                 </Show>
-                {move || view!{
-                    <div
-                        class="reference"
-                        style:transform=move || match node.get() {
-                            Node::Reference | Node::OffsetParentReference => "scale(1.25) translate(2rem, -2rem)",
-                            _ => ""
-                        }
-                    >
-                        Reference
-                    </div>
-                }.into_any().node_ref(reference_ref)}
                 <div
-                    _ref=floating_ref
+                    node_ref=reference_ref
+                    class="reference"
+                    style:transform=move || match node.get() {
+                        Node::Reference | Node::OffsetParentReference => "scale(1.25) translate(2rem, -2rem)",
+                        _ => ""
+                    }
+                >
+                    Reference
+                </div>
+                <div
+                    node_ref=floating_ref
                     class="floating"
                     style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                     style:top=move || format!("{}px", y.get())
@@ -209,22 +207,23 @@ pub fn Transform() -> impl IntoView {
                 children=move |local_node| view! {
                     <button
                         data-testid=move || format!("transform-{}", match local_node {
-                            Node::None => "null".into(),
-                            Node::OffsetParent3d => "offsetParent-3d".into(),
-                            Node::OffsetParentInverse => "offsetParent-inverse".into(),
-                            Node::OffsetParentReference => "offsetParent-reference".into(),
+                            Node::None => "null".to_owned(),
+                            Node::OffsetParent3d => "offsetParent-3d".to_owned(),
+                            Node::OffsetParentInverse => "offsetParent-inverse".to_owned(),
+                            Node::OffsetParentReference => "offsetParent-reference".to_owned(),
                             _ => format!("{:?}", local_node).to_case(Case::Camel)
                         })
-                        style:background-color=move || match node.get() == local_node {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if node.get() == local_node {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_node.set(local_node)
                     >
                         {match local_node {
-                            Node::OffsetParent3d => "offsetParent-3d".into(),
-                            Node::OffsetParentInverse => "offsetParent-inverse".into(),
-                            Node::OffsetParentReference => "offsetParent-reference".into(),
+                            Node::OffsetParent3d => "offsetParent-3d".to_owned(),
+                            Node::OffsetParentInverse => "offsetParent-inverse".to_owned(),
+                            Node::OffsetParentReference => "offsetParent-reference".to_owned(),
                             _ => format!("{:?}", local_node).to_case(Case::Camel)
                         }}
                     </button>

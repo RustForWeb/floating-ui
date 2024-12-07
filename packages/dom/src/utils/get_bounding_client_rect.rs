@@ -23,24 +23,26 @@ pub fn get_bounding_client_rect(
     };
     let dom_element = element_or_virtual.clone().resolve();
 
-    let scale = match include_scale {
-        true => match &offset_parent {
+    let scale = if include_scale {
+        match &offset_parent {
             Some(offset_parent) => match offset_parent {
                 DomElementOrWindow::Element(element) => get_scale((*element).into()),
                 DomElementOrWindow::Window(_) => Coords::new(1.0),
             },
             None => get_scale(element_or_virtual),
-        },
-        false => Coords::new(1.0),
+        }
+    } else {
+        Coords::new(1.0)
     };
 
-    let visual_offsets = match should_add_visual_offsets(
+    let visual_offsets = if should_add_visual_offsets(
         dom_element.as_ref(),
         is_fixed_strategy,
         offset_parent.clone(),
     ) {
-        true => get_visual_offsets(dom_element.as_ref()),
-        false => Coords::new(0.0),
+        get_visual_offsets(dom_element.as_ref())
+    } else {
+        Coords::new(0.0)
     };
 
     let mut x = (client_rect.left + visual_offsets.x) / scale.x;
