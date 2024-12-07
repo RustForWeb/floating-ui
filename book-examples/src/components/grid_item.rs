@@ -1,13 +1,13 @@
-use leptos::*;
+use leptos::prelude::*;
 use tailwind_fuse::tw_merge;
 
 #[component]
 pub fn GridItem<F, IV>(
-    #[prop(into)] title: MaybeSignal<String>,
-    #[prop(into)] description: MaybeSignal<String>,
+    #[prop(into)] title: Signal<String>,
+    #[prop(into)] description: Signal<String>,
     chrome: F,
-    // #[prop(into)] demo_link: MaybeSignal<String>,
-    #[prop(default = false.into(), into)] hidden: MaybeSignal<bool>,
+    // #[prop(into)] demo_link: Signal<String>,
+    #[prop(default = false.into(), into)] hidden: Signal<bool>,
 ) -> impl IntoView
 where
     F: Fn() -> IV + 'static,

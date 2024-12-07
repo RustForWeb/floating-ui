@@ -94,8 +94,8 @@ pub struct FloatingStyles {
 impl FloatingStyles {
     pub fn style_position(&self) -> String {
         match self.position {
-            Strategy::Absolute => "absolute".into(),
-            Strategy::Fixed => "fixed".into(),
+            Strategy::Absolute => "absolute".to_owned(),
+            Strategy::Fixed => "fixed".to_owned(),
         }
     }
 
@@ -129,10 +129,13 @@ impl Display for FloatingStyles {
             self.left,
             self.transform
                 .as_ref()
-                .map_or("".into(), |transform| format!(" transform: {};", transform),),
+                .map_or("".to_owned(), |transform| format!(
+                    " transform: {};",
+                    transform
+                ),),
             self.will_change
                 .as_ref()
-                .map_or("".into(), |will_change| format!(
+                .map_or("".to_owned(), |will_change| format!(
                     " will-change: {};",
                     will_change
                 ))

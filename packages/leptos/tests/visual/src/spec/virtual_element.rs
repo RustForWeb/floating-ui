@@ -4,14 +4,15 @@ use floating_ui_leptos::{
     use_floating, DefaultVirtualElement, Strategy, UseFloatingOptions, UseFloatingReturn,
     VirtualElement,
 };
-use leptos::{html::Div, *};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
 
 use crate::utils::use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn};
 
 #[component]
 pub fn VirtualElement() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
     let virtual_element = MaybeProp::derive(move || {
         let context_element = reference_ref.get();
         context_element.map(|context_element| {
@@ -54,15 +55,15 @@ pub fn VirtualElement() -> impl IntoView {
         <h1>Virtual Element</h1>
         <p></p>
         <div class="container">
-            <div _ref=scroll_ref class="scroll" data-x="" style:position="relative">
-                <div _ref=reference_ref class="reference">
+            <div node_ref=scroll_ref class="scroll" data-x="" style:position="relative">
+                <div node_ref=reference_ref class="reference">
                     Reference
                 </div>
             </div>
         </div>
 
         <div
-            _ref=floating_ref
+            node_ref=floating_ref
             class="floating"
             style:position=move || format!("{:?}", strategy.get()).to_lowercase()
             style:top=move || format!("{}px", y.get())

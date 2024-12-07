@@ -212,13 +212,15 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
 
                     let top = first_rect.top;
                     let bottom = last_rect.bottom;
-                    let left = match is_top {
-                        true => first_rect.left,
-                        false => last_rect.left,
+                    let left = if is_top {
+                        first_rect.left
+                    } else {
+                        last_rect.left
                     };
-                    let right = match is_top {
-                        true => first_rect.right,
-                        false => last_rect.right,
+                    let right = if is_top {
+                        first_rect.right
+                    } else {
+                        last_rect.right
                     };
                     let width = right - left;
                     let height = bottom - top;
@@ -248,9 +250,12 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
                     .expect("Enough elements exist.");
                 let measure_rects: Vec<&ClientRectObject> = client_rects
                     .iter()
-                    .filter(|rect| match is_left_side {
-                        true => rect.left == min_left,
-                        false => rect.right == max_right,
+                    .filter(|rect| {
+                        if is_left_side {
+                            rect.left == min_left
+                        } else {
+                            rect.right == max_right
+                        }
                     })
                     .collect();
 

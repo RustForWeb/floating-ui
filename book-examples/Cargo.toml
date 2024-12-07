@@ -15,7 +15,9 @@ console_log.workspace = true
 convert_case = "0.6.0"
 floating-ui-leptos = { path = "../packages/leptos" }
 leptos = { workspace = true, features = ["csr"] }
+leptos-node-ref.workspace = true
 log.workspace = true
+send_wrapper.workspace = true
 tailwind_fuse = "0.3.1"
 
 [features]

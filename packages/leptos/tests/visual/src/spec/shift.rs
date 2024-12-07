@@ -1,63 +1,71 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, Derivable, DerivableFn, IntoReference, LimitShift, LimitShiftOffset,
-    LimitShiftOffsetValues, LimitShiftOptions, MiddlewareState, MiddlewareVec, Offset,
-    OffsetOptions, Placement, Shift, ShiftOptions, UseFloatingOptions, UseFloatingReturn,
+    use_floating, Derivable, DerivableFn, LimitShift, LimitShiftOffset, LimitShiftOffsetValues,
+    LimitShiftOptions, MiddlewareState, MiddlewareVec, Offset, OffsetOptions, Placement, Shift,
+    ShiftOptions, UseFloatingOptions, UseFloatingReturn,
 };
-use leptos::{html::Div, *};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 
 use crate::utils::{
     all_placements::ALL_PLACEMENTS,
     use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn},
 };
 
-fn values() -> Vec<(
-    &'static str,
-    Derivable<'static, web_sys::Element, web_sys::Window, LimitShiftOffset>,
-)> {
+type Value = SendWrapper<Derivable<'static, web_sys::Element, web_sys::Window, LimitShiftOffset>>;
+
+fn values() -> Vec<(&'static str, Value)> {
     vec![
-        ("0", LimitShiftOffset::Value(0.0).into()),
-        ("50", LimitShiftOffset::Value(50.0).into()),
-        ("-50", LimitShiftOffset::Value(-50.0).into()),
+        ("0", SendWrapper::new(LimitShiftOffset::Value(0.0).into())),
+        ("50", SendWrapper::new(LimitShiftOffset::Value(50.0).into())),
+        (
+            "-50",
+            SendWrapper::new(LimitShiftOffset::Value(-50.0).into()),
+        ),
         (
             "mA: 50",
-            LimitShiftOffset::Values(LimitShiftOffsetValues::default().main_axis(50.0)).into(),
+            SendWrapper::new(
+                LimitShiftOffset::Values(LimitShiftOffsetValues::default().main_axis(50.0)).into(),
+            ),
         ),
         (
             "cA: 50",
-            LimitShiftOffset::Values(LimitShiftOffsetValues::default().cross_axis(50.0)).into(),
+            SendWrapper::new(
+                LimitShiftOffset::Values(LimitShiftOffsetValues::default().cross_axis(50.0)).into(),
+            ),
         ),
         (
             "fn => r.width/2",
-            DerivableFn::into(&|MiddlewareState { rects, .. }| {
+            SendWrapper::new(DerivableFn::into(&|MiddlewareState { rects, .. }| {
                 LimitShiftOffset::Value(rects.reference.width)
-            }),
+            })),
         ),
         (
             "fn => cA: f.width/2",
-            DerivableFn::into(&|MiddlewareState { rects, .. }| {
+            SendWrapper::new(DerivableFn::into(&|MiddlewareState { rects, .. }| {
                 LimitShiftOffset::Values(
                     // According to the name this should be `rects.floating / 2.0`, but the React unit test uses `rects.reference` instead.
                     LimitShiftOffsetValues::default().cross_axis(rects.reference.width),
                 )
-            }),
+            })),
         ),
     ]
 }
 
 #[component]
 pub fn Shift() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (placement, set_placement) = create_signal(Placement::Bottom);
-    let (main_axis, set_main_axis) = create_signal(true);
-    let (cross_axis, set_cross_axis) = create_signal(false);
-    let (limit_shift, set_limit_shift) = create_signal(false);
-    let (limit_shift_main_axis, set_limit_shift_main_axis) = create_signal(true);
-    let (limit_shift_cross_axis, set_limit_shift_cross_axis) = create_signal(true);
-    let (limit_shift_offset, set_limit_shift_offset) = create_signal("0");
-    let (offset_value, set_offset_value) = create_signal(0);
+    let (placement, set_placement) = signal(Placement::Bottom);
+    let (main_axis, set_main_axis) = signal(true);
+    let (cross_axis, set_cross_axis) = signal(false);
+    let (limit_shift, set_limit_shift) = signal(false);
+    let (limit_shift_main_axis, set_limit_shift_main_axis) = signal(true);
+    let (limit_shift_cross_axis, set_limit_shift_cross_axis) = signal(true);
+    let (limit_shift_offset, set_limit_shift_offset) = signal("0");
+    let (offset_value, set_offset_value) = signal(0);
 
     let UseFloatingReturn {
         x,
@@ -66,7 +74,7 @@ pub fn Shift() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref.into_reference(),
+        reference_ref,
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())
@@ -74,9 +82,8 @@ pub fn Shift() -> impl IntoView {
             .middleware(MaybeProp::derive(move || {
                 let limit_shift_offset = values()
                     .into_iter()
-                    .find_map(|(name, options)| match name == limit_shift_offset.get() {
-                        true => Some(options),
-                        false => None,
+                    .find_map(|(name, options)| {
+                        (name == limit_shift_offset.get()).then(|| options.take())
                     })
                     .unwrap();
 
@@ -97,7 +104,7 @@ pub fn Shift() -> impl IntoView {
                     Box::new(Offset::new(OffsetOptions::Value(offset_value.get() as f64))),
                     Box::new(Shift::new(shift_options)),
                 ];
-                Some(middleware)
+                Some(SendWrapper::new(middleware))
             })),
     );
 
@@ -113,12 +120,12 @@ pub fn Shift() -> impl IntoView {
         <h1>Shift</h1>
         <p></p>
         <div class="container">
-            <div _ref=scroll_ref class="scroll" data-x="" style:position="relative">
-                <div _ref=reference_ref class="reference">
+            <div node_ref=scroll_ref class="scroll" data-x="" style:position="relative">
+                <div node_ref=reference_ref class="reference">
                     Reference
                 </div>
                 <div
-                    _ref=floating_ref
+                    node_ref=floating_ref
                     class="floating"
                     style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                     style:top=move || format!("{}px", y.get())
@@ -137,9 +144,10 @@ pub fn Shift() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement.get() == local_placement {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if placement.get() == local_placement {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_placement.set(local_placement)
                     >
@@ -157,9 +165,10 @@ pub fn Shift() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("offset-{}", value)
-                        style:background-color=move || match offset_value.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if offset_value.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_offset_value.set(value)
                     >
@@ -177,9 +186,10 @@ pub fn Shift() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("mainAxis-{}", value)
-                        style:background-color=move || match main_axis.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if main_axis.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_main_axis.set(value)
                     >
@@ -197,9 +207,10 @@ pub fn Shift() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("crossAxis-{}", value)
-                        style:background-color=move || match cross_axis.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if cross_axis.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_cross_axis.set(value)
                     >
@@ -217,9 +228,10 @@ pub fn Shift() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("limitShift-{}", value)
-                        style:background-color=move || match limit_shift.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if limit_shift.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_limit_shift.set(value)
                     >
@@ -238,9 +250,10 @@ pub fn Shift() -> impl IntoView {
                     children=move |value| view! {
                         <button
                             data-testid=format!("limitShift.mainAxis-{}", value)
-                            style:background-color=move || match limit_shift_main_axis.get() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if limit_shift_main_axis.get() == value {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_limit_shift_main_axis.set(value)
                         >
@@ -258,9 +271,10 @@ pub fn Shift() -> impl IntoView {
                     children=move |value| view! {
                         <button
                             data-testid=format!("limitShift.crossAxis-{}", value)
-                            style:background-color=move || match limit_shift_cross_axis.get() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if limit_shift_cross_axis.get() == value {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_limit_shift_cross_axis.set(value)
                         >
@@ -278,9 +292,10 @@ pub fn Shift() -> impl IntoView {
                     children=move |(name, _)| view! {
                         <button
                             data-testid=move || format!("limitShift.offset-{}", name)
-                            style:background-color=move || match limit_shift_offset.get() == name {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if limit_shift_offset.get() == name {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_limit_shift_offset.set(name)
                         >

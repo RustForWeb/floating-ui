@@ -18,7 +18,7 @@ cargo add floating-ui-leptos
 
 ```rust,ignore
 use floating_ui_leptos::{use_floating, UseFloatingOptions, UseFloatingReturn};
-use leptos::*;
+use leptos::prelude::*;
 
 #[component]
 pub fn Example() -> impl IntoView {
@@ -27,12 +27,12 @@ pub fn Example() -> impl IntoView {
 
     let UseFloatingReturn {
         floating_styles,
-    } = use_floating(reference_ref.into_reference(), floating_ref, UseFloatingOptions::default());
+    } = use_floating(reference_ref, floating_ref, UseFloatingOptions::default());
 
     view! {
-        <button _ref=reference_ref>Button</button>
+        <button node_ref=reference_ref>Button</button>
         <div
-            _ref=floating_ref
+            node_ref=floating_ref
             style:position=move || floating_styles.get().style_position()
             style:top=move || floating_styles.get().style_top()
             style:left=move || floating_styles.get().style_left()
@@ -107,7 +107,7 @@ The composable also accepts `Signal` options:
 use floating_ui_leptos::{
     use_floating, Flip, FlipOptions, MiddlewareVec, Offset, OffsetOptions, Placement, Shift, ShiftOptions, UseFloatingOptions
 };
-use leptos::*;
+use leptos::prelude::*;
 
 let placement = Signal::derive(move || Placement::Right);
 

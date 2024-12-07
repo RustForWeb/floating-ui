@@ -86,8 +86,8 @@ pub fn use_floating(
         |(floating, transform_option, x, y, strategy)| {
             let initial_styles = FloatingStyles {
                 position: **strategy,
-                top: "0".into(),
-                left: "0".into(),
+                top: "0".to_owned(),
+                left: "0".to_owned(),
                 transform: None,
                 will_change: None,
             };
@@ -99,10 +99,8 @@ pub fn use_floating(
                 if **transform_option {
                     FloatingStyles {
                         transform: Some(format!("translate({x_val}px, {y_val}px)")),
-                        will_change: match get_dpr(&floating_element) >= 1.5 {
-                            true => Some("transform".into()),
-                            false => None,
-                        },
+                        will_change: (get_dpr(&floating_element) >= 1.5)
+                            .then_some("transform".to_owned()),
                         ..initial_styles
                     }
                 } else {

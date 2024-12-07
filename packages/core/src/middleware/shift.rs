@@ -435,23 +435,19 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Limiter<Element, Win
             let data_cross_axis = data.map_or(0.0, |data| data.diff_coords.axis(cross_axis));
 
             let limit_min = rects.reference.axis(cross_axis) - rects.floating.length(len)
-                + match is_origin_side {
-                    true => data_cross_axis,
-                    false => 0.0,
-                }
-                + match is_origin_side {
-                    true => 0.0,
-                    false => computed_cross_axis,
+                + if is_origin_side { data_cross_axis } else { 0.0 }
+                + if is_origin_side {
+                    0.0
+                } else {
+                    computed_cross_axis
                 };
             let limit_max = rects.reference.axis(cross_axis)
                 + rects.reference.length(len)
-                + match is_origin_side {
-                    true => 0.0,
-                    false => data_cross_axis,
-                }
-                - match is_origin_side {
-                    true => computed_cross_axis,
-                    false => 0.0,
+                + if is_origin_side { 0.0 } else { data_cross_axis }
+                - if is_origin_side {
+                    computed_cross_axis
+                } else {
+                    0.0
                 };
 
             cross_axis_coord = clamp(limit_min, cross_axis_coord, limit_max);

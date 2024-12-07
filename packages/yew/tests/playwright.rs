@@ -69,7 +69,7 @@ pub fn playwright() {
     assert!(status.success(), "pnpm install failed");
 
     if env::var("CI")
-        .unwrap_or("false".into())
+        .unwrap_or("false".to_owned())
         .parse::<bool>()
         .unwrap_or(false)
     {
@@ -93,7 +93,7 @@ pub fn playwright() {
     assert!(status.success(), "Build failed.");
 
     if env::var("UPDATE_SNAPSHOTS")
-        .unwrap_or("false".into())
+        .unwrap_or("false".to_owned())
         .parse::<bool>()
         .unwrap_or(false)
     {

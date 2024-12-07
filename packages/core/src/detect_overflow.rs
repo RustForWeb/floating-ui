@@ -112,9 +112,10 @@ pub fn detect_overflow<Element: Clone + 'static, Window: Clone + 'static>(
         ElementContext::Reference => ElementContext::Floating,
         ElementContext::Floating => ElementContext::Reference,
     };
-    let element = match alt_boundary {
-        true => elements.get_element_context(alt_context),
-        false => elements.get_element_context(element_context),
+    let element = if alt_boundary {
+        elements.get_element_context(alt_context)
+    } else {
+        elements.get_element_context(element_context)
     };
 
     let document_element = platform.get_document_element(elements.floating);

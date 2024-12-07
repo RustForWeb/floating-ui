@@ -7,10 +7,11 @@ use floating_ui_leptos::{
     UseFloatingReturn, VirtualElement, VirtualElementOrNodeRef,
 };
 use leptos::{
-    ev::MouseEvent,
-    html::{AnyElement, Div},
-    *,
+    ev::{self, MouseEvent},
+    prelude::*,
 };
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 
 use crate::utils::all_placements::ALL_PLACEMENTS;
 
@@ -24,20 +25,18 @@ enum ConnectedStatus {
 
 #[component]
 pub fn Inline() -> impl IntoView {
-    let reference_ref = create_node_ref::<AnyElement>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (placement, set_placement) = create_signal(Placement::Bottom);
-    let (status, set_status) = create_signal(ConnectedStatus::TwoDisjoined);
-    let (open, set_open) = create_signal(false);
-    let (mouse_coords, set_mouse_coords) = create_signal::<Option<Coords>>(None);
+    let (placement, set_placement) = signal(Placement::Bottom);
+    let (status, set_status) = signal(ConnectedStatus::TwoDisjoined);
+    let (open, set_open) = signal(false);
+    let (mouse_coords, set_mouse_coords) = signal::<Option<Coords>>(None);
 
-    let reference_signal = create_rw_signal::<
-        VirtualElementOrNodeRef<NodeRef<AnyElement>, AnyElement>,
-    >(reference_ref.into());
+    let reference_signal = RwSignal::<VirtualElementOrNodeRef>::new(reference_ref.into());
 
     let UseFloatingReturn { x, y, strategy, .. } = use_floating(
-        reference_signal.into(),
+        reference_signal,
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())
@@ -54,7 +53,7 @@ pub fn Inline() -> impl IntoView {
                     Box::new(Size::new(SizeOptions::default())),
                 ];
 
-                Some(middleware)
+                Some(SendWrapper::new(middleware))
             })),
     );
 
@@ -165,25 +164,24 @@ pub fn Inline() -> impl IntoView {
         <div class="container">
             <p class="prose" style:padding="10px">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.{' '}
-                {move || view! {
-                    <strong
-                        style:color="royalblue"
-                        on:mouseenter=handle_mouse_enter
-                        on:mouseleave=handle_mouse_leave
-                    >
-                        {text}
-                    </strong>
-                }.into_any().node_ref(reference_ref)}. Ut eu magna eu augue efficitur bibendum id commodo tellus. Nullam
+                <strong
+                    node_ref=reference_ref
+                    style:color="royalblue"
+                    on:mouseenter=handle_mouse_enter
+                    on:mouseleave=handle_mouse_leave
+                >
+                    {text}
+                </strong>. Ut eu magna eu augue efficitur bibendum id commodo tellus. Nullam
                 gravida, mi nec sodales tincidunt, lorem orci aliquam ex, id commodo
                 erat libero ut risus. Nam molestie non lectus sit amet tempus. Vivamus
                 accumsan{' '}
-                <strong style:color="red">nunc quis faucibus egestas</strong>.
+                <strong style:color={"red"}>nunc quis faucibus egestas</strong>.
                 Duis cursus nisi massa, non dictum turpis interdum at.
             </p>
 
             <Show when=move || open.get()>
                <div
-                    _ref=floating_ref
+                    node_ref=floating_ref
                     class="floating"
                     style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                     style:top=move || format!("{}px", y.get())
@@ -203,9 +201,10 @@ pub fn Inline() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement.get() == local_placement {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if placement.get() == local_placement {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_placement.set(local_placement)
                     >
@@ -223,9 +222,10 @@ pub fn Inline() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("open-{}", value)
-                        style:background-color=move || match open.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if open.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_open.set(value)
                     >
@@ -248,9 +248,10 @@ pub fn Inline() -> impl IntoView {
                             ConnectedStatus::TwoJoined => "2-joined",
                             ConnectedStatus::Three => "3",
                         })
-                        style:background-color=move || match status.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if status.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_status.set(value)
                     >

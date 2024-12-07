@@ -1,9 +1,11 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, FallbackStrategy, Flip, FlipOptions, IntoReference, MiddlewareVec, Placement,
-    Shift, ShiftOptions, UseFloatingOptions, UseFloatingReturn,
+    use_floating, FallbackStrategy, Flip, FlipOptions, MiddlewareVec, Placement, Shift,
+    ShiftOptions, UseFloatingOptions, UseFloatingReturn,
 };
-use leptos::{html::Div, *};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 
 use crate::utils::{
     all_placements::ALL_PLACEMENTS,
@@ -19,16 +21,16 @@ enum FallbackPlacements {
 
 #[component]
 pub fn Flip() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (placement, set_placement) = create_signal(Placement::Bottom);
-    let (main_axis, set_main_axis) = create_signal(true);
-    let (cross_axis, set_cross_axis) = create_signal(true);
-    let (fallback_placements, set_fallback_placements) = create_signal(FallbackPlacements::None);
-    let (fallback_strategy, set_fallback_strategy) = create_signal(FallbackStrategy::BestFit);
-    let (flip_alignment, set_flip_alignment) = create_signal(true);
-    let (add_shift, set_add_shift) = create_signal(false);
+    let (placement, set_placement) = signal(Placement::Bottom);
+    let (main_axis, set_main_axis) = signal(true);
+    let (cross_axis, set_cross_axis) = signal(true);
+    let (fallback_placements, set_fallback_placements) = signal(FallbackPlacements::None);
+    let (fallback_strategy, set_fallback_strategy) = signal(FallbackStrategy::BestFit);
+    let (flip_alignment, set_flip_alignment) = signal(true);
+    let (add_shift, set_add_shift) = signal(false);
 
     let UseFloatingReturn {
         x,
@@ -37,7 +39,7 @@ pub fn Flip() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref.into_reference(),
+        reference_ref,
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())
@@ -49,15 +51,16 @@ pub fn Flip() -> impl IntoView {
                     .fallback_strategy(fallback_strategy.get())
                     .flip_alignment(flip_alignment.get());
 
-                options = match add_shift.get() {
-                    true => options.fallback_placements(vec![Placement::Bottom]),
-                    false => match fallback_placements.get() {
+                options = if add_shift.get() {
+                    options.fallback_placements(vec![Placement::Bottom])
+                } else {
+                    match fallback_placements.get() {
                         FallbackPlacements::None => options,
                         FallbackPlacements::Empty => options.fallback_placements(vec![]),
                         FallbackPlacements::All => {
                             options.fallback_placements(ALL_PLACEMENTS.into())
                         }
-                    },
+                    }
                 };
 
                 let mut middleware: MiddlewareVec = vec![Box::new(Flip::new(options))];
@@ -66,7 +69,7 @@ pub fn Flip() -> impl IntoView {
                     middleware.push(Box::new(Shift::new(ShiftOptions::default())));
                 }
 
-                Some(middleware)
+                Some(SendWrapper::new(middleware))
             })),
     );
 
@@ -86,21 +89,18 @@ pub fn Flip() -> impl IntoView {
         <h1>Flip</h1>
         <p></p>
         <div class="container">
-            <div _ref=scroll_ref class="scroll" data-x="" style:position="relative">
-                {indicator}
-                <div _ref=reference_ref class="reference">
+            <div node_ref=scroll_ref class="scroll" data-x="" style:position="relative">
+                {move || indicator()}
+                <div node_ref=reference_ref class="reference">
                     Reference
                 </div>
                 <div
-                    _ref=floating_ref
+                    node_ref=floating_ref
                     class="floating"
                     style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                     style:top=move || format!("{}px", y.get())
                     style:left=move || format!("{}px", x.get())
-                    style:width=move || match add_shift.get() {
-                        true => "400px",
-                        false => ""
-                    }
+                    style:width=move || add_shift.get().then_some("400px").unwrap_or_default()
                 >
                     Floating
                 </div>
@@ -115,9 +115,10 @@ pub fn Flip() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement.get() == local_placement {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if placement.get() == local_placement {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_placement.set(local_placement)
                     >
@@ -135,9 +136,10 @@ pub fn Flip() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("mainAxis-{}", value)
-                        style:background-color=move || match main_axis.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if main_axis.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_main_axis.set(value)
                     >
@@ -155,9 +157,10 @@ pub fn Flip() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("crossAxis-{}", value)
-                        style:background-color=move || match cross_axis.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if cross_axis.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_cross_axis.set(value)
                     >
@@ -179,15 +182,16 @@ pub fn Flip() -> impl IntoView {
                             FallbackPlacements::Empty => "[]",
                             FallbackPlacements::All => "all",
                         })
-                        style:background-color=move || match fallback_placements.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if fallback_placements.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_fallback_placements.set(value)
                     >
                         {match value {
-                            FallbackPlacements::None => "undefined".into(),
-                            FallbackPlacements::Empty => "[]".into(),
+                            FallbackPlacements::None => "undefined".to_owned(),
+                            FallbackPlacements::Empty => "[]".to_owned(),
                             FallbackPlacements::All => format!("[{}]", ALL_PLACEMENTS.map(|p| format!("{:?}", p).to_case(Case::Kebab)).join(", ")),
                         }}
                     </button>
@@ -203,9 +207,10 @@ pub fn Flip() -> impl IntoView {
                 children=move |local_fallback_strategy| view! {
                     <button
                         data-testid=format!("fallbackStrategy-{}", format!("{:?}", local_fallback_strategy).to_case(Case::Camel))
-                        style:background-color=move || match fallback_strategy.get() == local_fallback_strategy {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if fallback_strategy.get() == local_fallback_strategy {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_fallback_strategy.set(local_fallback_strategy)
                     >
@@ -223,9 +228,10 @@ pub fn Flip() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("flipAlignment-{}", value)
-                        style:background-color=move || match flip_alignment.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if flip_alignment.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_flip_alignment.set(value)
                     >
@@ -243,9 +249,10 @@ pub fn Flip() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("shift-{}", value)
-                        style:background-color=move || match add_shift.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if add_shift.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_add_shift.set(value)
                     >

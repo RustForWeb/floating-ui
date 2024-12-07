@@ -237,19 +237,18 @@ pub fn auto_update(
         ElementOrVirtual::VirtualElement(ve) => OwnedElementOrVirtual::VirtualElement(ve.clone()),
     };
 
-    let ancestors = match ancestor_scoll || ancestor_resize {
-        true => {
-            let mut ancestors = vec![];
+    let ancestors = if ancestor_scoll || ancestor_resize {
+        let mut ancestors = vec![];
 
-            if let Some(reference) = reference_element.as_ref() {
-                ancestors = get_overflow_ancestors(reference, ancestors, true);
-            }
-
-            ancestors.append(&mut get_overflow_ancestors(floating, vec![], true));
-
-            ancestors
+        if let Some(reference) = reference_element.as_ref() {
+            ancestors = get_overflow_ancestors(reference, ancestors, true);
         }
-        false => vec![],
+
+        ancestors.append(&mut get_overflow_ancestors(floating, vec![], true));
+
+        ancestors
+    } else {
+        vec![]
     };
 
     let update_closure: Closure<dyn Fn()> = Closure::new({
@@ -286,13 +285,9 @@ pub fn auto_update(
         }
     }
 
-    let cleanup_observe_move =
-        reference_element
-            .as_ref()
-            .and_then(|reference_element| match layout_shift {
-                true => Some(observe_move(reference_element.clone(), update.clone())),
-                false => None,
-            });
+    let cleanup_observe_move = reference_element.as_ref().and_then(|reference_element| {
+        layout_shift.then(|| observe_move(reference_element.clone(), update.clone()))
+    });
 
     let reobserve_frame: Rc<RefCell<Option<i32>>> = Rc::new(RefCell::new(None));
     let resize_observer: Rc<RefCell<Option<ResizeObserver>>> = Rc::new(RefCell::new(None));
@@ -359,10 +354,9 @@ pub fn auto_update(
 
     let frame_id: Rc<RefCell<Option<i32>>> = Rc::new(RefCell::new(None));
     let prev_ref_rect: Rc<RefCell<Option<ClientRectObject>>> =
-        Rc::new(RefCell::new(match animation_frame {
-            true => Some(get_bounding_client_rect(reference, false, false, None)),
-            false => None,
-        }));
+        Rc::new(RefCell::new(animation_frame.then(|| {
+            get_bounding_client_rect(reference, false, false, None)
+        })));
 
     let frame_loop_frame_id = frame_id.clone();
     let frame_loop_closure = Rc::new(RefCell::new(None));

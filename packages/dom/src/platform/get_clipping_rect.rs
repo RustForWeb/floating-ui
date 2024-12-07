@@ -92,10 +92,7 @@ fn get_clipping_element_ancestors(element: &Element) -> Vec<Element> {
         .into_iter()
         .filter_map(|ancestor| match ancestor {
             OverflowAncestor::Element(element) => {
-                match get_node_name((&element).into()) == "body" {
-                    true => None,
-                    false => Some(element),
-                }
+                (get_node_name((&element).into()) != "body").then_some(element)
             }
             OverflowAncestor::Window(_) => None,
         })
@@ -105,9 +102,10 @@ fn get_clipping_element_ancestors(element: &Element) -> Vec<Element> {
         .get_property_value("position")
         .expect("Computed style should have position.")
         == "fixed";
-    let mut current_node: Node = match element_is_fixed {
-        true => get_parent_node(element),
-        false => element.clone().into(),
+    let mut current_node: Node = if element_is_fixed {
+        get_parent_node(element)
+    } else {
+        element.clone().into()
     };
 
     // https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block
@@ -124,26 +122,23 @@ fn get_clipping_element_ancestors(element: &Element) -> Vec<Element> {
             current_containing_block_computed_style = None;
         }
 
-        let should_drop_current_node = match element_is_fixed {
-            true => {
-                !current_node_is_containing && current_containing_block_computed_style.is_none()
-            }
-            false => {
-                (!current_node_is_containing
-                    && position == "static"
-                    && current_containing_block_computed_style
-                        .as_ref()
-                        .is_some_and(|style| {
-                            let positon = style
-                                .get_property_value("position")
-                                .expect("Computed style should have position");
+        let should_drop_current_node = if element_is_fixed {
+            !current_node_is_containing && current_containing_block_computed_style.is_none()
+        } else {
+            (!current_node_is_containing
+                && position == "static"
+                && current_containing_block_computed_style
+                    .as_ref()
+                    .is_some_and(|style| {
+                        let positon = style
+                            .get_property_value("position")
+                            .expect("Computed style should have position");
 
-                            positon == "absolute" || positon == "fixed"
-                        }))
-                    || (is_overflow_element(current_element)
-                        && !current_node_is_containing
-                        && has_fixed_position_ancestor(element, current_element))
-            }
+                        positon == "absolute" || positon == "fixed"
+                    }))
+                || (is_overflow_element(current_element)
+                    && !current_node_is_containing
+                    && has_fixed_position_ancestor(element, current_element))
         };
 
         if should_drop_current_node {
@@ -172,10 +167,13 @@ pub fn get_clipping_rect(
     // TODO: cache
 
     let clipping_element_ancestors = match boundary {
-        floating_ui_core::Boundary::ClippingAncestors => match is_top_layer(element) {
-            true => vec![],
-            false => get_clipping_element_ancestors(element),
-        },
+        Boundary::ClippingAncestors => {
+            if is_top_layer(element) {
+                vec![]
+            } else {
+                get_clipping_element_ancestors(element)
+            }
+        }
         _ => vec![],
     };
 

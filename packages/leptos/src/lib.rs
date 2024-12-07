@@ -5,7 +5,7 @@
 //! See [the Rust Floating UI book](https://floating-ui.rustforweb.org/frameworks/leptos.html) for more documenation.
 
 mod arrow;
-mod node_ref;
+// mod node_ref;
 mod types;
 mod use_floating;
 mod utils;

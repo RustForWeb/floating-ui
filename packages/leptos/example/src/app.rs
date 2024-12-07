@@ -1,20 +1,19 @@
 use floating_ui_leptos::{
     use_floating, Arrow, ArrowData, ArrowOptions, DetectOverflowOptions, Flip, FlipOptions,
-    IntoReference, MiddlewareVec, Offset, OffsetOptions, Padding, Placement, Shift, ShiftOptions,
-    Side, UseFloatingOptions, UseFloatingReturn, ARROW_NAME,
+    MiddlewareVec, Offset, OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side,
+    UseFloatingOptions, UseFloatingReturn, ARROW_NAME,
 };
-use leptos::{
-    html::{Button, Div},
-    *,
-};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 
 #[component]
 pub fn App() -> impl IntoView {
-    let reference_ref = create_node_ref::<Button>();
-    let floating_ref = create_node_ref::<Div>();
-    let arrow_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
+    let arrow_ref = AnyNodeRef::new();
 
-    let (open, set_open) = create_signal(false);
+    let (open, set_open) = signal(false);
 
     let middleware: MiddlewareVec = vec![
         Box::new(Offset::new(OffsetOptions::Value(6.0))),
@@ -31,12 +30,12 @@ pub fn App() -> impl IntoView {
         middleware_data,
         ..
     } = use_floating(
-        reference_ref.into_reference(),
+        reference_ref,
         floating_ref,
         UseFloatingOptions::default()
             .open(open.into())
             .placement(Placement::Top.into())
-            .middleware(middleware.into())
+            .middleware(SendWrapper::new(middleware).into())
             .while_elements_mounted_auto_update(),
     );
 
@@ -56,7 +55,7 @@ pub fn App() -> impl IntoView {
 
     view! {
         <button
-            _ref=reference_ref
+            node_ref=reference_ref
             id="button"
             aria-describedby="tooltip"
             on:mouseenter=move |_| set_open.set(true)
@@ -68,39 +67,40 @@ pub fn App() -> impl IntoView {
         </button>
 
         <div
-            _ref=floating_ref
+            node_ref=floating_ref
             id="tooltip"
             role="tooltip"
-            style:display=move || match open.get() {
-                true => "block",
-                false => "none"
+            style:display=move || if open.get() {
+                "block"
+            } else {
+                "none"
             }
             style:position=move || floating_styles.get().style_position()
             style:top=move || floating_styles.get().style_top()
             style:left=move || floating_styles.get().style_left()
-            style:transform=move || floating_styles.get().style_transform()
-            style:will-change=move || floating_styles.get().style_will_change()
+            style:transform=move || floating_styles.get().style_transform().unwrap_or_default()
+            style:will-change=move || floating_styles.get().style_will_change().unwrap_or_default()
         >
             My tooltip with more content
             <div
-                _ref=arrow_ref
+                node_ref=arrow_ref
                 id="arrow"
                 style:left=move || match static_side.get() {
-                    Side::Left => Some("-4px".into()),
+                    Side::Left => Some("-4px".to_owned()),
                     _ => arrow_x.get()
-                }
+                }.unwrap_or_default()
                 style:top=move || match static_side.get() {
-                    Side::Top => Some("-4px".into()),
+                    Side::Top => Some("-4px".to_owned()),
                     _ => arrow_y.get()
-                }
+                }.unwrap_or_default()
                 style:right=move || match static_side.get() {
                     Side::Right => Some("-4px"),
                     _ => None
-                }
+                }.unwrap_or_default()
                 style:bottom=move || match static_side.get() {
                     Side::Bottom => Some("-4px"),
                     _ => None
-                }
+                }.unwrap_or_default()
             />
         </div>
     }

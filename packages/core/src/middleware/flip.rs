@@ -231,9 +231,10 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
 
         let has_specified_fallback_placements = specified_fallback_placements.is_some();
         let mut placements =
-            specified_fallback_placements.unwrap_or(match is_base_placement || !flip_alignment {
-                true => vec![get_opposite_placement(initial_placement)],
-                false => get_expanded_placements(initial_placement),
+            specified_fallback_placements.unwrap_or(if is_base_placement || !flip_alignment {
+                vec![get_opposite_placement(initial_placement)]
+            } else {
+                get_expanded_placements(initial_placement)
             });
 
         let has_fallback_axis_side_direction = fallback_axis_side_direction.is_some();

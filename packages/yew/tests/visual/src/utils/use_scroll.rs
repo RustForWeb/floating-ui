@@ -197,7 +197,7 @@ pub fn use_scroll(options: UseScrollOptions) -> UseScrollReturn {
                         *x
                     )}
                 >
-                    {scroll.map_or("x: null, y: null".into(), |scroll| format!("x: {}, y: {}", scroll.0, scroll.1))}
+                    {scroll.map_or("x: null, y: null".to_owned(), |scroll| format!("x: {}, y: {}", scroll.0, scroll.1))}
                 </div>
             }
         })

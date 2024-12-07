@@ -1,10 +1,12 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, ApplyState, DetectOverflowOptions, Flip, FlipOptions, IntoReference, LimitShift,
-    LimitShiftOffset, LimitShiftOptions, MiddlewareState, MiddlewareVec, Placement, Shift,
+    use_floating, ApplyState, DetectOverflowOptions, Flip, FlipOptions, LimitShift,
+    LimitShiftOffset, LimitShiftOptions, MiddlewareState, MiddlewareVec, Padding, Placement, Shift,
     ShiftOptions, Size, SizeOptions, UseFloatingOptions, UseFloatingReturn,
 };
-use leptos::{html::Div, *};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 use wasm_bindgen::JsCast;
 
 use crate::utils::{
@@ -22,20 +24,17 @@ enum ShiftOrder {
 
 #[component]
 pub fn Size() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (rtl, set_rtl) = create_signal(false);
-    let (placement, set_placement) = create_signal(Placement::Bottom);
-    let (add_flip, set_add_flip) = create_signal(false);
-    let (add_shift, set_add_shift) = create_signal(ShiftOrder::None);
-    let (shift_cross_axis, set_shift_cross_axis) = create_signal(false);
-    let (shift_limiter, set_shift_limiter) = create_signal(false);
+    let (rtl, set_rtl) = signal(false);
+    let (placement, set_placement) = signal(Placement::Bottom);
+    let (add_flip, set_add_flip) = signal(false);
+    let (add_shift, set_add_shift) = signal(ShiftOrder::None);
+    let (shift_cross_axis, set_shift_cross_axis) = signal(false);
+    let (shift_limiter, set_shift_limiter) = signal(false);
 
     let has_edge_alignment = move || placement.get().alignment().is_some();
-
-    let detect_overflow_options =
-        DetectOverflowOptions::default().padding(floating_ui_leptos::Padding::All(10.0));
 
     let UseFloatingReturn {
         x,
@@ -44,13 +43,16 @@ pub fn Size() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref.into_reference(),
+        reference_ref,
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())
             .while_elements_mounted_auto_update()
             .middleware(MaybeProp::derive(move || {
                 let mut middleware: MiddlewareVec = vec![];
+
+                let detect_overflow_options =
+                    DetectOverflowOptions::default().padding(Padding::All(10.0));
 
                 let mut shift_options = ShiftOptions::default()
                     .detect_overflow(detect_overflow_options.clone())
@@ -103,7 +105,7 @@ pub fn Size() -> impl IntoView {
                     middleware.push(Box::new(Shift::new(shift_options.clone())));
                 }
 
-                Some(middleware)
+                Some(SendWrapper::new(middleware))
             })),
     );
 
@@ -120,33 +122,36 @@ pub fn Size() -> impl IntoView {
     view! {
         <h1>Size</h1>
         <p></p>
-        <div class="container" style:direction=move || match rtl.get() {
-            true => "rtl",
-            false => "ltr",
+        <div class="container" style:direction=move || if rtl.get() {
+            "rtl"
+        } else {
+            "ltr"
         }>
-            <div _ref=scroll_ref class="scroll resize" data-x="" style:position="relative">
-                <div _ref=reference_ref class="reference">
+            <div node_ref=scroll_ref class="scroll resize" data-x="" style:position="relative">
+                <div node_ref=reference_ref class="reference">
                     Reference
                 </div>
                 <div
-                    _ref=floating_ref
+                    node_ref=floating_ref
                     class="floating"
                     style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                     style:top=move || format!("{}px", y.get())
                     style:left=move || format!("{}px", x.get())
-                    style:width=move || match add_shift.get() != ShiftOrder::None {
-                        true => if add_shift.get() == ShiftOrder::Before && shift_cross_axis.get() {
+                    style:width=move || if add_shift.get() != ShiftOrder::None {
+                        if add_shift.get() == ShiftOrder::Before && shift_cross_axis.get() {
                             "100px"
                         } else if add_shift.get() == ShiftOrder::Before && has_edge_alignment() {
                             "360px"
                         } else {
                             "600px"
-                        },
-                        false => "400px"
+                        }
+                    } else {
+                        "400px"
                     }
-                    style:height=move || match add_shift.get() != ShiftOrder::None {
-                        true => "600px",
-                        false => "300px",
+                    style:height=move || if add_shift.get() != ShiftOrder::None {
+                        "600px"
+                    } else {
+                        "300px"
                     }
                 >
                     Floating
@@ -162,9 +167,10 @@ pub fn Size() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement.get() == local_placement {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if placement.get() == local_placement {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_placement.set(local_placement)
                     >
@@ -183,9 +189,10 @@ pub fn Size() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("rtl-{}", value)
-                            style:background-color=move || match rtl.get() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if rtl.get() == value {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| {
                                 set_rtl.set(value);
@@ -206,9 +213,10 @@ pub fn Size() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("flip-{}", value)
-                        style:background-color=move || match add_flip.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if add_flip.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_add_flip.set(value)
                     >
@@ -226,9 +234,10 @@ pub fn Size() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("shift-{}", format!("{:?}", value).to_case(Case::Camel))
-                        style:background-color=move || match add_shift.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if add_shift.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_add_shift.set(value)
                     >
@@ -247,9 +256,10 @@ pub fn Size() -> impl IntoView {
                     children=move |value| view! {
                         <button
                             data-testid=format!("shift.crossAxis-{}", value)
-                            style:background-color=move || match shift_cross_axis.get() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if shift_cross_axis.get() == value {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_shift_cross_axis.set(value)
                         >
@@ -267,9 +277,10 @@ pub fn Size() -> impl IntoView {
                     children=move |value| view! {
                         <button
                             data-testid=format!("shift.limiter-{}", value)
-                            style:background-color=move || match shift_limiter.get() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if shift_limiter.get() == value {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_shift_limiter.set(value)
                         >

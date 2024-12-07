@@ -1,11 +1,9 @@
 use floating_ui_leptos::{
-    use_floating, IntoReference, MiddlewareVec, Placement, Strategy, UseFloatingOptions,
-    UseFloatingReturn,
+    use_floating, MiddlewareVec, Placement, Strategy, UseFloatingOptions, UseFloatingReturn,
 };
-use leptos::{
-    html::{AnyElement, Div},
-    *,
-};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 use tailwind_fuse::tw_merge;
 
 #[component]
@@ -13,25 +11,25 @@ pub fn Floating<CF, CIV, RF, RIV>(
     #[prop(into, optional)] class: MaybeProp<String>,
     #[prop(into, optional)] strategy: MaybeProp<Strategy>,
     #[prop(into, optional)] placement: MaybeProp<Placement>,
-    #[prop(into, optional)] middleware: MaybeProp<MiddlewareVec>,
-    #[prop(default = false.into(), into)] arrow: MaybeSignal<bool>,
+    #[prop(into, optional)] middleware: MaybeProp<SendWrapper<MiddlewareVec>>,
+    #[prop(default = false.into(), into)] arrow: Signal<bool>,
     content: CF,
     reference: RF,
 ) -> impl IntoView
 where
     CF: Fn() -> CIV + 'static,
     CIV: IntoView + 'static,
-    RF: Fn(NodeRef<AnyElement>) -> RIV + 'static,
+    RF: Fn(AnyNodeRef) -> RIV + 'static,
     RIV: IntoView + 'static,
 {
-    let floating_ref: NodeRef<Div> = NodeRef::new();
-    let reference_ref: NodeRef<AnyElement> = NodeRef::new();
-    let arrow_ref: NodeRef<Div> = NodeRef::new();
+    let floating_ref = AnyNodeRef::new();
+    let reference_ref = AnyNodeRef::new();
+    let arrow_ref = AnyNodeRef::new();
 
     let UseFloatingReturn {
         floating_styles, ..
     } = use_floating(
-        reference_ref.into_reference(),
+        reference_ref,
         floating_ref,
         UseFloatingOptions::default()
             .while_elements_mounted_auto_update()
@@ -57,8 +55,8 @@ where
             style:position=move || floating_styles.get().style_position()
             style:top=move || floating_styles.get().style_top()
             style:left=move || floating_styles.get().style_left()
-            style:transform=move || floating_styles.get().style_transform()
-            style:will-change=move || floating_styles.get().style_will_change()
+            style:transform=move || floating_styles.get().style_transform().unwrap_or_default()
+            style:will-change=move || floating_styles.get().style_will_change().unwrap_or_default()
         >
             <div class="px-2 py-2">{content()}</div>
             <Show when=move || arrow.get()>

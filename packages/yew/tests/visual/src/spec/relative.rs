@@ -124,12 +124,13 @@ pub fn Relative() -> Html {
                             <button
                                 key={format!("{:?}", value)}
                                 data-testid={format!("relative-{}", match value {
-                                    Node::None => "null".into(),
+                                    Node::None => "null".to_owned(),
                                     _ => format!("{:?}", value).to_case(Case::Camel)
                                 })}
-                                style={match *node == value {
-                                    true => "background-color: black;",
-                                    false => ""
+                                style={if *node == value {
+                                    "background-color: black;"
+                                } else {
+                                    ""
                                 }}
                                 onclick={Callback::from({
                                     let node = node.clone();
@@ -152,9 +153,10 @@ pub fn Relative() -> Html {
                             <button
                                 key={format!("{}", value)}
                                 data-testid={format!("offset-{}", value)}
-                                style={match *offset == value {
-                                    true => "background-color: black;",
-                                    false => ""
+                                style={if *offset == value {
+                                    "background-color: black;"
+                                } else {
+                                    ""
                                 }}
                                 onclick={Callback::from({
                                     let offset = offset.clone();

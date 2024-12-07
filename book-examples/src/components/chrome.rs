@@ -1,7 +1,7 @@
 // TODO: remove
 #![allow(unused)]
 
-use leptos::{html::Div, *};
+use leptos::{context::Provider, html::Div, prelude::*};
 use tailwind_fuse::tw_merge;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -17,13 +17,13 @@ pub struct ChromeContext(pub NodeRef<Div>);
 
 #[component]
 pub fn Chrome(
-    #[prop(default = false.into(), into)] center: MaybeSignal<bool>,
-    #[prop(default = Scrollable::None.into(), into)] scrollable: MaybeSignal<Scrollable>,
-    #[prop(default = true.into(), into)] relative: MaybeSignal<bool>,
+    #[prop(default = false.into(), into)] center: Signal<bool>,
+    #[prop(default = Scrollable::None.into(), into)] scrollable: Signal<Scrollable>,
+    #[prop(default = true.into(), into)] relative: Signal<bool>,
     #[prop(into, optional)] label: MaybeProp<String>,
-    #[prop(default = 305.into(), into)] scroll_height: MaybeSignal<isize>,
-    #[prop(default = true.into(), into)] shadow: MaybeSignal<bool>,
-    #[prop(default = false.into(), into)] tall: MaybeSignal<bool>,
+    #[prop(default = 305.into(), into)] scroll_height: Signal<isize>,
+    #[prop(default = true.into(), into)] shadow: Signal<bool>,
+    #[prop(default = false.into(), into)] tall: Signal<bool>,
     children: Children,
 ) -> impl IntoView {
     let scrollable_ref: NodeRef<Div> = NodeRef::new();
@@ -57,11 +57,7 @@ pub fn Chrome(
             )}
         >
             <div class="bg-gray-75 dark:bg-gray-600/60 dark:text-white">
-            <div class={{
-                let label = label.clone();
-
-                move || tw_merge!("absolute mx-4 flex h-12 items-center gap-2", label.get().map(|_| "sm:flex"))}
-            }>
+            <div class={move || tw_merge!("absolute mx-4 flex h-12 items-center gap-2", label.get().map(|_| "sm:flex"))}>
                 <div
                     class="h-3 w-3 rounded-full"
                     style:background="#ec695e"
@@ -94,9 +90,10 @@ pub fn Chrome(
                     <Show when=move || is_scrollable.get()>
                         <div
                             class={scrollable_x.get().then_some("w-[180vw] md:w-[75rem] lg:w-[90rem]")}
-                            style:height={match scrollable_y.get() {
-                                true => format!("{}px", scroll_height.get()),
-                                false => "1px".into(),
+                            style:height={if scrollable_y.get() {
+                                format!("{}px", scroll_height.get())
+                            } else {
+                                "1px".to_owned()
                             }}
                         />
                     </Show>
@@ -106,9 +103,10 @@ pub fn Chrome(
                     <Show when=move || is_scrollable.get()>
                         <div
                             class={scrollable_x.get().then_some("w-[180vw] md:w-[75rem] lg:w-[90rem]")}
-                            style:height={match scrollable_y.get() {
-                                true => format!("{}px", scroll_height.get()),
-                                false => "1px".into(),
+                            style:height={if scrollable_y.get() {
+                                format!("{}px", scroll_height.get())
+                            } else {
+                                "1px".to_owned()
                             }}
                         />
                     </Show>

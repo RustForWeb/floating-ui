@@ -161,14 +161,18 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
             Side::Top | Side::Bottom => {
                 height_side = side;
                 width_side = match alignment {
-                    Some(alignment) => match alignment
-                        == match platform.is_rtl(elements.floating) {
-                            Some(true) => Alignment::Start,
-                            _ => Alignment::End,
-                        } {
-                        true => Side::Left,
-                        false => Side::Right,
-                    },
+                    Some(alignment) => {
+                        if alignment
+                            == match platform.is_rtl(elements.floating) {
+                                Some(true) => Alignment::Start,
+                                _ => Alignment::End,
+                            }
+                        {
+                            Side::Left
+                        } else {
+                            Side::Right
+                        }
+                    }
                     None => Side::Right,
                 };
             }
@@ -211,16 +215,18 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
             if is_y_axis {
                 available_width = width
                     - 2.0
-                        * (match x_min != 0.0 || x_max != 0.0 {
-                            true => x_min + x_max,
-                            false => overflow.left.max(overflow.right),
+                        * (if x_min != 0.0 || x_max != 0.0 {
+                            x_min + x_max
+                        } else {
+                            overflow.left.max(overflow.right)
                         });
             } else {
                 available_height = height
                     - 2.0
-                        * (match y_min != 0.0 || y_max != 0.0 {
-                            true => y_min + y_max,
-                            false => overflow.top.max(overflow.bottom),
+                        * (if y_min != 0.0 || y_max != 0.0 {
+                            y_min + y_max
+                        } else {
+                            overflow.top.max(overflow.bottom)
                         });
             }
         }

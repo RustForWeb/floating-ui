@@ -2,7 +2,8 @@ use floating_ui_leptos::{
     DetectOverflowOptions, MiddlewareVec, Offset, OffsetOptions, Padding, RootBoundary, Size,
     SizeOptions,
 };
-use leptos::*;
+use leptos::prelude::*;
+use send_wrapper::SendWrapper;
 
 use crate::components::{Chrome, Floating, GridItem, Reference, Scrollable};
 
@@ -31,7 +32,7 @@ pub fn SizeDemo() -> impl IntoView {
                                 ))),
                             ];
 
-                            middleware
+                            SendWrapper::new(middleware)
                         }
                         content=move || view! {
                             <div class="grid items-center text-sm font-bold">

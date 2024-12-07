@@ -1,12 +1,11 @@
-use std::{cell::RefCell, rc::Rc};
-
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    auto_update, use_floating, AutoUpdateOptions, IntoReference, Strategy, UseFloatingOptions,
-    UseFloatingReturn,
+    auto_update, use_floating, AutoUpdateOptions, Strategy, UseFloatingOptions, UseFloatingReturn,
 };
-use leptos::{html::Div, *};
-use web_sys::Element;
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
+use wasm_bindgen::JsCast;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 enum LayoutShift {
@@ -27,20 +26,20 @@ const ALL_LAYOUT_SHIFTS: [LayoutShift; 5] = [
 
 #[component]
 pub fn AutoUpdate() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (layout_shift, set_layout_shift) = create_signal(LayoutShift::None);
-    let (options, set_options) = create_signal(AutoUpdateOptions {
+    let (layout_shift, set_layout_shift) = signal(LayoutShift::None);
+    let (options, set_options) = signal(AutoUpdateOptions {
         ancestor_scroll: Some(false),
         ancestor_resize: Some(false),
         element_resize: Some(false),
         layout_shift: None,
         animation_frame: Some(false),
     });
-    let (reference_size, set_reference_size) = create_signal(200);
-    let (floating_size, set_floating_size) = create_signal(100);
-    let (while_elements_mounted, set_while_elements_mounted) = create_signal(false);
+    let (reference_size, set_reference_size) = signal(200);
+    let (floating_size, set_floating_size) = signal(100);
+    let (while_elements_mounted, set_while_elements_mounted) = signal(false);
 
     let UseFloatingReturn {
         x,
@@ -49,7 +48,7 @@ pub fn AutoUpdate() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref.into_reference(),
+        reference_ref,
         floating_ref,
         UseFloatingOptions::default()
             .strategy(Strategy::Fixed.into())
@@ -57,55 +56,60 @@ pub fn AutoUpdate() -> impl IntoView {
     );
 
     type CleanupFn = Box<dyn Fn()>;
-    let cleanup: Rc<RefCell<Option<CleanupFn>>> = Rc::new(RefCell::new(None));
+    let cleanup: StoredValue<Option<SendWrapper<CleanupFn>>> = StoredValue::new(None);
 
-    let effect_cleanup = cleanup.clone();
-    let effect_update = update.clone();
-    create_effect(move |_| {
-        if let Some(reference) = reference_ref.get() {
-            if let Some(floating) = floating_ref.get() {
-                if let Some(cleanup) = effect_cleanup.take() {
-                    cleanup();
+    Effect::new({
+        let update = update.clone();
+
+        move |_| {
+            if let Some(reference) = reference_ref.get() {
+                if let Some(floating) = floating_ref.get() {
+                    if let Some(cleanup) = &*cleanup.read_value() {
+                        cleanup();
+                    }
+
+                    let size_factor = match layout_shift.get() {
+                        LayoutShift::Move => 0.9,
+                        _ => 1.0,
+                    };
+
+                    // Match React test behaviour by moving the size change from style attributes to here.
+                    // The style attributes update after this effect, so `auto_update` would not use the correct size.
+                    let style = reference.unchecked_ref::<web_sys::HtmlElement>().style();
+
+                    style
+                        .set_property(
+                            "width",
+                            &format!("{}px", reference_size.get() as f64 * size_factor),
+                        )
+                        .expect("Style should be updated.");
+                    style
+                        .set_property(
+                            "height",
+                            &format!("{}px", reference_size.get() as f64 * size_factor),
+                        )
+                        .expect("Style should be updated.");
+
+                    cleanup.set_value(Some(SendWrapper::new(auto_update(
+                        (&reference).into(),
+                        &floating,
+                        (*update).clone(),
+                        options
+                            .get()
+                            .layout_shift(layout_shift.get() != LayoutShift::None),
+                    ))));
                 }
-
-                let size_factor = match layout_shift.get() {
-                    LayoutShift::Move => 0.9,
-                    _ => 1.0,
-                };
-
-                // Match React test behaviour by moving the size change from style attributes to here.
-                // The style attributes update after this effect, so `auto_update` would not use the correct size.
-                _ = reference
-                    .clone()
-                    .style(
-                        "width",
-                        format!("{}px", reference_size.get() as f64 * size_factor),
-                    )
-                    .style(
-                        "height",
-                        format!("{}px", reference_size.get() as f64 * size_factor),
-                    );
-
-                let reference: &Element = &reference;
-                effect_cleanup.replace(Some(auto_update(
-                    reference.into(),
-                    &floating,
-                    effect_update.clone(),
-                    options
-                        .get()
-                        .layout_shift(layout_shift.get() != LayoutShift::None),
-                )));
             }
         }
     });
 
     on_cleanup(move || {
-        if let Some(cleanup) = cleanup.take() {
+        if let Some(cleanup) = &*cleanup.read_value() {
             cleanup();
         }
     });
 
-    create_effect(move |_| {
+    Effect::new(move |_| {
         if options.get().element_resize.unwrap() {
             set_reference_size.set(100);
             set_floating_size.set(50);
@@ -128,7 +132,7 @@ pub fn AutoUpdate() -> impl IntoView {
             data-flexible
         >
             <div
-                _ref=reference_ref
+                node_ref=reference_ref
                 class="reference"
                 style:position="relative"
                 style:top=move || match layout_shift.get() {
@@ -155,7 +159,7 @@ pub fn AutoUpdate() -> impl IntoView {
                 Reference
             </div>
             <div
-                _ref=floating_ref
+                node_ref=floating_ref
                 class="floating"
                 style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                 style:top=move || format!("{}px", y.get())
@@ -176,9 +180,10 @@ pub fn AutoUpdate() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("ancestorScroll-{}", value)
-                            style:background-color=move || match options.get().ancestor_scroll.unwrap() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if options.get().ancestor_scroll.unwrap() == value {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_options.set(options.get().ancestor_scroll(value))
                         >
@@ -198,9 +203,10 @@ pub fn AutoUpdate() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("ancestorResize-{}", value)
-                            style:background-color=move || match options.get().ancestor_resize.unwrap() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if options.get().ancestor_resize.unwrap() == value {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_options.set(options.get().ancestor_resize(value))
                         >
@@ -220,9 +226,10 @@ pub fn AutoUpdate() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("elementResize-{}", value)
-                            style:background-color=move || match options.get().element_resize.unwrap() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if options.get().element_resize.unwrap() == value {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_options.set(options.get().element_resize(value))
                         >
@@ -241,9 +248,10 @@ pub fn AutoUpdate() -> impl IntoView {
                 children=move |local_layout_shift| view! {
                     <button
                         data-testid=move || format!("layoutShift-{}", format!("{:?}", local_layout_shift).to_case(Case::Camel))
-                        style:background-color=move || match layout_shift.get() == local_layout_shift {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if layout_shift.get() == local_layout_shift {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_layout_shift.set(local_layout_shift)
                     >
@@ -262,9 +270,10 @@ pub fn AutoUpdate() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("animationFrame-{}", value)
-                            style:background-color=move || match options.get().animation_frame.unwrap() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if options.get().animation_frame.unwrap() == value {
+                               "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_options.set(options.get().animation_frame(value))
                         >
@@ -284,9 +293,10 @@ pub fn AutoUpdate() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("whileElementsMounted-{}", value)
-                            style:background-color=move || match while_elements_mounted.get() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if while_elements_mounted.get() == value {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_while_elements_mounted.set(value)
                         >

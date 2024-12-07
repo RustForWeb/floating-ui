@@ -1,8 +1,7 @@
 use convert_case::{Case, Casing};
-use floating_ui_leptos::{
-    use_floating, IntoReference, Strategy, UseFloatingOptions, UseFloatingReturn,
-};
-use leptos::{html::Div, *};
+use floating_ui_leptos::{use_floating, Strategy, UseFloatingOptions, UseFloatingReturn};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
 
 use crate::utils::use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn};
 
@@ -24,20 +23,17 @@ const ALL_STRATEGIES: [Strategy; 2] = [Strategy::Absolute, Strategy::Fixed];
 
 #[component]
 pub fn Scroll() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (strategy, set_strategy) = create_signal(Strategy::Absolute);
-    let (node, set_node) = create_signal(Node::ReferenceScrollParent);
+    let (strategy, set_strategy) = signal(Strategy::Absolute);
+    let (node, set_node) = signal(Node::ReferenceScrollParent);
 
     let UseFloatingReturn { x, y, update, .. } = use_floating(
-        reference_ref.into_reference(),
+        reference_ref,
         floating_ref,
         UseFloatingOptions::default().strategy(strategy.into()),
     );
-
-    let strategy_update = update.clone();
-    let node_update = update.clone();
 
     let UseScrollReturn {
         scroll_ref,
@@ -46,15 +42,21 @@ pub fn Scroll() -> impl IntoView {
     } = use_scroll(UseScrollOptions {
         reference_ref,
         floating_ref,
-        update,
+        update: update.clone(),
         rtl: None::<bool>.into(),
         disable_ref_updates: Some(true),
+    });
+
+    Effect::new(move || {
+        _ = strategy.get();
+        _ = node.get();
+        update();
     });
 
     let reference_view = move || {
         view! {
             <div
-                _ref=reference_ref
+                node_ref=reference_ref
                 class="reference"
                 style=move || match node.get() {
                     Node::FloatingScrollParent => "position: relative; top: -350px;",
@@ -69,7 +71,7 @@ pub fn Scroll() -> impl IntoView {
     let floating_view = move || {
         view! {
             <div
-                _ref=floating_ref
+                node_ref=floating_ref
                 class="floating"
                 style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                 style:top=move || format!("{}px", y.get())
@@ -94,14 +96,18 @@ pub fn Scroll() -> impl IntoView {
                 }
             >
                 <div
-                    _ref=scroll_ref
+                    node_ref=scroll_ref
                     class="scroll"
                     style:position=move || match node.get() {
                         Node::FloatingScrollParent | Node::SameScrollParent => "relative",
                         _ => "",
                     }
                 >
-                    {indicator.clone()}
+                    {{
+                        let indicator = indicator.clone();
+
+                        move || indicator()
+                    }}
                     <Show when=move || node.get() != Node::FloatingScrollParent>
                         {reference_view}
                     </Show>
@@ -118,24 +124,18 @@ pub fn Scroll() -> impl IntoView {
             <For
                 each=|| ALL_STRATEGIES
                 key=|local_strategy| format!("{:?}", local_strategy)
-                children=move |local_strategy| {
-                    let strategy_update = strategy_update.clone();
-
-                    view! {
-                        <button
-                            data-testid=move || format!("Strategy{:?}", local_strategy).to_case(Case::Kebab)
-                            style:background-color=move || match strategy.get() == local_strategy {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| {
-                                set_strategy.set(local_strategy);
-                                strategy_update();
-                            }
-                        >
-                            {format!("{:?}", local_strategy).to_case(Case::Kebab)}
-                        </button>
-                    }
+                children=move |local_strategy| view! {
+                    <button
+                        data-testid=move || format!("Strategy{:?}", local_strategy).to_case(Case::Kebab)
+                        style:background-color=move || if strategy.get() == local_strategy {
+                            "black"
+                        } else {
+                            ""
+                        }
+                        on:click=move |_| set_strategy.set(local_strategy)
+                    >
+                        {format!("{:?}", local_strategy).to_case(Case::Kebab)}
+                    </button>
                 }
             />
         </div>
@@ -145,24 +145,18 @@ pub fn Scroll() -> impl IntoView {
             <For
                 each=|| ALL_NODES
                 key=|local_node| format!("{:?}", local_node)
-                children=move |local_node| {
-                    let node_update = node_update.clone();
-
-                    view! {
-                        <button
-                            data-testid=move || format!("scroll-{}", format!("{:?}", local_node).to_case(Case::Camel))
-                            style:background-color=move || match node.get() == local_node {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| {
-                                set_node.set(local_node);
-                                node_update();
-                            }
-                        >
-                            {format!("{:?}", local_node).to_case(Case::Camel)}
-                        </button>
-                    }
+                children=move |local_node| view! {
+                    <button
+                        data-testid=move || format!("scroll-{}", format!("{:?}", local_node).to_case(Case::Camel))
+                        style:background-color=move || if node.get() == local_node {
+                            "black"
+                        } else {
+                            ""
+                        }
+                        on:click=move |_| set_node.set(local_node)
+                    >
+                        {format!("{:?}", local_node).to_case(Case::Camel)}
+                    </button>
                 }
             />
         </div>

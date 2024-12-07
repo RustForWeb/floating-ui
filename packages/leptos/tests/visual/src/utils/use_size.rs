@@ -1,4 +1,4 @@
-use leptos::{create_signal, event_target_value, ReadSignal, SignalSet, WriteSignal};
+use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
 use web_sys::{js_sys::Reflect, window, Event};
 
@@ -9,7 +9,7 @@ pub fn use_size(
     let initial_size = initial_size.unwrap_or(80);
     let key = key.unwrap_or("floating");
 
-    let (size, set_size) = create_signal(initial_size);
+    let (size, set_size) = signal(initial_size);
 
     let closure: Closure<dyn Fn(Event)> = Closure::new(move |event: Event| {
         set_size.set(event_target_value(&event).parse().unwrap());

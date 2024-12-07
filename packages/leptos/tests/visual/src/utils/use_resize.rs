@@ -1,18 +1,22 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{
+    rc::Rc,
+    sync::{Arc, Mutex},
+};
 
-use leptos::{html::Div, *};
+use leptos::{html::Div, prelude::*};
+use send_wrapper::SendWrapper;
 use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{ResizeObserver, ResizeObserverEntry};
 
-pub fn use_resize(node_ref: NodeRef<Div>, update: Rc<dyn Fn()>) {
+pub fn use_resize(node_ref: NodeRef<Div>, update: SendWrapper<Rc<dyn Fn()>>) {
     type CleanupFn = dyn Fn();
-    let cleanup: Rc<RefCell<Option<Box<CleanupFn>>>> = Rc::new(RefCell::new(None));
+    let cleanup: Arc<Mutex<Option<SendWrapper<Box<CleanupFn>>>>> = Arc::new(Mutex::new(None));
 
     Effect::new({
         let cleanup = cleanup.clone();
 
         move |_| {
-            if let Some(cleanup) = cleanup.take() {
+            if let Some(cleanup) = cleanup.lock().expect("Lock should be acquired.").as_ref() {
                 cleanup();
             }
 
@@ -30,15 +34,16 @@ pub fn use_resize(node_ref: NodeRef<Div>, update: Rc<dyn Fn()>) {
 
                 observer.observe(&element);
 
-                cleanup.replace(Some(Box::new(move || {
-                    observer.unobserve(&element);
-                })));
+                *cleanup.lock().expect("Lock should be acquired.") =
+                    Some(SendWrapper::new(Box::new(move || {
+                        observer.unobserve(&element);
+                    })));
             }
         }
     });
 
     on_cleanup(move || {
-        if let Some(cleanup) = cleanup.take() {
+        if let Some(cleanup) = cleanup.lock().expect("Lock should be acquired.").as_ref() {
             cleanup();
         }
     });

@@ -14,6 +14,8 @@ console_error_panic_hook.workspace = true
 console_log.workspace = true
 floating-ui-leptos = { path = ".." }
 leptos = { workspace = true, features = ["csr"] }
+leptos-node-ref.workspace = true
 log.workspace = true
+send_wrapper.workspace = true
 wasm-bindgen.workspace = true
 web-sys.workspace = true

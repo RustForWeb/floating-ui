@@ -1,13 +1,15 @@
-use leptos::{html::AnyElement, *};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
 use tailwind_fuse::tw_merge;
 
 #[component]
 pub fn Reference(
     #[prop(into, optional)] class: MaybeProp<String>,
-    #[prop(into, optional)] node_ref: NodeRef<AnyElement>,
+    #[prop(into, optional)] node_ref: AnyNodeRef,
 ) -> impl IntoView {
     view! {
         <button
+            node_ref=node_ref
             class={move || {
                 let class = class.get();
                 tw_merge!(
@@ -20,6 +22,4 @@ pub fn Reference(
             Reference
         </button>
     }
-    .into_any()
-    .node_ref(node_ref)
 }

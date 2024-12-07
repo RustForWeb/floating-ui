@@ -1,73 +1,82 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, Derivable, DerivableFn, IntoReference, MiddlewareState, MiddlewareVec, Offset,
-    OffsetOptions, OffsetOptionsValues, Placement, UseFloatingOptions, UseFloatingReturn,
+    use_floating, Derivable, DerivableFn, MiddlewareState, MiddlewareVec, Offset, OffsetOptions,
+    OffsetOptionsValues, Placement, UseFloatingOptions, UseFloatingReturn,
 };
-use leptos::{html::Div, *};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 
 use crate::utils::all_placements::ALL_PLACEMENTS;
 
-fn values() -> Vec<(
-    &'static str,
-    Derivable<'static, web_sys::Element, web_sys::Window, OffsetOptions>,
-)> {
+type Value = SendWrapper<Derivable<'static, web_sys::Element, web_sys::Window, OffsetOptions>>;
+
+fn values() -> Vec<(&'static str, Value)> {
     vec![
-        ("0", OffsetOptions::Value(0.0).into()),
-        ("10", OffsetOptions::Value(10.0).into()),
-        ("-10", OffsetOptions::Value(-10.0).into()),
+        ("0", SendWrapper::new(OffsetOptions::Value(0.0).into())),
+        ("10", SendWrapper::new(OffsetOptions::Value(10.0).into())),
+        ("-10", SendWrapper::new(OffsetOptions::Value(-10.0).into())),
         (
             "cA: 10",
-            OffsetOptions::Values(OffsetOptionsValues::default().cross_axis(10.0)).into(),
+            SendWrapper::new(
+                OffsetOptions::Values(OffsetOptionsValues::default().cross_axis(10.0)).into(),
+            ),
         ),
         (
             "mA: 5, cA: -10",
-            OffsetOptions::Values(
-                OffsetOptionsValues::default()
-                    .main_axis(5.0)
-                    .cross_axis(-10.0),
-            )
-            .into(),
+            SendWrapper::new(
+                OffsetOptions::Values(
+                    OffsetOptionsValues::default()
+                        .main_axis(5.0)
+                        .cross_axis(-10.0),
+                )
+                .into(),
+            ),
         ),
         (
             "() => -f.height",
-            DerivableFn::into(&|MiddlewareState { rects, .. }| {
+            SendWrapper::new(DerivableFn::into(&|MiddlewareState { rects, .. }| {
                 OffsetOptions::Value(-rects.floating.height)
-            }),
+            })),
         ),
         (
             "() => cA: -f.width/2",
-            DerivableFn::into(&|MiddlewareState { rects, .. }| {
+            SendWrapper::new(DerivableFn::into(&|MiddlewareState { rects, .. }| {
                 OffsetOptions::Values(
                     OffsetOptionsValues::default().cross_axis(-rects.floating.width / 2.0),
                 )
-            }),
+            })),
         ),
         (
             "aA: 5",
-            OffsetOptions::Values(OffsetOptionsValues::default().alignment_axis(5.0)).into(),
+            SendWrapper::new(
+                OffsetOptions::Values(OffsetOptionsValues::default().alignment_axis(5.0)).into(),
+            ),
         ),
         (
             "aA: -10",
-            OffsetOptions::Values(OffsetOptionsValues::default().alignment_axis(-10.0)).into(),
+            SendWrapper::new(
+                OffsetOptions::Values(OffsetOptionsValues::default().alignment_axis(-10.0)).into(),
+            ),
         ),
     ]
 }
 
 #[component]
 pub fn Offset() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (rtl, set_rtl) = create_signal(false);
-    let (placement, set_placement) = create_signal(Placement::Bottom);
-    let (offset_options, set_offset_options) = create_signal("0");
+    let (rtl, set_rtl) = signal(false);
+    let (placement, set_placement) = signal(Placement::Bottom);
+    let (offset_options, set_offset_options) = signal("0");
 
     let UseFloatingReturn {
         floating_styles,
         update,
         ..
     } = use_floating(
-        reference_ref.into_reference(),
+        reference_ref,
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())
@@ -75,28 +84,34 @@ pub fn Offset() -> impl IntoView {
             .middleware(MaybeProp::derive(move || {
                 let options = values()
                     .into_iter()
-                    .find_map(|(name, options)| match name == offset_options.get() {
-                        true => Some(options),
-                        false => None,
+                    .find_map(|(name, options)| {
+                        (name == offset_options.get()).then(|| options.take())
                     })
                     .unwrap();
 
                 let middleware: MiddlewareVec = vec![Box::new(Offset::new_derivable(options))];
-                Some(middleware)
+
+                Some(SendWrapper::new(middleware))
             })),
     );
+
+    Effect::new(move || {
+        _ = rtl.get();
+        update();
+    });
 
     view! {
         <h1>Offset</h1>
         <p></p>
-        <div class="container" style:direction=move || match rtl.get() {
-            true => "rtl",
-            false => "ltr",
+        <div class="container" style:direction=move || if rtl.get() {
+            "rtl"
+        } else {
+            "ltr"
         }>
-            <div _ref=reference_ref class="reference">
+            <div node_ref=reference_ref class="reference">
                 Reference
             </div>
-            <div _ref=floating_ref class="floating" style=floating_styles>
+            <div node_ref=floating_ref class="floating" style=floating_styles>
                 Floating
             </div>
         </div>
@@ -109,9 +124,10 @@ pub fn Offset() -> impl IntoView {
                 children=move |(name, _)| view! {
                     <button
                         data-testid=move || format!("offset-{}", name)
-                        style:background-color=move || match offset_options.get() == name {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if offset_options.get() == name {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_offset_options.set(name)
                     >
@@ -129,9 +145,10 @@ pub fn Offset() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement.get() == local_placement {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if placement.get() == local_placement {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_placement.set(local_placement)
                     >
@@ -146,24 +163,18 @@ pub fn Offset() -> impl IntoView {
             <For
                 each=|| [true, false]
                 key=|value| format!("{}", value)
-                children=move |value| {
-                    let rtl_update = update.clone();
-
-                    view! {
-                        <button
-                            data-testid=format!("rtl-{}", value)
-                            style:background-color=move || match rtl.get() == value {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| {
-                                set_rtl.set(value);
-                                rtl_update();
-                            }
-                        >
-                            {format!("{}", value)}
-                        </button>
-                    }
+                children=move |value| view! {
+                    <button
+                        data-testid=format!("rtl-{}", value)
+                        style:background-color=move || if rtl.get() == value {
+                            "black"
+                        } else {
+                            ""
+                        }
+                        on:click=move |_| set_rtl.set(value)
+                    >
+                        {format!("{}", value)}
+                    </button>
                 }
             />
         </div>

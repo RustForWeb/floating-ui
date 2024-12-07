@@ -1,9 +1,7 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{use_floating, UseFloatingOptions, UseFloatingReturn};
-use leptos::{
-    html::{AnyElement, Div},
-    *,
-};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 enum Node {
@@ -16,13 +14,13 @@ const ALL_NODES: [Node; 3] = [Node::Table, Node::Td, Node::Th];
 
 #[component]
 pub fn Table() -> impl IntoView {
-    let reference_table_ref = create_node_ref::<AnyElement>();
-    let reference_tr_ref = create_node_ref::<AnyElement>();
-    let reference_td_ref = create_node_ref::<AnyElement>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_table_ref = AnyNodeRef::new();
+    let reference_tr_ref = AnyNodeRef::new();
+    let reference_td_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (same_parent, set_same_parent) = create_signal(false);
-    let (node, set_node) = create_signal(Node::Td);
+    let (same_parent, set_same_parent) = signal(false);
+    let (node, set_node) = signal(Node::Td);
 
     let reference_signal = MaybeProp::derive(move || match node.get() {
         Node::Table => Some(reference_table_ref.into()),
@@ -44,17 +42,17 @@ pub fn Table() -> impl IntoView {
 
     let same_parent_update = update.clone();
     let node_update = update.clone();
-    _ = watch(
+    _ = Effect::watch(
         move || same_parent.get(),
         move |_, _, _| same_parent_update(),
         false,
     );
-    _ = watch(move || node.get(), move |_, _, _| node_update(), false);
+    _ = Effect::watch(move || node.get(), move |_, _, _| node_update(), false);
 
     let floating_view = move || {
         view! {
             <div
-                _ref=floating_ref
+                node_ref=floating_ref
                 class="floating"
                 style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                 style:top=move || format!("{}px", y.get())
@@ -72,28 +70,28 @@ pub fn Table() -> impl IntoView {
         </p>
         <div class="container">
             {move || view! {
-                <table>
+                <table node_ref=reference_table_ref>
                     <thead>
                         {move || view! {
-                            <tr>
+                            <tr node_ref=reference_tr_ref>
                                 <th>Reference th</th>
                             </tr>
-                        }.into_any().node_ref(reference_tr_ref)}
+                        }.into_any()}
                     </thead>
                     <tbody>
                         <tr>
                             {move || view! {
-                                <td>
+                                <td node_ref=reference_td_ref>
                                     Reference td
                                     <Show when=move || same_parent.get()>
                                         {floating_view}
                                     </Show>
                                 </td>
-                            }.into_any().node_ref(reference_td_ref)}
+                            }.into_any()}
                         </tr>
                     </tbody>
                 </table>
-            }.into_any().node_ref(reference_table_ref)}
+            }.into_any()}
 
             <Show when=move || !same_parent.get()>
                 {floating_view}
@@ -108,9 +106,10 @@ pub fn Table() -> impl IntoView {
                 children=move |value| view! {
                     <button
                         data-testid=format!("inside-{}", value)
-                        style:background-color=move || match same_parent.get() == value {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if same_parent.get() == value {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_same_parent.set(value)
                     >
@@ -128,9 +127,10 @@ pub fn Table() -> impl IntoView {
                 children=move |local_node| view! {
                     <button
                         data-testid=move || format!("reference-{}", format!("{:?}", local_node).to_case(Case::Camel))
-                        style:background-color=move || match node.get() == local_node {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if node.get() == local_node {
+                            "black"
+                        } else {
+                           ""
                         }
                         on:click=move |_| set_node.set(local_node)
                     >

@@ -38,9 +38,10 @@ pub fn Placement() -> Html {
             <p>
                 {"The floating element should be correctly positioned when given each of the 12 placements."}
             </p>
-            <div class="container" style={format!("direction: {}", match *rtl {
-                true => "rtl",
-                false => "ltr"
+            <div class="container" style={format!("direction: {}", if *rtl {
+                "rtl"
+            } else {
+                "ltr"
             })}>
                 <div ref={reference_ref} class="reference">
                     {"Reference"}
@@ -83,9 +84,10 @@ pub fn Placement() -> Html {
                             <button
                                 key={format!("{:?}", value)}
                                 data-testid={format!("Placement{:?}", value).to_case(Case::Kebab)}
-                                style={match *placement == value {
-                                    true => "background-color: black;",
-                                    false => ""
+                                style={if *placement == value {
+                                    "background-color: black;"
+                                } else {
+                                    ""
                                 }}
                                 onclick={Callback::from({
                                     let placement = placement.clone();
@@ -108,9 +110,10 @@ pub fn Placement() -> Html {
                             <button
                                 key={format!("{}", value)}
                                 data-testid={format!("rtl-{}", value)}
-                                style={match *rtl == value {
-                                    true => "background-color: black;",
-                                    false => ""
+                                style={if *rtl == value {
+                                    "background-color: black;"
+                                } else {
+                                    ""
                                 }}
                                 onclick={Callback::from({
                                     let rtl = rtl.clone();

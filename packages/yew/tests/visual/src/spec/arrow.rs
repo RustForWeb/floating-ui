@@ -30,9 +30,10 @@ pub fn Arrow() -> Html {
     let middleware = use_memo(
         (add_offset.clone(), padding.clone()),
         |(add_offset, padding)| {
-            let mut middleware: MiddlewareVec = match **add_offset {
-                true => vec![Box::new(Offset::new(OffsetOptions::Value(20.0)))],
-                false => vec![],
+            let mut middleware: MiddlewareVec = if **add_offset {
+                vec![Box::new(Offset::new(OffsetOptions::Value(20.0)))]
+            } else {
+                vec![]
             };
 
             middleware.append(&mut vec![
@@ -99,15 +100,13 @@ pub fn Arrow() -> Html {
         rtl: None,
     });
 
-    let arrow_tag = match *svg {
-        true => "svg",
-        false => "div",
-    };
+    let arrow_tag = if *svg { "svg" } else { "div" };
     let arrow_element = html! {
         <>
-            {match *center_offset {
-                true => center_offset_value.map_or("".into(), |center_offset_value| center_offset_value.to_string()),
-                false => "Floating".into(),
+            {if *center_offset {
+                center_offset_value.map_or("".to_owned(), |center_offset_value| center_offset_value.to_string())
+            } else {
+                "Floating".to_owned()
             }}
 
             <@{arrow_tag}
@@ -116,10 +115,10 @@ pub fn Arrow() -> Html {
                 style={format!(
                     "position: absolute; top: {}; right: {}; bottom: {}; left: {};",
                     match static_side {
-                        Side::Top => "-15px".into(),
+                        Side::Top => "-15px".to_owned(),
                         _ => match *arrow_y {
                             Some(arrow_y) => format!("{}px", arrow_y),
-                            None => "".into()
+                            None => "".to_owned()
                         }
                     },
                     match static_side {
@@ -131,10 +130,10 @@ pub fn Arrow() -> Html {
                         _ => ""
                     },
                     match static_side {
-                        Side::Left => "-15px".into(),
+                        Side::Left => "-15px".to_owned(),
                         _ => match *arrow_x {
                             Some(arrow_x) => format!("{}px", arrow_x),
-                            None => "".into()
+                            None => "".to_owned()
                         }
                     }
                 )}
@@ -142,8 +141,8 @@ pub fn Arrow() -> Html {
         </>
     };
 
-    let floating_element = match *nested {
-        true => html! {
+    let floating_element = if *nested {
+        html! {
             <div
                 ref={floating_ref.clone()}
                 style={format!("{} width: {}px; height: {}px;", floating_styles, *floating_size, *floating_size)}
@@ -152,8 +151,9 @@ pub fn Arrow() -> Html {
                     {arrow_element}
                 </div>
             </div>
-        },
-        false => html! {
+        }
+    } else {
+        html! {
             <div
                 ref={floating_ref.clone()}
                 class="floating"
@@ -161,16 +161,17 @@ pub fn Arrow() -> Html {
             >
                 {arrow_element}
             </div>
-        },
+        }
     };
 
     html! {
         <>
             <h1>{"Arrow"}</h1>
             <p></p>
-            <div class="container" style={match *svg {
-                true => "will-change: transform;",
-                false => "",
+            <div class="container" style={if *svg {
+                "will-change: transform;"
+            } else {
+                ""
             }}>
                 <div ref={scroll_ref} class="scroll" data-x="" style="position: relative;">
                     <div
@@ -192,9 +193,10 @@ pub fn Arrow() -> Html {
                             <button
                                 key={format!("{:?}", value)}
                                 data-testid={format!("reference-{value}")}
-                                style={match *reference_size == value {
-                                    true => "background-color: black;",
-                                    false => ""
+                                style={if *reference_size == value {
+                                    "background-color: black;"
+                                } else {
+                                    ""
                                 }}
                                 onclick={Callback::from({
                                     let reference_size = reference_size.clone();
@@ -217,9 +219,10 @@ pub fn Arrow() -> Html {
                             <button
                                 key={format!("{:?}", value)}
                                 data-testid={format!("floating-{value}")}
-                                style={match *floating_size == value {
-                                    true => "background-color: black;",
-                                    false => ""
+                                style={if *floating_size == value {
+                                    "background-color: black;"
+                                } else {
+                                    ""
                                 }}
                                 onclick={Callback::from({
                                     let floating_size = floating_size.clone();
@@ -242,9 +245,10 @@ pub fn Arrow() -> Html {
                             <button
                                 key={format!("{:?}", value)}
                                 data-testid={format!("arrow-padding-{value}")}
-                                style={match *padding == value {
-                                    true => "background-color: black;",
-                                    false => ""
+                                style={if *padding == value {
+                                    "background-color: black;"
+                                } else {
+                                    ""
                                 }}
                                 onclick={Callback::from({
                                     let padding = padding.clone();
@@ -273,9 +277,10 @@ pub fn Arrow() -> Html {
                             <button
                                 key={format!("{}", value)}
                                 data-testid={format!("add-offset-{}", value)}
-                                style={match *add_offset == value {
-                                    true => "background-color: black;",
-                                    false => ""
+                                style={if *add_offset == value {
+                                    "background-color: black;"
+                                } else {
+                                    ""
                                 }}
                                 onclick={Callback::from({
                                     let add_offset = add_offset.clone();
@@ -304,9 +309,10 @@ pub fn Arrow() -> Html {
                             <button
                                 key={format!("{:?}", value)}
                                 data-testid={format!("Placement{:?}", value).to_case(Case::Kebab)}
-                                style={match *placement == value {
-                                    true => "background-color: black;",
-                                    false => ""
+                                style={if *placement == value {
+                                    "background-color: black;"
+                                } else {
+                                    ""
                                 }}
                                 onclick={Callback::from({
                                     let placement = placement.clone();
@@ -335,9 +341,10 @@ pub fn Arrow() -> Html {
                             <button
                                 key={format!("{}", value)}
                                 data-testid={format!("svg-{}", value)}
-                                style={match *svg == value {
-                                    true => "background-color: black;",
-                                    false => ""
+                                style={if *svg == value {
+                                    "background-color: black;"
+                                } else {
+                                    ""
                                 }}
                                 onclick={Callback::from({
                                     let svg = svg.clone();
@@ -364,9 +371,10 @@ pub fn Arrow() -> Html {
                             <button
                                 key={format!("{}", value)}
                                 data-testid={format!("nested-{}", value)}
-                                style={match *nested == value {
-                                    true => "background-color: black;",
-                                    false => ""
+                                style={if *nested == value {
+                                    "background-color: black;"
+                                } else {
+                                    ""
                                 }}
                                 onclick={Callback::from({
                                     let nested = nested.clone();
@@ -393,9 +401,10 @@ pub fn Arrow() -> Html {
                             <button
                                 key={format!("{}", value)}
                                 data-testid={format!("centerOffset-{}", value)}
-                                style={match *center_offset == value {
-                                    true => "background-color: black;",
-                                    false => ""
+                                style={if *center_offset == value {
+                                    "background-color: black;"
+                                } else {
+                                    ""
                                 }}
                                 onclick={Callback::from({
                                     let center_offset = center_offset.clone();

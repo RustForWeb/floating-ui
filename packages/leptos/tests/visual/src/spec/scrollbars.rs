@@ -1,19 +1,21 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, DetectOverflowOptions, IntoReference, MiddlewareVec, Placement, Shift,
-    ShiftOptions, UseFloatingOptions, UseFloatingReturn,
+    use_floating, DetectOverflowOptions, MiddlewareVec, Placement, Shift, ShiftOptions,
+    UseFloatingOptions, UseFloatingReturn,
 };
-use leptos::{html::Div, *};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 
 use crate::utils::{all_placements::ALL_PLACEMENTS, use_size::use_size};
 
 #[component]
 pub fn Scrollbars() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (rtl, set_rtl) = create_signal(false);
-    let (placement, set_placement) = create_signal(Placement::Bottom);
+    let (rtl, set_rtl) = signal(false);
+    let (placement, set_placement) = signal(Placement::Bottom);
 
     let middleware: MiddlewareVec = vec![Box::new(Shift::new(
         ShiftOptions::default()
@@ -21,18 +23,12 @@ pub fn Scrollbars() -> impl IntoView {
             .cross_axis(true),
     ))];
 
-    let UseFloatingReturn {
-        x,
-        y,
-        strategy,
-        update,
-        ..
-    } = use_floating(
-        reference_ref.into_reference(),
+    let UseFloatingReturn { x, y, strategy, .. } = use_floating(
+        reference_ref,
         floating_ref,
         UseFloatingOptions::default()
             .placement(placement.into())
-            .middleware(middleware.into())
+            .middleware(SendWrapper::new(middleware).into())
             .while_elements_mounted_auto_update(),
     );
 
@@ -44,16 +40,17 @@ pub fn Scrollbars() -> impl IntoView {
         <div
             class="container"
             style:overflow="scroll"
-            style:direction=move || match rtl.get() {
-                true => "rtl",
-                false => "ltr",
+            style:direction=move || if rtl.get() {
+                "rtl"
+            } else {
+                "ltr"
             }
         >
-            <div _ref=reference_ref class="reference">
+            <div node_ref=reference_ref class="reference">
                 Reference
             </div>
             <div
-                _ref=floating_ref
+                node_ref=floating_ref
                 class="floating"
                 style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                 style:top=move || format!("{}px", y.get())
@@ -86,9 +83,10 @@ pub fn Scrollbars() -> impl IntoView {
                 children=move |local_placement| view! {
                     <button
                         data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
-                        style:background-color=move || match placement.get() == local_placement {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if placement.get() == local_placement {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_placement.set(local_placement)
                     >
@@ -103,24 +101,18 @@ pub fn Scrollbars() -> impl IntoView {
             <For
                 each=|| [true, false]
                 key=|value| format!("{}", value)
-                children=move |value| {
-                    let rtl_update = update.clone();
-
-                    view! {
-                        <button
-                            data-testid=format!("rtl-{}", value)
-                            style:background-color=move || match rtl.get() == value {
-                                true => "black",
-                                false => ""
-                            }
-                            on:click=move |_| {
-                                set_rtl.set(value);
-                                rtl_update();
-                            }
-                        >
-                            {format!("{}", value)}
-                        </button>
-                    }
+                children=move |value| view! {
+                    <button
+                        data-testid=format!("rtl-{}", value)
+                        style:background-color=move || if rtl.get() == value {
+                            "black"
+                        } else {
+                            ""
+                        }
+                        on:click=move |_| set_rtl.set(value)
+                    >
+                        {format!("{}", value)}
+                    </button>
                 }
             />
         </div>

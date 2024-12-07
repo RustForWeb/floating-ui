@@ -1,9 +1,11 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, Alignment, AutoPlacement, AutoPlacementOptions, IntoReference, MiddlewareVec,
-    Placement, Shift, ShiftOptions, UseFloatingOptions, UseFloatingReturn,
+    use_floating, Alignment, AutoPlacement, AutoPlacementOptions, MiddlewareVec, Placement, Shift,
+    ShiftOptions, UseFloatingOptions, UseFloatingReturn,
 };
-use leptos::{html::Div, *};
+use leptos::prelude::*;
+use leptos_node_ref::AnyNodeRef;
+use send_wrapper::SendWrapper;
 
 use crate::utils::use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn};
 
@@ -42,15 +44,15 @@ const ALL_ALLOWED_PLACEMENTS: [AllowedPlacements; 4] = [
 
 #[component]
 pub fn AutoPlacement() -> impl IntoView {
-    let reference_ref = create_node_ref::<Div>();
-    let floating_ref = create_node_ref::<Div>();
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
 
-    let (alignment, set_alignment) = create_signal::<Option<Alignment>>(Some(Alignment::Start));
-    let (auto_alignment, set_auto_alignment) = create_signal(true);
+    let (alignment, set_alignment) = signal::<Option<Alignment>>(Some(Alignment::Start));
+    let (auto_alignment, set_auto_alignment) = signal(true);
     let (allowed_placements, set_allowed_placements) =
-        create_signal::<AllowedPlacements>(AllowedPlacements::None);
-    let (cross_axis, set_cross_axis) = create_signal(false);
-    let (add_shift, set_add_shift) = create_signal(false);
+        signal::<AllowedPlacements>(AllowedPlacements::None);
+    let (cross_axis, set_cross_axis) = signal(false);
+    let (add_shift, set_add_shift) = signal(false);
 
     let UseFloatingReturn {
         x,
@@ -59,7 +61,7 @@ pub fn AutoPlacement() -> impl IntoView {
         update,
         ..
     } = use_floating(
-        reference_ref.into_reference(),
+        reference_ref,
         floating_ref,
         UseFloatingOptions::default()
             .while_elements_mounted_auto_update()
@@ -77,7 +79,7 @@ pub fn AutoPlacement() -> impl IntoView {
                     middleware.push(Box::new(Shift::new(ShiftOptions::default())));
                 }
 
-                Some(middleware)
+                Some(SendWrapper::new(middleware))
             })),
     );
 
@@ -98,36 +100,27 @@ pub fn AutoPlacement() -> impl IntoView {
         <p></p>
         <div class="container">
             <div
-                _ref=scroll_ref
+                node_ref=scroll_ref
                 class="scroll"
                 data-x=""
                 style:position="relative"
             >
-                {indicator}
+                {move || indicator()}
                 <div
-                    _ref=reference_ref
+                    node_ref=reference_ref
                     class="reference"
-                    style=move || match add_shift.get() {
-                        true => "width: 50px; height: 25px;",
-                        false => ""
-                    }
+                    style=move || add_shift.get().then_some("width: 50px; height: 25px;").unwrap_or_default()
                 >
                     Reference
                 </div>
                 <div
-                    _ref=floating_ref
+                    node_ref=floating_ref
                     class="floating"
                     style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                     style:top=move || format!("{}px", y.get())
                     style:left=move || format!("{}px", x.get())
-                    style:width=move || match add_shift.get() {
-                        true => "250px",
-                        false => ""
-                    }
-                    style:height=move || match add_shift.get() {
-                        true => "250px",
-                        false => ""
-                    }
+                    style:width=move || add_shift.get().then_some("250px").unwrap_or_default()
+                    style:height=move || add_shift.get().then_some("250px").unwrap_or_default()
                 >
                     Floating
                 </div>
@@ -142,17 +135,18 @@ pub fn AutoPlacement() -> impl IntoView {
                 children=move |local_alignment| view! {
                     <button
                         data-testid=move || format!("alignment-{}", match local_alignment {
-                            None => "null".into(),
+                            None => "null".to_owned(),
                             Some(local_alignment) => format!("{:?}", local_alignment).to_case(Case::Camel)
                         })
-                        style:background-color=move || match alignment.get() == local_alignment {
-                            true => "black",
-                            false => ""
+                        style:background-color=move || if alignment.get() == local_alignment {
+                            "black"
+                        } else {
+                            ""
                         }
                         on:click=move |_| set_alignment.set(local_alignment)
                     >
                         {match local_alignment {
-                            None => "null".into(),
+                            None => "null".to_owned(),
                             Some(local_alignment) => format!("{:?}", local_alignment).to_case(Case::Camel)
                         }}
                     </button>
@@ -169,9 +163,10 @@ pub fn AutoPlacement() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("autoAlignment-{}", value)
-                            style:background-color=move || match auto_alignment.get() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if auto_alignment.get() == value {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_auto_alignment.set(value)
                         >
@@ -191,17 +186,18 @@ pub fn AutoPlacement() -> impl IntoView {
                     view! {
                         <button
                             data-testid=move || format!("allowedPlacements-{}", match local_allowed_placements {
-                                AllowedPlacements::None => "undefined".into(),
+                                AllowedPlacements::None => "undefined".to_owned(),
                                 _ => format!("{:?}", local_allowed_placements).replace("Comma", ",").to_case(Case::Kebab)
                             })
-                            style:background-color=move || match allowed_placements.get() == local_allowed_placements {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if allowed_placements.get() == local_allowed_placements {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_allowed_placements.set(local_allowed_placements)
                         >
                             {match local_allowed_placements {
-                                AllowedPlacements::None => "undefined".into(),
+                                AllowedPlacements::None => "undefined".to_owned(),
                                 _ => format!("{:?}", local_allowed_placements).replace("Comma", ",").to_case(Case::Kebab)
                             }}
                         </button>
@@ -219,9 +215,10 @@ pub fn AutoPlacement() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("crossAxis-{}", value)
-                            style:background-color=move || match cross_axis.get() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if cross_axis.get() == value {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_cross_axis.set(value)
                         >
@@ -241,9 +238,10 @@ pub fn AutoPlacement() -> impl IntoView {
                     view! {
                         <button
                             data-testid=format!("shift-{}", value)
-                            style:background-color=move || match add_shift.get() == value {
-                                true => "black",
-                                false => ""
+                            style:background-color=move || if add_shift.get() == value {
+                                "black"
+                            } else {
+                                ""
                             }
                             on:click=move |_| set_add_shift.set(value)
                         >

@@ -170,18 +170,21 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
             && get_alignment(placement).is_some()
             && center != offset
             && rects.reference.length(length) / 2.0
-                - (match center < min {
-                    true => min_padding,
-                    false => max_padding,
+                - (if center < min {
+                    min_padding
+                } else {
+                    max_padding
                 })
                 - arrow_dimensions.length(length) / 2.0
                 < 0.0;
-        let alignment_offset = match should_add_offset {
-            true => match center < min {
-                true => center - min,
-                false => center - max,
-            },
-            false => 0.0,
+        let alignment_offset = if should_add_offset {
+            if center < min {
+                center - min
+            } else {
+                center - max
+            }
+        } else {
+            0.0
         };
 
         MiddlewareReturn {
@@ -204,10 +207,7 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
                         Axis::Y => Some(offset),
                     },
                     center_offset: center - offset - alignment_offset,
-                    alignment_offset: match should_add_offset {
-                        true => Some(alignment_offset),
-                        false => None,
-                    },
+                    alignment_offset: should_add_offset.then_some(alignment_offset),
                 })
                 .expect("Data should be valid JSON."),
             ),
