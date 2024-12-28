@@ -16,6 +16,6 @@ See [the Rust Floating UI book](https://floating-ui.rustforweb.org/) for documen
 
 ## Rust For Web
 
-The Rust Floating UI project is part of the [Rust For Web](https://github.com/RustForWeb).
+The Rust Floating UI project is part of [Rust For Web](https://github.com/RustForWeb).
 
 [Rust For Web](https://github.com/RustForWeb) creates and ports web UI libraries for Rust. All projects are free and open source.
