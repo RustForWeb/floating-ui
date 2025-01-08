@@ -1,0 +1,78 @@
+name: Release
+
+on:
+    workflow_dispatch:
+        inputs:
+            bump:
+                description: 'Bump version by semver keyword.'
+                required: true
+                type: choice
+                options:
+                    - patch
+                    - minor
+                    - major
+
+jobs:
+    release:
+        name: Release
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Generate GitHub App token
+              id: app-token
+              uses: getsentry/action-github-app-token@v3
+              with:
+                  app_id: ${{ secrets.APP_ID }}
+                  private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Rust toolchain
+              run: rustup toolchain install nightly --no-self-update --profile default --target wasm32-unknown-unknown
+
+            - name: Set up Rust cache
+              uses: swatinem/rust-cache@v2
+              with:
+                  cache-on-failure: true
+                  save-if: ${{ github.ref == 'refs/heads/main' }}
+
+            - name: Install Cargo Binary Install
+              uses: cargo-bins/cargo-binstall@main
+
+            - name: Install crates
+              run: cargo binstall --force -y cargo-workspaces toml-cli
+
+            - name: Bump version
+              run: cargo workspaces version --all --no-git-commit --yes ${{ inputs.bump }}
+
+            - name: Extract version
+              id: extract-version
+              run: echo "VERSION=v$(toml get Cargo.toml workspace.package.version --raw)" >> "$GITHUB_OUTPUT"
+
+            - name: Add changes
+              run: git add .
+
+            - name: Commit
+              uses: dsanders11/github-app-commit-action@v1
+              with:
+                  message: ${{ steps.extract-version.outputs.VERSION }}
+                  token: ${{ steps.app-token.outputs.token }}
+
+            - name: Tag
+              uses: bruno-fs/repo-tagger@1.0.0
+              with:
+                  tag: ${{ steps.extract-version.outputs.VERSION }}
+              env:
+                  GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+
+            - name: Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  generate_release_notes: true
+                  make_latest: true
+                  tag_name: ${{ steps.extract-version.outputs.VERSION }}
+                  token: ${{ steps.app-token.outputs.token }}
+
+            - name: Publish
+              run: cargo workspaces publish --publish-as-is --token "${{ secrets.CRATES_IO_TOKEN }}"
