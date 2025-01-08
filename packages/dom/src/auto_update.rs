@@ -12,7 +12,7 @@ use web_sys::{
 
 use crate::{
     types::{ElementOrVirtual, OwnedElementOrVirtual},
-    utils::get_bounding_client_rect::get_bounding_client_rect,
+    utils::{get_bounding_client_rect::get_bounding_client_rect, rects_are_equal::rects_are_equal},
 };
 
 fn request_animation_frame(callback: &Closure<dyn FnMut()>) -> i32 {
@@ -63,20 +63,26 @@ fn observe_move(element: Element, on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
     *refresh_closure_clone.borrow_mut() = Some(Box::new(move |skip: bool, threshold: f64| {
         refresh_cleanup();
 
-        let rect = element.get_bounding_client_rect();
+        let element_rect_for_root_margin = element.get_bounding_client_rect();
 
         if !skip {
             on_move();
         }
 
-        if rect.width() == 0.0 || rect.height() == 0.0 {
+        if element_rect_for_root_margin.width() == 0.0
+            || element_rect_for_root_margin.height() == 0.0
+        {
             return;
         }
 
-        let inset_top = rect.top().floor();
-        let inset_right = (root.client_width() as f64 - (rect.left() + rect.width())).floor();
-        let inset_bottom = (root.client_height() as f64 - (rect.top() + rect.height())).floor();
-        let inset_left = rect.left().floor();
+        let inset_top = element_rect_for_root_margin.top().floor();
+        let inset_right = (root.client_width() as f64
+            - (element_rect_for_root_margin.left() + element_rect_for_root_margin.width()))
+        .floor();
+        let inset_bottom = (root.client_height() as f64
+            - (element_rect_for_root_margin.top() + element_rect_for_root_margin.height()))
+        .floor();
+        let inset_left = element_rect_for_root_margin.left().floor();
         let root_margin = format!(
             "{}px {}px {}px {}px",
             -inset_top, -inset_right, -inset_bottom, -inset_left
@@ -95,33 +101,60 @@ fn observe_move(element: Element, on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
         let observe_timeout_id = timeout_id.clone();
         let observe_window = window.clone();
         let observe_refresh = refresh_closure.clone();
-        let local_observe_closure = Closure::new(move |entries: Vec<IntersectionObserverEntry>| {
-            let ratio = entries[0].intersection_ratio();
+        let local_observe_closure = Closure::new({
+            let element = element.clone();
 
-            if ratio != threshold {
-                if !*is_first_update.borrow() {
+            move |entries: Vec<IntersectionObserverEntry>| {
+                let ratio = entries[0].intersection_ratio();
+
+                if ratio != threshold {
+                    if !*is_first_update.borrow() {
+                        observe_refresh
+                            .borrow()
+                            .as_ref()
+                            .expect("Refresh closure should exist.")(
+                            false, 1.0
+                        );
+                        return;
+                    }
+
+                    if ratio == 0.0 {
+                        // If the reference is clipped, the ratio is 0. Throttle the refresh to prevent an infinite loop of updates.
+                        observe_timeout_id.replace(Some(
+                            observe_window
+                                .set_timeout_with_callback_and_timeout_and_arguments_0(
+                                    (*timeout_closure).as_ref().unchecked_ref(),
+                                    1000,
+                                )
+                                .expect("Set timeout should be successful."),
+                        ));
+                    } else {
+                        observe_refresh
+                            .borrow()
+                            .as_ref()
+                            .expect("Refresh closure should exist.")(
+                            false, ratio
+                        );
+                    }
+                }
+
+                if ratio == 1.0
+                    && !rects_are_equal(
+                        &element_rect_for_root_margin.clone().into(),
+                        &element.get_bounding_client_rect().into(),
+                    )
+                {
+                    // It's possible that even though the ratio is reported as 1, the
+                    // element is not actually fully within the IntersectionObserver's root
+                    // area anymore. This can happen under performance constraints. This may
+                    // be a bug in the browser's IntersectionObserver implementation. To
+                    // work around this, we compare the element's bounding rect now with
+                    // what it was at the time we created the IntersectionObserver. If they
+                    // are not equal then the element moved, so we refresh.
                     observe_refresh
                         .borrow()
                         .as_ref()
                         .expect("Refresh closure should exist.")(false, 1.0);
-                    return;
-                }
-
-                if ratio == 0.0 {
-                    // If the reference is clipped, the ratio is 0. Throttle the refresh to prevent an infinite loop of updates.
-                    observe_timeout_id.replace(Some(
-                        observe_window
-                            .set_timeout_with_callback_and_timeout_and_arguments_0(
-                                (*timeout_closure).as_ref().unchecked_ref(),
-                                1000,
-                            )
-                            .expect("Set timeout should be successful."),
-                    ));
-                } else {
-                    observe_refresh
-                        .borrow()
-                        .as_ref()
-                        .expect("Refresh closure should exist.")(false, ratio);
                 }
 
                 is_first_update.replace(false);
@@ -373,11 +406,7 @@ pub fn auto_update(
                 get_bounding_client_rect((&owned_reference).into(), false, false, None);
 
             if let Some(prev_ref_rect) = prev_ref_rect.borrow().as_ref() {
-                if next_ref_rect.x != prev_ref_rect.x
-                    || next_ref_rect.y != prev_ref_rect.y
-                    || next_ref_rect.width != prev_ref_rect.width
-                    || next_ref_rect.height != prev_ref_rect.height
-                {
+                if !rects_are_equal(prev_ref_rect, &next_ref_rect) {
                     update();
                 }
             }
