@@ -60,7 +60,7 @@ pub fn ContainingBlock() -> impl IntoView {
         <h2>willChange</h2>
         <div class="controls">
             <For
-                each=|| ["transform", "perspective", "transform, perspective", "opacity"]
+                each=|| ["transform", "translate", "scale", "rotate", "perspective", "transform, perspective", "opacity"]
                 key=|local_will_change| format!("{:?}", local_will_change)
                 children=move |local_will_change| view! {
                     <button
