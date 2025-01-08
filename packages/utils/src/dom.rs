@@ -162,7 +162,14 @@ pub fn is_top_layer(element: &Element) -> bool {
         .any(|selector| element.matches(selector).unwrap_or(false))
 }
 
-const WILL_CHANGE_VALUES: [&str; 3] = ["transform", "perspective", "filter"];
+const WILL_CHANGE_VALUES: [&str; 6] = [
+    "transform",
+    "translate",
+    "scale",
+    "rotate",
+    "perspective",
+    "filter",
+];
 const CONTAIN_VALUES: [&str; 4] = ["paint", "layout", "strict", "content"];
 
 pub enum ElementOrCss<'a> {
@@ -195,11 +202,15 @@ pub fn is_containing_block(element: ElementOrCss) -> bool {
         ElementOrCss::Css(css) => css,
     };
 
-    css.get_property_value("transform").unwrap_or("none".into()) != "none"
-        || css
-            .get_property_value("perspective")
-            .unwrap_or("none".into())
-            != "none"
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block
+    // https://drafts.csswg.org/css-transforms-2/#individual-transforms
+    ["transform", "translate", "scale", "rotate", "perspective"]
+        .into_iter()
+        .any(|property| {
+            css.get_property_value(property)
+                .map(|value| value != "none")
+                .unwrap_or(false)
+        })
         || css
             .get_property_value("container-type")
             .map(|value| value != "normal")
