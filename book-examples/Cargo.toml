@@ -12,7 +12,7 @@ version.workspace = true
 [dependencies]
 console_error_panic_hook.workspace = true
 console_log.workspace = true
-convert_case = "0.6.0"
+convert_case = "0.7.0"
 floating-ui-leptos = { path = "../packages/leptos" }
 leptos = { workspace = true, features = ["csr"] }
 leptos-node-ref.workspace = true
