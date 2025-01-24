@@ -73,6 +73,14 @@ pub fn playwright() {
         .parse::<bool>()
         .unwrap_or(false)
     {
+        let status = Command::new("pnpm")
+            .arg("update")
+            .arg("@playwright/test")
+            .current_dir(repository_path.clone())
+            .status()
+            .expect("pnpm update failed.");
+        assert!(status.success(), "pnpm update failed");
+
         let status = Command::new("npx")
             .arg("playwright")
             .arg("install")
