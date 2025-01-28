@@ -2911,9 +2911,9 @@ dependencies = [
 
 [[package]]
 name = "tachys"
-version = "0.1.0"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8be68dfd4abf192e11a1bdd484239daa84ffa6fcd27c25cf4f011b2b0fb27ddb"
+checksum = "d777e4426a597296b020edcb5c3d8f25a3ccd8adfd22eb5154ac81da946aef9f"
 dependencies = [
  "any_spawner",
  "const_str_slice_concat",
