@@ -23,7 +23,7 @@ dyn_derive = "0.3.4"
 dyn_std = "0.3.3"
 leptos = "0.7.0"
 leptos_router = "0.7.0"
-leptos-node-ref = "0.0.3"
+leptos-node-ref = "0.1.0"
 log = "0.4.22"
 send_wrapper = "0.6.0"
 serde = { version = "1.0.209", features = ["derive"] }
