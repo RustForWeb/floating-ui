@@ -311,7 +311,7 @@ version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68578f196d2a33ff61b27fae256c3164f65e36382648e30666dde05b8cc9dfdf"
 dependencies = [
- "convert_case",
+ "convert_case 0.6.0",
  "nom",
  "pathdiff",
  "serde",
@@ -369,6 +369,15 @@ name = "convert_case"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec182b0ca2f35d8fc196cf3404988fd8b8c739a4d270ff118a398feb0cbec1ca"
+dependencies = [
+ "unicode-segmentation",
+]
+
+[[package]]
+name = "convert_case"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bb402b8d4c85569410425650ce3eddc7d698ed96d39a73f941b08fb63082f1e7"
 dependencies = [
  "unicode-segmentation",
 ]
@@ -558,7 +567,7 @@ version = "0.2.1"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
- "convert_case",
+ "convert_case 0.7.1",
  "floating-ui-leptos",
  "leptos",
  "leptos-node-ref",
@@ -634,7 +643,7 @@ version = "0.2.1"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
- "convert_case",
+ "convert_case 0.6.0",
  "floating-ui-leptos",
  "leptos",
  "leptos-node-ref",
@@ -685,7 +694,7 @@ version = "0.2.1"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
- "convert_case",
+ "convert_case 0.6.0",
  "floating-ui-yew",
  "log",
  "wasm-bindgen",
@@ -1735,7 +1744,7 @@ checksum = "2b9165909eabb02188a4b33b0ab6acff408bdf440018bf65b30bba0d38d61b19"
 dependencies = [
  "attribute-derive",
  "cfg-if",
- "convert_case",
+ "convert_case 0.6.0",
  "html-escape",
  "itertools",
  "leptos_hot_reload",
@@ -2343,7 +2352,7 @@ version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6d4d8e40112b8ee1424e5ec636fcbc9764c1a099e81f8fa818f6762b43cc10cd"
 dependencies = [
- "convert_case",
+ "convert_case 0.6.0",
  "proc-macro-error2",
  "proc-macro2",
  "quote",
@@ -2740,7 +2749,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e65737414a9583ce3b43dddd4e5dfb33fe385a6933ed79a9b539b8eb0767cd07"
 dependencies = [
  "const_format",
- "convert_case",
+ "convert_case 0.6.0",
  "proc-macro2",
  "quote",
  "syn 2.0.87",
@@ -2974,9 +2983,9 @@ dependencies = [
 
 [[package]]
 name = "tempfile"
-version = "3.17.0"
+version = "3.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a40f762a77d2afa88c2d919489e390a12bdd261ed568e60cfa7e48d4e20f0d33"
+checksum = "22e5a0acb1f3f55f65cc4a866c361b2fb2a0ff6366785ae6fbb5f85df07ba230"
 dependencies = [
  "cfg-if",
  "fastrand",
