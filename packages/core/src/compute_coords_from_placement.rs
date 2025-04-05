@@ -1,6 +1,6 @@
 use floating_ui_utils::{
-    get_alignment, get_alignment_axis, get_axis_length, get_side, get_side_axis, Alignment, Axis,
-    Coords, ElementRects, Placement, Side,
+    Alignment, Axis, Coords, ElementRects, Placement, Side, get_alignment, get_alignment_axis,
+    get_axis_length, get_side, get_side_axis,
 };
 
 /// Computes the `x` and `y` coordinates that will place the floating element next to a given reference element based on a `placement`.

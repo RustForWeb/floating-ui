@@ -1,4 +1,4 @@
-use floating_ui_utils::{dom::NodeScroll, Coords};
+use floating_ui_utils::{Coords, dom::NodeScroll};
 use web_sys::Element;
 
 use crate::utils::get_window_scroll_bar_x::get_window_scroll_bar_x;

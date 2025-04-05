@@ -16,16 +16,16 @@ pub use use_floating::*;
 
 #[doc(no_inline)]
 pub use floating_ui_dom::{
-    auto_update, compute_position, dom, AlignedPlacement, Alignment, ApplyState, ArrowData,
+    ARROW_NAME, AUTO_PLACEMENT_NAME, AlignedPlacement, Alignment, ApplyState, ArrowData,
     AutoPlacement, AutoPlacementData, AutoPlacementDataOverflow, AutoPlacementOptions,
     AutoUpdateOptions, Axis, Boundary, ClientRectObject, ComputePositionConfig,
     ComputePositionReturn, Coords, DefaultLimiter, DefaultVirtualElement, Derivable, DerivableFn,
-    DetectOverflowOptions, Dimensions, ElementContext, ElementOrVirtual, ElementRects,
-    FallbackStrategy, Flip, FlipData, FlipDataOverflow, FlipOptions, Hide, HideData, HideOptions,
-    HideStrategy, Inline, InlineOptions, Length, LimitShift, LimitShiftOffset,
-    LimitShiftOffsetValues, LimitShiftOptions, Middleware, MiddlewareData, MiddlewareReturn,
-    MiddlewareState, MiddlewareVec, MiddlewareWithOptions, Offset, OffsetData, OffsetOptions,
-    OffsetOptionsValues, Padding, PartialSideObject, Placement, Rect, RootBoundary, Shift,
-    ShiftData, ShiftOptions, Side, Size, SizeOptions, Strategy, VirtualElement, ARROW_NAME,
-    AUTO_PLACEMENT_NAME, FLIP_NAME, HIDE_NAME, INLINE_NAME, OFFSET_NAME, SHIFT_NAME, SIZE_NAME,
+    DetectOverflowOptions, Dimensions, ElementContext, ElementOrVirtual, ElementRects, FLIP_NAME,
+    FallbackStrategy, Flip, FlipData, FlipDataOverflow, FlipOptions, HIDE_NAME, Hide, HideData,
+    HideOptions, HideStrategy, INLINE_NAME, Inline, InlineOptions, Length, LimitShift,
+    LimitShiftOffset, LimitShiftOffsetValues, LimitShiftOptions, Middleware, MiddlewareData,
+    MiddlewareReturn, MiddlewareState, MiddlewareVec, MiddlewareWithOptions, OFFSET_NAME, Offset,
+    OffsetData, OffsetOptions, OffsetOptionsValues, Padding, PartialSideObject, Placement, Rect,
+    RootBoundary, SHIFT_NAME, SIZE_NAME, Shift, ShiftData, ShiftOptions, Side, Size, SizeOptions,
+    Strategy, VirtualElement, auto_update, compute_position, dom,
 };

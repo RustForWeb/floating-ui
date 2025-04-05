@@ -1,13 +1,13 @@
 use std::rc::Rc;
 
 use floating_ui_leptos::{
-    use_floating, DefaultVirtualElement, Strategy, UseFloatingOptions, UseFloatingReturn,
-    VirtualElement,
+    DefaultVirtualElement, Strategy, UseFloatingOptions, UseFloatingReturn, VirtualElement,
+    use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;
 
-use crate::utils::use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn};
+use crate::utils::use_scroll::{UseScrollOptions, UseScrollReturn, use_scroll};
 
 #[component]
 pub fn VirtualElement() -> impl IntoView {

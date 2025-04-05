@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, DetectOverflowOptions, MiddlewareVec, Placement, Shift, ShiftOptions,
-    UseFloatingOptions, UseFloatingReturn,
+    DetectOverflowOptions, MiddlewareVec, Placement, Shift, ShiftOptions, UseFloatingOptions,
+    UseFloatingReturn, use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;

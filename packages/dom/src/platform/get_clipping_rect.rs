@@ -1,16 +1,17 @@
 use floating_ui_core::{GetClippingRectArgs, RootBoundary};
 use floating_ui_utils::{
+    ClientRectObject, Rect, Strategy,
     dom::{
-        get_computed_style, get_document_element, get_node_name, get_overflow_ancestors,
-        get_parent_node, is_containing_block, is_last_traversable_node, is_overflow_element,
-        is_top_layer, OverflowAncestor,
+        OverflowAncestor, get_computed_style, get_document_element, get_node_name,
+        get_overflow_ancestors, get_parent_node, is_containing_block, is_last_traversable_node,
+        is_overflow_element, is_top_layer,
     },
-    rect_to_client_rect, ClientRectObject, Rect, Strategy,
+    rect_to_client_rect,
 };
-use web_sys::{wasm_bindgen::JsCast, CssStyleDeclaration, Element, Node};
+use web_sys::{CssStyleDeclaration, Element, Node, wasm_bindgen::JsCast};
 
 use crate::{
-    platform::{get_scale::get_scale, Platform},
+    platform::{Platform, get_scale::get_scale},
     types::Boundary,
     utils::{
         get_bounding_client_rect::get_bounding_client_rect, get_document_rect::get_document_rect,

@@ -1,11 +1,11 @@
 use std::{cell::RefCell, rc::Rc};
 
 use floating_ui_dom::{
-    compute_position, ComputePositionConfig, MiddlewareData, OwnedElementOrVirtual, Placement,
-    Strategy, VirtualElement,
+    ComputePositionConfig, MiddlewareData, OwnedElementOrVirtual, Placement, Strategy,
+    VirtualElement, compute_position,
 };
 use web_sys::wasm_bindgen::JsCast;
-use yew::{hook, use_callback, use_effect_with, use_memo, use_mut_ref, use_state_eq, NodeRef};
+use yew::{NodeRef, hook, use_callback, use_effect_with, use_memo, use_mut_ref, use_state_eq};
 
 use crate::{
     types::{
@@ -92,26 +92,27 @@ pub fn use_floating(
                 will_change: None,
             };
 
-            if let Some(floating_element) = floating.get() {
-                let x_val = round_by_dpr(&floating_element, **x);
-                let y_val = round_by_dpr(&floating_element, **y);
+            match floating.get() {
+                Some(floating_element) => {
+                    let x_val = round_by_dpr(&floating_element, **x);
+                    let y_val = round_by_dpr(&floating_element, **y);
 
-                if **transform_option {
-                    FloatingStyles {
-                        transform: Some(format!("translate({x_val}px, {y_val}px)")),
-                        will_change: (get_dpr(&floating_element) >= 1.5)
-                            .then_some("transform".to_owned()),
-                        ..initial_styles
-                    }
-                } else {
-                    FloatingStyles {
-                        left: format!("{x_val}px"),
-                        top: format!("{y_val}px"),
-                        ..initial_styles
+                    if **transform_option {
+                        FloatingStyles {
+                            transform: Some(format!("translate({x_val}px, {y_val}px)")),
+                            will_change: (get_dpr(&floating_element) >= 1.5)
+                                .then_some("transform".to_owned()),
+                            ..initial_styles
+                        }
+                    } else {
+                        FloatingStyles {
+                            left: format!("{x_val}px"),
+                            top: format!("{y_val}px"),
+                            ..initial_styles
+                        }
                     }
                 }
-            } else {
-                initial_styles
+                _ => initial_styles,
             }
         },
     );

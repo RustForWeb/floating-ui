@@ -1,5 +1,5 @@
 use convert_case::{Case, Casing};
-use floating_ui_yew::{use_floating, UseFloatingOptions, UseFloatingReturn};
+use floating_ui_yew::{UseFloatingOptions, UseFloatingReturn, use_floating};
 use wasm_bindgen::JsCast;
 use web_sys::window;
 use yew::prelude::*;

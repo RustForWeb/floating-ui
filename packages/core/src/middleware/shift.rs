@@ -1,12 +1,12 @@
 use std::fmt::Debug;
 
 use dyn_derive::dyn_trait;
-use floating_ui_utils::{clamp, get_opposite_axis, get_side_axis, Axis, Coords, Side};
+use floating_ui_utils::{Axis, Coords, Side, clamp, get_opposite_axis, get_side_axis};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    detect_overflow::{detect_overflow, DetectOverflowOptions},
-    middleware::{OffsetData, OFFSET_NAME},
+    detect_overflow::{DetectOverflowOptions, detect_overflow},
+    middleware::{OFFSET_NAME, OffsetData},
     types::{
         Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
         MiddlewareWithOptions,

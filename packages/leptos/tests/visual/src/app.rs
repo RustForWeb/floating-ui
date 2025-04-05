@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use leptos_router::components::{Outlet, ParentRoute, Route, Router, Routes, A};
+use leptos_router::components::{A, Outlet, ParentRoute, Route, Router, Routes};
 use leptos_router::path;
 
 use crate::spec::arrow::Arrow;

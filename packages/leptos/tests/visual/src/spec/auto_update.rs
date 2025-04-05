@@ -1,6 +1,6 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    auto_update, use_floating, AutoUpdateOptions, Strategy, UseFloatingOptions, UseFloatingReturn,
+    AutoUpdateOptions, Strategy, UseFloatingOptions, UseFloatingReturn, auto_update, use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;

@@ -1,6 +1,6 @@
 use floating_ui_utils::{
-    get_padding_object, rect_to_client_rect, Coords, ElementOrVirtual, OwnedElementOrWindow,
-    Padding, Rect, SideObject,
+    Coords, ElementOrVirtual, OwnedElementOrWindow, Padding, Rect, SideObject, get_padding_object,
+    rect_to_client_rect,
 };
 
 use crate::types::{

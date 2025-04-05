@@ -1,9 +1,9 @@
 use floating_ui_utils::{
-    dom::{
-        get_document_element, get_node_name, get_node_scroll, is_overflow_element,
-        DomElementOrWindow, NodeScroll,
-    },
     Coords, Rect, Strategy,
+    dom::{
+        DomElementOrWindow, NodeScroll, get_document_element, get_node_name, get_node_scroll,
+        is_overflow_element,
+    },
 };
 
 use crate::{

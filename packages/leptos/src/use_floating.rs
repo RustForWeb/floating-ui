@@ -5,8 +5,8 @@ use std::{
 };
 
 use floating_ui_dom::{
-    compute_position, ComputePositionConfig, MiddlewareData, OwnedElementOrVirtual, Placement,
-    Strategy, VirtualElement,
+    ComputePositionConfig, MiddlewareData, OwnedElementOrVirtual, Placement, Strategy,
+    VirtualElement, compute_position,
 };
 use leptos::{html::ElementType, prelude::*};
 use leptos_node_ref::AnyNodeRef;
@@ -185,29 +185,30 @@ pub fn use_floating<R: Into<Reference>>(
             will_change: None,
         };
 
-        if let Some(floating_element) = floating
+        match floating
             .get()
             .and_then(|floating| floating.dyn_into::<web_sys::Element>().ok())
         {
-            let x_val = round_by_dpr(&floating_element, x.get());
-            let y_val = round_by_dpr(&floating_element, y.get());
+            Some(floating_element) => {
+                let x_val = round_by_dpr(&floating_element, x.get());
+                let y_val = round_by_dpr(&floating_element, y.get());
 
-            if transform_option() {
-                FloatingStyles {
-                    transform: Some(format!("translate({x_val}px, {y_val}px)")),
-                    will_change: (get_dpr(&floating_element) >= 1.5)
-                        .then_some("transform".to_owned()),
-                    ..initial_styles
-                }
-            } else {
-                FloatingStyles {
-                    left: format!("{x_val}px"),
-                    top: format!("{y_val}px"),
-                    ..initial_styles
+                if transform_option() {
+                    FloatingStyles {
+                        transform: Some(format!("translate({x_val}px, {y_val}px)")),
+                        will_change: (get_dpr(&floating_element) >= 1.5)
+                            .then_some("transform".to_owned()),
+                        ..initial_styles
+                    }
+                } else {
+                    FloatingStyles {
+                        left: format!("{x_val}px"),
+                        top: format!("{y_val}px"),
+                        ..initial_styles
+                    }
                 }
             }
-        } else {
-            initial_styles
+            _ => initial_styles,
         }
     });
 
@@ -275,26 +276,29 @@ pub fn use_floating<R: Into<Reference>>(
         move || {
             cleanup();
 
-            if let Some(while_elements_mounted) = while_elements_mounted_untracked() {
-                if let Some(reference) = reference.get_untracked() {
-                    if let Some(reference_element) = reference.get_untracked() {
-                        if let Some(floating_element) = floating
-                            .get_untracked()
-                            .and_then(|floating| floating.dyn_into::<web_sys::Element>().ok())
-                        {
-                            *while_elements_mounted_cleanup
-                                .lock()
-                                .expect("Lock should be acquired.") =
-                                Some(SendWrapper::new(while_elements_mounted(
-                                    (&reference_element).into(),
-                                    &floating_element,
-                                    update.clone(),
-                                )));
+            match while_elements_mounted_untracked() {
+                Some(while_elements_mounted) => {
+                    if let Some(reference) = reference.get_untracked() {
+                        if let Some(reference_element) = reference.get_untracked() {
+                            if let Some(floating_element) = floating
+                                .get_untracked()
+                                .and_then(|floating| floating.dyn_into::<web_sys::Element>().ok())
+                            {
+                                *while_elements_mounted_cleanup
+                                    .lock()
+                                    .expect("Lock should be acquired.") =
+                                    Some(SendWrapper::new(while_elements_mounted(
+                                        (&reference_element).into(),
+                                        &floating_element,
+                                        update.clone(),
+                                    )));
+                            }
                         }
                     }
                 }
-            } else {
-                update();
+                _ => {
+                    update();
+                }
             }
         }
     });

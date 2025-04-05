@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use std::{collections::HashMap, ptr};
 
 use dyn_derive::dyn_trait;
-use serde::{de::DeserializeOwned, Serialize};
+use serde::{Serialize, de::DeserializeOwned};
 
 use floating_ui_utils::{
     ClientRectObject, Coords, Dimensions, ElementOrVirtual, ElementOrWindow, ElementRects, Length,

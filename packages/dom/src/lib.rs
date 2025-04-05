@@ -23,13 +23,12 @@ pub use floating_ui_core::{
 };
 #[doc(no_inline)]
 pub use floating_ui_utils::{
-    dom, AlignedPlacement, Alignment, Axis, ClientRectObject, Coords, Dimensions, ElementRects,
-    Length, Padding, PartialSideObject, Placement, Rect, Side, SideObject, Strategy,
-    VirtualElement,
+    AlignedPlacement, Alignment, Axis, ClientRectObject, Coords, Dimensions, ElementRects, Length,
+    Padding, PartialSideObject, Placement, Rect, Side, SideObject, Strategy, VirtualElement, dom,
 };
 
 use floating_ui_core::{
-    compute_position as compute_position_core, ComputePositionConfig as CoreComputePositionConfig,
+    ComputePositionConfig as CoreComputePositionConfig, compute_position as compute_position_core,
 };
 use web_sys::Element;
 

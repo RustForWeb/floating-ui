@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, FallbackStrategy, Flip, FlipOptions, MiddlewareVec, Placement, Shift,
-    ShiftOptions, UseFloatingOptions, UseFloatingReturn,
+    FallbackStrategy, Flip, FlipOptions, MiddlewareVec, Placement, Shift, ShiftOptions,
+    UseFloatingOptions, UseFloatingReturn, use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;
@@ -9,7 +9,7 @@ use send_wrapper::SendWrapper;
 
 use crate::utils::{
     all_placements::ALL_PLACEMENTS,
-    use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn},
+    use_scroll::{UseScrollOptions, UseScrollReturn, use_scroll},
 };
 
 #[derive(Copy, Clone, Debug, PartialEq)]

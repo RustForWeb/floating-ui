@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use floating_ui_dom::{auto_update, AutoUpdateOptions};
+use floating_ui_dom::{AutoUpdateOptions, auto_update};
 use yew::prelude::*;
 
 use crate::types::WhileElementsMountedFn;

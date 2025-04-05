@@ -1,9 +1,9 @@
 use std::rc::Rc;
 
 use floating_ui_dom::{
-    compute_position, Arrow, ArrowData, ArrowOptions, ComputePositionConfig, ComputePositionReturn,
+    ARROW_NAME, Arrow, ArrowData, ArrowOptions, ComputePositionConfig, ComputePositionReturn,
     DetectOverflowOptions, Flip, FlipOptions, Offset, OffsetOptions, Padding, Placement, Shift,
-    ShiftOptions, Side, ARROW_NAME,
+    ShiftOptions, Side, compute_position,
 };
 use wasm_bindgen::prelude::*;
 use web_sys::{Element, HtmlElement};

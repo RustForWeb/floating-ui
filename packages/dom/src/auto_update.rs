@@ -1,13 +1,14 @@
 use std::{cell::RefCell, rc::Rc};
 
 use floating_ui_utils::{
-    dom::{get_document_element, get_overflow_ancestors, get_window, OverflowAncestor},
     ClientRectObject,
+    dom::{OverflowAncestor, get_document_element, get_overflow_ancestors, get_window},
 };
 use web_sys::{
-    wasm_bindgen::{closure::Closure, JsCast, JsValue},
-    window, AddEventListenerOptions, Element, EventTarget, IntersectionObserver,
-    IntersectionObserverEntry, IntersectionObserverInit, ResizeObserver, ResizeObserverEntry,
+    AddEventListenerOptions, Element, EventTarget, IntersectionObserver, IntersectionObserverEntry,
+    IntersectionObserverInit, ResizeObserver, ResizeObserverEntry,
+    wasm_bindgen::{JsCast, JsValue, closure::Closure},
+    window,
 };
 
 use crate::{

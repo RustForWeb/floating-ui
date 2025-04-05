@@ -1,11 +1,12 @@
 use std::rc::Rc;
 
 use floating_ui_yew::{
-    dom::{get_overflow_ancestors, OverflowAncestor},
-    use_floating, DetectOverflowOptions, MiddlewareVec, Padding, Placement, Shift, ShiftOptions,
-    Strategy, UseFloatingOptions, UseFloatingReturn,
+    DetectOverflowOptions, MiddlewareVec, Padding, Placement, Shift, ShiftOptions, Strategy,
+    UseFloatingOptions, UseFloatingReturn,
+    dom::{OverflowAncestor, get_overflow_ancestors},
+    use_floating,
 };
-use wasm_bindgen::{closure::Closure, JsCast};
+use wasm_bindgen::{JsCast, closure::Closure};
 use web_sys::EventTarget;
 use yew::prelude::*;
 

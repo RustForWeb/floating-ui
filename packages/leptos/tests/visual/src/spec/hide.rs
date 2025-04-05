@@ -1,8 +1,8 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, ApplyState, Hide, HideData, HideOptions, HideStrategy, MiddlewareState,
+    ApplyState, HIDE_NAME, Hide, HideData, HideOptions, HideStrategy, MiddlewareState,
     MiddlewareVec, Placement, Shift, ShiftOptions, Size, SizeOptions, Strategy, UseFloatingOptions,
-    UseFloatingReturn, HIDE_NAME,
+    UseFloatingReturn, use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;
@@ -11,7 +11,7 @@ use wasm_bindgen::JsCast;
 
 use crate::utils::{
     all_placements::ALL_PLACEMENTS,
-    use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn},
+    use_scroll::{UseScrollOptions, UseScrollReturn, use_scroll},
 };
 
 #[component]

@@ -1,8 +1,8 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, Derivable, DerivableFn, LimitShift, LimitShiftOffset, LimitShiftOffsetValues,
+    Derivable, DerivableFn, LimitShift, LimitShiftOffset, LimitShiftOffsetValues,
     LimitShiftOptions, MiddlewareState, MiddlewareVec, Offset, OffsetOptions, Placement, Shift,
-    ShiftOptions, UseFloatingOptions, UseFloatingReturn,
+    ShiftOptions, UseFloatingOptions, UseFloatingReturn, use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;
@@ -10,7 +10,7 @@ use send_wrapper::SendWrapper;
 
 use crate::utils::{
     all_placements::ALL_PLACEMENTS,
-    use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn},
+    use_scroll::{UseScrollOptions, UseScrollReturn, use_scroll},
 };
 
 type Value = SendWrapper<Derivable<'static, web_sys::Element, web_sys::Window, LimitShiftOffset>>;

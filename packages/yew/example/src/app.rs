@@ -1,7 +1,7 @@
 use floating_ui_yew::{
-    use_auto_update, use_floating, Arrow, ArrowData, ArrowOptions, DetectOverflowOptions, Flip,
-    FlipOptions, MiddlewareVec, Offset, OffsetOptions, Padding, Placement, Shift, ShiftOptions,
-    Side, UseFloatingOptions, UseFloatingReturn, ARROW_NAME,
+    ARROW_NAME, Arrow, ArrowData, ArrowOptions, DetectOverflowOptions, Flip, FlipOptions,
+    MiddlewareVec, Offset, OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side,
+    UseFloatingOptions, UseFloatingReturn, use_auto_update, use_floating,
 };
 use yew::prelude::*;
 

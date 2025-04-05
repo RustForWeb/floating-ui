@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use floating_ui_yew::{
-    use_auto_update, use_floating, Placement as PlacementEnum, UseFloatingOptions,
-    UseFloatingReturn,
+    Placement as PlacementEnum, UseFloatingOptions, UseFloatingReturn, use_auto_update,
+    use_floating,
 };
 use wasm_bindgen::JsCast;
 use yew::prelude::*;

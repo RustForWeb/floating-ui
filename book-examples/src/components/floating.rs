@@ -1,5 +1,5 @@
 use floating_ui_leptos::{
-    use_floating, MiddlewareVec, Placement, Strategy, UseFloatingOptions, UseFloatingReturn,
+    MiddlewareVec, Placement, Strategy, UseFloatingOptions, UseFloatingReturn, use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;

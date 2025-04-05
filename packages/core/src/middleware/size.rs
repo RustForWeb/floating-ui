@@ -1,10 +1,10 @@
 use std::ptr;
 
-use floating_ui_utils::{get_side_axis, Alignment, Axis, Rect, Side};
+use floating_ui_utils::{Alignment, Axis, Rect, Side, get_side_axis};
 
 use crate::{
-    detect_overflow::{detect_overflow, DetectOverflowOptions},
-    middleware::shift::{ShiftData, SHIFT_NAME},
+    detect_overflow::{DetectOverflowOptions, detect_overflow},
+    middleware::shift::{SHIFT_NAME, ShiftData},
     types::{
         Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
         MiddlewareWithOptions, ResetRects, ResetValue,

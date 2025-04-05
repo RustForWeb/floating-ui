@@ -1,6 +1,6 @@
 use floating_ui_utils::{
-    clamp, get_alignment, get_alignment_axis, get_axis_length, get_padding_object, Axis, Coords,
-    OwnedElementOrWindow, Padding, Side,
+    Axis, Coords, OwnedElementOrWindow, Padding, Side, clamp, get_alignment, get_alignment_axis,
+    get_axis_length, get_padding_object,
 };
 use serde::{Deserialize, Serialize};
 

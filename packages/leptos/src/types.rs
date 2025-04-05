@@ -1,8 +1,8 @@
 use std::{fmt::Display, rc::Rc};
 
 use floating_ui_dom::{
-    auto_update, AutoUpdateOptions, ElementOrVirtual, Middleware, MiddlewareData, Placement,
-    Strategy,
+    AutoUpdateOptions, ElementOrVirtual, Middleware, MiddlewareData, Placement, Strategy,
+    auto_update,
 };
 use leptos::{prelude::*, tachys::html::style::IntoStyle};
 use send_wrapper::SendWrapper;
