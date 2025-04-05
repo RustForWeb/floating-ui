@@ -1,6 +1,6 @@
 use floating_ui_dom::{
-    Arrow as CoreArrow, ArrowOptions as CoreArrowOptions, Middleware, MiddlewareReturn,
-    MiddlewareState, Padding, ARROW_NAME,
+    ARROW_NAME, Arrow as CoreArrow, ArrowOptions as CoreArrowOptions, Middleware, MiddlewareReturn,
+    MiddlewareState, Padding,
 };
 use web_sys::wasm_bindgen::JsCast;
 use yew::NodeRef;
@@ -64,21 +64,20 @@ impl Middleware<web_sys::Element, web_sys::Window> for Arrow {
         &self,
         state: MiddlewareState<web_sys::Element, web_sys::Window>,
     ) -> MiddlewareReturn {
-        if let Some(element) = self.options.element.get() {
-            CoreArrow::new(CoreArrowOptions {
+        match self.options.element.get() {
+            Some(element) => CoreArrow::new(CoreArrowOptions {
                 element: element
                     .dyn_into()
                     .expect("Arrow element should be an Element."),
                 padding: self.options.padding.clone(),
             })
-            .compute(state)
-        } else {
-            MiddlewareReturn {
+            .compute(state),
+            _ => MiddlewareReturn {
                 x: None,
                 y: None,
                 data: None,
                 reset: None,
-            }
+            },
         }
     }
 }

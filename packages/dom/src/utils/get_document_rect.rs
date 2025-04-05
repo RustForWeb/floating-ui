@@ -1,6 +1,6 @@
 use floating_ui_utils::{
-    dom::{get_document_element, get_node_scroll},
     Rect,
+    dom::{get_document_element, get_node_scroll},
 };
 use web_sys::Element;
 

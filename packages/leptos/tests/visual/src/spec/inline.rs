@@ -2,9 +2,9 @@ use std::{rc::Rc, time::Duration};
 
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, ClientRectObject, Coords, DefaultVirtualElement, Flip, FlipOptions, Inline,
-    InlineOptions, MiddlewareVec, Placement, Size, SizeOptions, UseFloatingOptions,
-    UseFloatingReturn, VirtualElement, VirtualElementOrNodeRef,
+    ClientRectObject, Coords, DefaultVirtualElement, Flip, FlipOptions, Inline, InlineOptions,
+    MiddlewareVec, Placement, Size, SizeOptions, UseFloatingOptions, UseFloatingReturn,
+    VirtualElement, VirtualElementOrNodeRef, use_floating,
 };
 use leptos::{
     ev::{self, MouseEvent},
@@ -57,13 +57,15 @@ pub fn Inline() -> impl IntoView {
             })),
     );
 
-    let text = move || {
-        match status.get() {
+    let text = move || match status.get() {
         ConnectedStatus::One => "test",
         ConnectedStatus::TwoDisjoined => "Nulla rutrum dapibus turpis eu volutpat",
-        ConnectedStatus::TwoJoined => "Nulla rutrum dapibus turpis eu volutpat. Duis cursus nisi massa, non dictum",
-        ConnectedStatus::Three => "Nulla rutrum dapibus turpis eu volutpat. Duis cursus nisi massa, non dictum turpis interdum at. Nulla rutrum dapibus turpis eu volutpat",
-    }
+        ConnectedStatus::TwoJoined => {
+            "Nulla rutrum dapibus turpis eu volutpat. Duis cursus nisi massa, non dictum"
+        }
+        ConnectedStatus::Three => {
+            "Nulla rutrum dapibus turpis eu volutpat. Duis cursus nisi massa, non dictum turpis interdum at. Nulla rutrum dapibus turpis eu volutpat"
+        }
     };
 
     let handle_mouse_enter = move |event: MouseEvent| {

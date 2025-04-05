@@ -1,13 +1,13 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, Alignment, AutoPlacement, AutoPlacementOptions, MiddlewareVec, Placement, Shift,
-    ShiftOptions, UseFloatingOptions, UseFloatingReturn,
+    Alignment, AutoPlacement, AutoPlacementOptions, MiddlewareVec, Placement, Shift, ShiftOptions,
+    UseFloatingOptions, UseFloatingReturn, use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;
 use send_wrapper::SendWrapper;
 
-use crate::utils::use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn};
+use crate::utils::use_scroll::{UseScrollOptions, UseScrollReturn, use_scroll};
 
 const ALL_ALIGNMENTS: [Option<Alignment>; 3] = [None, Some(Alignment::Start), Some(Alignment::End)];
 

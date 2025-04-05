@@ -229,7 +229,10 @@ async fn create_pull_request(
     let diff = String::from_utf8(output.stdout)?;
 
     let diff = if diff.len() > 60_000 {
-        format!("Diff is too big for GitHub pull request description.\n\n```sh\ngit clone https://github.com/floating-ui/floating-ui.git /tmp/floating-ui\n(cd /tmp/floating-ui && git diff {}..{} -- {})\nrm -rf /tmp/floating-ui\n```", current_tag, new_tag, directory)
+        format!(
+            "Diff is too big for GitHub pull request description.\n\n```sh\ngit clone https://github.com/floating-ui/floating-ui.git /tmp/floating-ui\n(cd /tmp/floating-ui && git diff {}..{} -- {})\nrm -rf /tmp/floating-ui\n```",
+            current_tag, new_tag, directory
+        )
     } else {
         format!("```diff\n{}```", diff)
     };

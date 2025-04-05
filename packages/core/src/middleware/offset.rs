@@ -1,10 +1,10 @@
 use floating_ui_utils::{
-    get_alignment, get_side, get_side_axis, Alignment, Axis, Coords, Placement, Side,
+    Alignment, Axis, Coords, Placement, Side, get_alignment, get_side, get_side_axis,
 };
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    middleware::{ArrowData, ARROW_NAME},
+    middleware::{ARROW_NAME, ArrowData},
     types::{
         Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
         MiddlewareWithOptions,

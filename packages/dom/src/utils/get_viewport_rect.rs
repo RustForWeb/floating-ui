@@ -1,4 +1,4 @@
-use floating_ui_utils::{dom::get_document_element, Rect, Strategy};
+use floating_ui_utils::{Rect, Strategy, dom::get_document_element};
 use web_sys::Element;
 
 pub fn get_viewport_rect(element: &Element, _strategy: Strategy) -> Rect {

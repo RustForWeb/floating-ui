@@ -5,12 +5,12 @@ use floating_ui_core::middleware::{
 use web_sys::{Element, Window};
 
 pub use floating_ui_core::middleware::{
-    ApplyState, ArrowData, ArrowOptions, AutoPlacementData, AutoPlacementDataOverflow,
-    AutoPlacementOptions, DefaultLimiter, FallbackStrategy, FlipData, FlipDataOverflow,
-    FlipOptions, HideData, HideOptions, HideStrategy, InlineOptions, LimitShift, LimitShiftOffset,
-    LimitShiftOffsetValues, LimitShiftOptions, OffsetData, OffsetOptions, OffsetOptionsValues,
-    ShiftData, ShiftOptions, SizeOptions, ARROW_NAME, AUTO_PLACEMENT_NAME, FLIP_NAME, HIDE_NAME,
-    INLINE_NAME, OFFSET_NAME, SHIFT_NAME, SIZE_NAME,
+    ARROW_NAME, AUTO_PLACEMENT_NAME, ApplyState, ArrowData, ArrowOptions, AutoPlacementData,
+    AutoPlacementDataOverflow, AutoPlacementOptions, DefaultLimiter, FLIP_NAME, FallbackStrategy,
+    FlipData, FlipDataOverflow, FlipOptions, HIDE_NAME, HideData, HideOptions, HideStrategy,
+    INLINE_NAME, InlineOptions, LimitShift, LimitShiftOffset, LimitShiftOffsetValues,
+    LimitShiftOptions, OFFSET_NAME, OffsetData, OffsetOptions, OffsetOptionsValues, SHIFT_NAME,
+    SIZE_NAME, ShiftData, ShiftOptions, SizeOptions,
 };
 
 /// Arrow middleware.

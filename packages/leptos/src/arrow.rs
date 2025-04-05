@@ -1,6 +1,6 @@
 use floating_ui_dom::{
-    Arrow as CoreArrow, ArrowOptions as CoreArrowOptions, Middleware, MiddlewareReturn,
-    MiddlewareState, Padding, ARROW_NAME,
+    ARROW_NAME, Arrow as CoreArrow, ArrowOptions as CoreArrowOptions, Middleware, MiddlewareReturn,
+    MiddlewareState, Padding,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;

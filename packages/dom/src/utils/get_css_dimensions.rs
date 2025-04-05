@@ -1,8 +1,8 @@
 use floating_ui_utils::{
-    dom::{get_computed_style, is_html_element},
     Dimensions,
+    dom::{get_computed_style, is_html_element},
 };
-use web_sys::{wasm_bindgen::JsCast, Element, HtmlElement};
+use web_sys::{Element, HtmlElement, wasm_bindgen::JsCast};
 
 #[derive(Clone, Debug)]
 pub struct CssDimensions {

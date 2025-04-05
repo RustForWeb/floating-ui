@@ -1,12 +1,12 @@
 use floating_ui_utils::{
-    get_alignment, get_alignment_sides, get_expanded_placements, get_opposite_axis_placements,
-    get_opposite_placement, get_side, get_side_axis, Alignment, Axis, Placement,
+    Alignment, Axis, Placement, get_alignment, get_alignment_sides, get_expanded_placements,
+    get_opposite_axis_placements, get_opposite_placement, get_side, get_side_axis,
 };
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    detect_overflow::{detect_overflow, DetectOverflowOptions},
-    middleware::arrow::{ArrowData, ARROW_NAME},
+    detect_overflow::{DetectOverflowOptions, detect_overflow},
+    middleware::arrow::{ARROW_NAME, ArrowData},
     types::{
         Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
         MiddlewareWithOptions, Reset, ResetValue,

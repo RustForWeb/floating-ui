@@ -1,4 +1,4 @@
-use floating_ui_leptos::{use_floating, Strategy, UseFloatingOptions, UseFloatingReturn};
+use floating_ui_leptos::{Strategy, UseFloatingOptions, UseFloatingReturn, use_floating};
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;
 

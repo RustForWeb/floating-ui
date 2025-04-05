@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
-use web_sys::{js_sys::Reflect, window, Event};
+use web_sys::{Event, js_sys::Reflect, window};
 
 pub fn use_size(
     initial_size: Option<i32>,

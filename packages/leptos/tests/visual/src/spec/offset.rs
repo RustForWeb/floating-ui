@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, Derivable, DerivableFn, MiddlewareState, MiddlewareVec, Offset, OffsetOptions,
-    OffsetOptionsValues, Placement, UseFloatingOptions, UseFloatingReturn,
+    Derivable, DerivableFn, MiddlewareState, MiddlewareVec, Offset, OffsetOptions,
+    OffsetOptionsValues, Placement, UseFloatingOptions, UseFloatingReturn, use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;

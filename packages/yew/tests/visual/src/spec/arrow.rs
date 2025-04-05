@@ -1,14 +1,14 @@
 use convert_case::{Case, Casing};
 use floating_ui_yew::{
-    use_auto_update, use_floating, Arrow as ArrowMiddleware, ArrowData, ArrowOptions,
-    DetectOverflowOptions, MiddlewareVec, Offset, OffsetOptions, Padding, Placement, Shift,
-    ShiftOptions, Side, UseFloatingOptions, UseFloatingReturn, ARROW_NAME,
+    ARROW_NAME, Arrow as ArrowMiddleware, ArrowData, ArrowOptions, DetectOverflowOptions,
+    MiddlewareVec, Offset, OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side,
+    UseFloatingOptions, UseFloatingReturn, use_auto_update, use_floating,
 };
 use yew::prelude::*;
 
 use crate::utils::{
     all_placements::ALL_PLACEMENTS,
-    use_scroll::{use_scroll, UseScrollOptions, UseScrollReturn},
+    use_scroll::{UseScrollOptions, UseScrollReturn, use_scroll},
 };
 
 #[function_component]

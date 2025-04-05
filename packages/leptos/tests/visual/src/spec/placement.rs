@@ -1,5 +1,5 @@
 use convert_case::{Case, Casing};
-use floating_ui_leptos::{use_floating, Placement, UseFloatingOptions, UseFloatingReturn};
+use floating_ui_leptos::{Placement, UseFloatingOptions, UseFloatingReturn, use_floating};
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;
 

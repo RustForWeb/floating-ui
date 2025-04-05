@@ -1,6 +1,7 @@
 use floating_ui_utils::{
-    dom::{get_computed_style, get_frame_element, get_window, DomElementOrWindow},
-    rect_to_client_rect, ClientRectObject, Coords, Rect,
+    ClientRectObject, Coords, Rect,
+    dom::{DomElementOrWindow, get_computed_style, get_frame_element, get_window},
+    rect_to_client_rect,
 };
 
 use crate::{

@@ -5,7 +5,7 @@ use std::{
 
 use leptos::{html::Div, prelude::*};
 use send_wrapper::SendWrapper;
-use wasm_bindgen::{prelude::Closure, JsCast};
+use wasm_bindgen::{JsCast, prelude::Closure};
 use web_sys::{ResizeObserver, ResizeObserverEntry};
 
 pub fn use_resize(node_ref: NodeRef<Div>, update: SendWrapper<Rc<dyn Fn()>>) {

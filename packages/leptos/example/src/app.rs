@@ -1,7 +1,7 @@
 use floating_ui_leptos::{
-    use_floating, Arrow, ArrowData, ArrowOptions, DetectOverflowOptions, Flip, FlipOptions,
+    ARROW_NAME, Arrow, ArrowData, ArrowOptions, DetectOverflowOptions, Flip, FlipOptions,
     MiddlewareVec, Offset, OffsetOptions, Padding, Placement, Shift, ShiftOptions, Side,
-    UseFloatingOptions, UseFloatingReturn, ARROW_NAME,
+    UseFloatingOptions, UseFloatingReturn, use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;

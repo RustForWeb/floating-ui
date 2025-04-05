@@ -1,8 +1,8 @@
 //! Utility functions for the DOM. Requires `dom` feature.
 
 use web_sys::{
-    css, js_sys::Object, wasm_bindgen::JsCast, window, CssStyleDeclaration, Document, Element,
-    HtmlElement, Node, ShadowRoot, Window,
+    CssStyleDeclaration, Document, Element, HtmlElement, Node, ShadowRoot, Window, css,
+    js_sys::Object, wasm_bindgen::JsCast, window,
 };
 
 use crate::ElementOrWindow;
@@ -239,16 +239,19 @@ pub fn get_containing_block(element: &Element) -> Option<HtmlElement> {
     let mut current_node = get_parent_node(element);
 
     while !is_last_traversable_node(&current_node) {
-        if let Ok(element) = current_node.dyn_into::<HtmlElement>() {
-            if is_containing_block((&element).into()) {
-                return Some(element);
-            } else if is_top_layer(&element) {
-                return None;
-            }
+        match current_node.dyn_into::<HtmlElement>() {
+            Ok(element) => {
+                if is_containing_block((&element).into()) {
+                    return Some(element);
+                } else if is_top_layer(&element) {
+                    return None;
+                }
 
-            current_node = get_parent_node(&element);
-        } else {
-            break;
+                current_node = get_parent_node(&element);
+            }
+            _ => {
+                break;
+            }
         }
     }
 
@@ -309,18 +312,28 @@ pub fn get_parent_node(node: &Node) -> Node {
     let element = node.dyn_ref::<Element>();
 
     let result: Node;
-    if let Some(slot) = element.and_then(|element| element.assigned_slot()) {
-        // Step into the shadow DOM of the parent of a slotted node.
-        result = slot.into();
-    } else if let Some(parent_node) = node.parent_node() {
-        // DOM Element detected.
-        result = parent_node;
-    } else if let Some(shadow_root) = node.dyn_ref::<ShadowRoot>() {
-        // ShadowRoot detected.
-        result = shadow_root.host().into();
-    } else {
-        // Fallback.
-        result = get_document_element(Some(node.into())).into();
+    match element.and_then(|element| element.assigned_slot()) {
+        Some(slot) => {
+            // Step into the shadow DOM of the parent of a slotted node.
+            result = slot.into();
+        }
+        _ => {
+            match node.parent_node() {
+                Some(parent_node) => {
+                    // DOM Element detected.
+                    result = parent_node;
+                }
+                _ => {
+                    if let Some(shadow_root) = node.dyn_ref::<ShadowRoot>() {
+                        // ShadowRoot detected.
+                        result = shadow_root.host().into();
+                    } else {
+                        // Fallback.
+                        result = get_document_element(Some(node.into())).into();
+                    }
+                }
+            }
+        }
     }
 
     match node.dyn_ref::<ShadowRoot>() {

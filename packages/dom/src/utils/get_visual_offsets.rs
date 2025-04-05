@@ -1,6 +1,6 @@
 use floating_ui_utils::{
-    dom::{get_window, DomElementOrWindow},
     Coords,
+    dom::{DomElementOrWindow, get_window},
 };
 use web_sys::Element;
 

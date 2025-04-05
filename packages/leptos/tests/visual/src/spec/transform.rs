@@ -2,8 +2,8 @@ use std::rc::Rc;
 
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    use_floating, DefaultVirtualElement, MiddlewareVec, Shift, ShiftOptions, UseFloatingOptions,
-    UseFloatingReturn, VirtualElement, VirtualElementOrNodeRef,
+    DefaultVirtualElement, MiddlewareVec, Shift, ShiftOptions, UseFloatingOptions,
+    UseFloatingReturn, VirtualElement, VirtualElementOrNodeRef, use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;

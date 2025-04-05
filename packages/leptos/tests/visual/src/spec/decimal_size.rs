@@ -1,6 +1,6 @@
 use floating_ui_leptos::{
-    use_floating, ApplyState, MiddlewareState, MiddlewareVec, Size, SizeOptions,
-    UseFloatingOptions, UseFloatingReturn,
+    ApplyState, MiddlewareState, MiddlewareVec, Size, SizeOptions, UseFloatingOptions,
+    UseFloatingReturn, use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;

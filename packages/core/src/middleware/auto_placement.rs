@@ -1,11 +1,11 @@
 use floating_ui_utils::{
-    get_alignment, get_alignment_sides, get_opposite_alignment_placement, get_side, Alignment,
-    Placement, ALL_PLACEMENTS,
+    ALL_PLACEMENTS, Alignment, Placement, get_alignment, get_alignment_sides,
+    get_opposite_alignment_placement, get_side,
 };
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    detect_overflow::{detect_overflow, DetectOverflowOptions},
+    detect_overflow::{DetectOverflowOptions, detect_overflow},
     types::{
         Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
         MiddlewareWithOptions, Reset, ResetValue,

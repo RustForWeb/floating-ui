@@ -2,7 +2,7 @@ use floating_ui_utils::Coords;
 
 use crate::{
     types::ElementOrVirtual,
-    utils::get_css_dimensions::{get_css_dimensions, CssDimensions},
+    utils::get_css_dimensions::{CssDimensions, get_css_dimensions},
 };
 
 pub fn get_scale(element_or_virtual: ElementOrVirtual) -> Coords {

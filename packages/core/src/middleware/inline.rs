@@ -1,8 +1,8 @@
 use std::rc::Rc;
 
 use floating_ui_utils::{
-    get_padding_object, get_side_axis, rect_to_client_rect, Axis, ClientRectObject, Coords,
-    DefaultVirtualElement, ElementOrVirtual, Padding, Rect, Side,
+    Axis, ClientRectObject, Coords, DefaultVirtualElement, ElementOrVirtual, Padding, Rect, Side,
+    get_padding_object, get_side_axis, rect_to_client_rect,
 };
 
 use crate::types::{

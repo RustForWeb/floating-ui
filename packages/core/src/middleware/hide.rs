@@ -1,8 +1,8 @@
-use floating_ui_utils::{Rect, SideObject, ALL_SIDES};
+use floating_ui_utils::{ALL_SIDES, Rect, SideObject};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    detect_overflow::{detect_overflow, DetectOverflowOptions},
+    detect_overflow::{DetectOverflowOptions, detect_overflow},
     types::{
         Derivable, DerivableFn, ElementContext, Middleware, MiddlewareReturn, MiddlewareState,
         MiddlewareWithOptions,
