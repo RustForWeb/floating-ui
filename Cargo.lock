@@ -567,7 +567,7 @@ checksum = "37909eebbb50d72f9059c3b6d82c0463f2ff062c9e95845c43a6c9c0355411be"
 
 [[package]]
 name = "floating-ui-book"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
@@ -582,7 +582,7 @@ dependencies = [
 
 [[package]]
 name = "floating-ui-core"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "dyn_derive",
  "dyn_std",
@@ -593,7 +593,7 @@ dependencies = [
 
 [[package]]
 name = "floating-ui-dom"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "floating-ui-core",
  "floating-ui-utils",
@@ -602,7 +602,7 @@ dependencies = [
 
 [[package]]
 name = "floating-ui-dom-example"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
@@ -614,7 +614,7 @@ dependencies = [
 
 [[package]]
 name = "floating-ui-leptos"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "dyn_derive",
  "dyn_std",
@@ -628,7 +628,7 @@ dependencies = [
 
 [[package]]
 name = "floating-ui-leptos-example"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
@@ -643,7 +643,7 @@ dependencies = [
 
 [[package]]
 name = "floating-ui-leptos-test-visual"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
@@ -660,7 +660,7 @@ dependencies = [
 
 [[package]]
 name = "floating-ui-utils"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "cfg-if",
  "dyn_derive",
@@ -671,7 +671,7 @@ dependencies = [
 
 [[package]]
 name = "floating-ui-yew"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "floating-ui-dom",
  "wasm-bindgen-test",
@@ -681,7 +681,7 @@ dependencies = [
 
 [[package]]
 name = "floating-ui-yew-example"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
@@ -694,7 +694,7 @@ dependencies = [
 
 [[package]]
 name = "floating-ui-yew-test-visual"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
@@ -2582,7 +2582,7 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "scripts"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "env_logger",
  "log",
