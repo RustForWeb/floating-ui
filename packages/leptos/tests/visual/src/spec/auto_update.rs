@@ -175,7 +175,7 @@ pub fn AutoUpdate() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| {
                     view! {
                         <button
@@ -187,7 +187,7 @@ pub fn AutoUpdate() -> impl IntoView {
                             }
                             on:click=move |_| set_options.set(options.get().ancestor_scroll(value))
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 }
@@ -198,7 +198,7 @@ pub fn AutoUpdate() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| {
                     view! {
                         <button
@@ -210,7 +210,7 @@ pub fn AutoUpdate() -> impl IntoView {
                             }
                             on:click=move |_| set_options.set(options.get().ancestor_resize(value))
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 }
@@ -221,7 +221,7 @@ pub fn AutoUpdate() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| {
                     view! {
                         <button
@@ -233,7 +233,7 @@ pub fn AutoUpdate() -> impl IntoView {
                             }
                             on:click=move |_| set_options.set(options.get().element_resize(value))
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 }
@@ -244,10 +244,10 @@ pub fn AutoUpdate() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_LAYOUT_SHIFTS
-                key=|local_layout_shift| format!("{:?}", local_layout_shift)
+                key=|local_layout_shift| format!("{local_layout_shift:?}")
                 children=move |local_layout_shift| view! {
                     <button
-                        data-testid=move || format!("layoutShift-{}", format!("{:?}", local_layout_shift).to_case(Case::Camel))
+                        data-testid=move || format!("layoutShift-{}", format!("{local_layout_shift:?}").to_case(Case::Camel))
                         style:background-color=move || if layout_shift.get() == local_layout_shift {
                             "black"
                         } else {
@@ -255,7 +255,7 @@ pub fn AutoUpdate() -> impl IntoView {
                         }
                         on:click=move |_| set_layout_shift.set(local_layout_shift)
                     >
-                        {format!("{:?}", local_layout_shift).to_case(Case::Camel)}
+                        {format!("{local_layout_shift:?}").to_case(Case::Camel)}
                     </button>
                 }
             />
@@ -265,7 +265,7 @@ pub fn AutoUpdate() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| {
                     view! {
                         <button
@@ -277,7 +277,7 @@ pub fn AutoUpdate() -> impl IntoView {
                             }
                             on:click=move |_| set_options.set(options.get().animation_frame(value))
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 }
@@ -288,7 +288,7 @@ pub fn AutoUpdate() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| {
                     view! {
                         <button
@@ -300,7 +300,7 @@ pub fn AutoUpdate() -> impl IntoView {
                             }
                             on:click=move |_| set_while_elements_mounted.set(value)
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 }

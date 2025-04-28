@@ -123,10 +123,10 @@ pub fn Scroll() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_STRATEGIES
-                key=|local_strategy| format!("{:?}", local_strategy)
+                key=|local_strategy| format!("{local_strategy:?}")
                 children=move |local_strategy| view! {
                     <button
-                        data-testid=move || format!("Strategy{:?}", local_strategy).to_case(Case::Kebab)
+                        data-testid=move || format!("Strategy{local_strategy:?}").to_case(Case::Kebab)
                         style:background-color=move || if strategy.get() == local_strategy {
                             "black"
                         } else {
@@ -134,7 +134,7 @@ pub fn Scroll() -> impl IntoView {
                         }
                         on:click=move |_| set_strategy.set(local_strategy)
                     >
-                        {format!("{:?}", local_strategy).to_case(Case::Kebab)}
+                        {format!("{local_strategy:?}").to_case(Case::Kebab)}
                     </button>
                 }
             />
@@ -144,10 +144,10 @@ pub fn Scroll() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_NODES
-                key=|local_node| format!("{:?}", local_node)
+                key=|local_node| format!("{local_node:?}")
                 children=move |local_node| view! {
                     <button
-                        data-testid=move || format!("scroll-{}", format!("{:?}", local_node).to_case(Case::Camel))
+                        data-testid=move || format!("scroll-{}", format!("{local_node:?}").to_case(Case::Camel))
                         style:background-color=move || if node.get() == local_node {
                             "black"
                         } else {
@@ -155,7 +155,7 @@ pub fn Scroll() -> impl IntoView {
                         }
                         on:click=move |_| set_node.set(local_node)
                     >
-                        {format!("{:?}", local_node).to_case(Case::Camel)}
+                        {format!("{local_node:?}").to_case(Case::Camel)}
                     </button>
                 }
             />

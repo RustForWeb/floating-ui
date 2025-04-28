@@ -203,7 +203,7 @@ pub fn Transform() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_NODES
-                key=|local_node| format!("{:?}", local_node)
+                key=|local_node| format!("{local_node:?}")
                 children=move |local_node| view! {
                     <button
                         data-testid=move || format!("transform-{}", match local_node {
@@ -211,7 +211,7 @@ pub fn Transform() -> impl IntoView {
                             Node::OffsetParent3d => "offsetParent-3d".to_owned(),
                             Node::OffsetParentInverse => "offsetParent-inverse".to_owned(),
                             Node::OffsetParentReference => "offsetParent-reference".to_owned(),
-                            _ => format!("{:?}", local_node).to_case(Case::Camel)
+                            _ => format!("{local_node:?}").to_case(Case::Camel)
                         })
                         style:background-color=move || if node.get() == local_node {
                             "black"
@@ -224,7 +224,7 @@ pub fn Transform() -> impl IntoView {
                             Node::OffsetParent3d => "offsetParent-3d".to_owned(),
                             Node::OffsetParentInverse => "offsetParent-inverse".to_owned(),
                             Node::OffsetParentReference => "offsetParent-reference".to_owned(),
-                            _ => format!("{:?}", local_node).to_case(Case::Camel)
+                            _ => format!("{local_node:?}").to_case(Case::Camel)
                         }}
                     </button>
                 }

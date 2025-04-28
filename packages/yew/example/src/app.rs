@@ -48,13 +48,13 @@ pub fn App() -> Html {
         arrow_data
             .as_ref()
             .clone()
-            .and_then(|arrow_data| arrow_data.x.map(|x| format!("{}px", x)))
+            .and_then(|arrow_data| arrow_data.x.map(|x| format!("{x}px")))
     });
     let arrow_y = use_memo(arrow_data.clone(), |arrow_data| {
         arrow_data
             .as_ref()
             .clone()
-            .and_then(|arrow_data| arrow_data.y.map(|y| format!("{}px", y)))
+            .and_then(|arrow_data| arrow_data.y.map(|y| format!("{y}px")))
     });
 
     let onmouseenter = use_callback(open.clone(), |_, open| open.set(true));

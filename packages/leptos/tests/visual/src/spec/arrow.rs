@@ -99,7 +99,7 @@ pub fn Arrow() -> impl IntoView {
                         style:top=move || match static_side() {
                             Side::Top => "-15px".to_owned(),
                             _ => match arrow_y() {
-                                Some(arrow_y) => format!("{}px", arrow_y),
+                                Some(arrow_y) => format!("{arrow_y}px"),
                                 None => "".to_owned()
                             }
                         }
@@ -114,7 +114,7 @@ pub fn Arrow() -> impl IntoView {
                         style:left=move || match static_side() {
                             Side::Left => "-15px".to_owned(),
                             _ => match arrow_x() {
-                                Some(arrow_x) => format!("{}px", arrow_x),
+                                Some(arrow_x) => format!("{arrow_x}px"),
                                 None => "".to_owned()
                             }
                         }
@@ -129,7 +129,7 @@ pub fn Arrow() -> impl IntoView {
                         style:top=move || match static_side() {
                             Side::Top => "-15px".to_owned(),
                             _ => match arrow_y() {
-                                Some(arrow_y) => format!("{}px", arrow_y),
+                                Some(arrow_y) => format!("{arrow_y}px"),
                                 None => "".to_owned()
                             }
                         }
@@ -144,7 +144,7 @@ pub fn Arrow() -> impl IntoView {
                         style:left=move || match static_side() {
                             Side::Left => "-15px".to_owned(),
                             _ => match arrow_x() {
-                                Some(arrow_x) => format!("{}px", arrow_x),
+                                Some(arrow_x) => format!("{arrow_x}px"),
                                 None => "".to_owned()
                             }
                         }
@@ -216,7 +216,7 @@ pub fn Arrow() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [25, 125]
-                key=|size| format!("{:?}", size)
+                key=|size| format!("{size:?}")
                 children=move |size| view! {
                     <button
                         data-testid=format!("reference-{size}")
@@ -237,7 +237,7 @@ pub fn Arrow() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [75, 150]
-                key=|size| format!("{:?}", size)
+                key=|size| format!("{size:?}")
                 children=move |size| view! {
                     <button
                         data-testid=format!("floating-{size}")
@@ -258,7 +258,7 @@ pub fn Arrow() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [0, 20, 200]
-                key=|size| format!("{:?}", size)
+                key=|size| format!("{size:?}")
                 children={
                     let update_scroll = update_scroll.clone();
 
@@ -294,7 +294,7 @@ pub fn Arrow() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children={
                     let update_scroll = update_scroll.clone();
 
@@ -318,7 +318,7 @@ pub fn Arrow() -> impl IntoView {
                                     }
                                 }
                             >
-                                {format!("{}", value)}
+                                {format!("{value}")}
                             </button>
                         }
                     }
@@ -330,14 +330,14 @@ pub fn Arrow() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_PLACEMENTS
-                key=|local_placement| format!("{:?}", local_placement)
+                key=|local_placement| format!("{local_placement:?}")
                 children={
                     let update_scroll = update_scroll.clone();
 
                     move |local_placement| {
                         view! {
                             <button
-                                data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
+                                data-testid=format!("Placement{local_placement:?}").to_case(Case::Kebab)
                                 style:background-color=move || if placement.get() == local_placement {
                                     "black"
                                 } else {
@@ -354,7 +354,7 @@ pub fn Arrow() -> impl IntoView {
                                     }
                                 }
                             >
-                                {format!("{:?}", local_placement).to_case(Case::Kebab)}
+                                {format!("{local_placement:?}").to_case(Case::Kebab)}
                             </button>
                         }
                     }
@@ -366,7 +366,7 @@ pub fn Arrow() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("svg-{}", value)
@@ -377,7 +377,7 @@ pub fn Arrow() -> impl IntoView {
                         }
                         on:click=move |_| set_svg.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
@@ -387,7 +387,7 @@ pub fn Arrow() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("nested-{}", value)
@@ -398,7 +398,7 @@ pub fn Arrow() -> impl IntoView {
                         }
                         on:click=move |_| set_nested.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
@@ -408,7 +408,7 @@ pub fn Arrow() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children={
                     let update_scroll = update_scroll.clone();
 
@@ -443,7 +443,7 @@ pub fn Arrow() -> impl IntoView {
                                     }
                                 }
                             >
-                                {format!("{}", value)}
+                                {format!("{value}")}
                             </button>
                         }
                     }

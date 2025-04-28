@@ -83,7 +83,7 @@ pub fn Placement() -> Html {
                         html! {
                             <button
                                 key={format!("{:?}", value)}
-                                data-testid={format!("Placement{:?}", value).to_case(Case::Kebab)}
+                                data-testid={format!("Placement{value:?}").to_case(Case::Kebab)}
                                 style={if *placement == value {
                                     "background-color: black;"
                                 } else {
@@ -95,7 +95,7 @@ pub fn Placement() -> Html {
                                     move |_| placement.set(value)
                                 })}
                             >
-                                {format!("{:?}", value).to_case(Case::Kebab)}
+                                {format!("{value:?}").to_case(Case::Kebab)}
                             </button>
                         }
                     }).collect::<Html>()
@@ -109,7 +109,7 @@ pub fn Placement() -> Html {
                         html! {
                             <button
                                 key={format!("{}", value)}
-                                data-testid={format!("rtl-{}", value)}
+                                data-testid={format!("rtl-{value}")}
                                 style={if *rtl == value {
                                     "background-color: black;"
                                 } else {

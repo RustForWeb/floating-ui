@@ -17,7 +17,7 @@ pub fn use_size(
 
     Reflect::set(
         &window().expect("Window should exist."),
-        &format!("__handleSizeChange_{}", key).into(),
+        &format!("__handleSizeChange_{key}").into(),
         &closure.into_js_value(),
     )
     .expect("Reflect set should be successful.");

@@ -61,7 +61,7 @@ pub fn ContainingBlock() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ["transform", "translate", "scale", "rotate", "perspective", "transform, perspective", "opacity"]
-                key=|local_will_change| format!("{:?}", local_will_change)
+                key=|local_will_change| format!("{local_will_change:?}")
                 children=move |local_will_change| view! {
                     <button
                         data-testid=format!("willchange-{}", local_will_change)
@@ -82,7 +82,7 @@ pub fn ContainingBlock() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ["paint", "layout", "paint, layout", "strict", "content", "size"]
-                key=|local_contain| format!("{:?}", local_contain)
+                key=|local_contain| format!("{local_contain:?}")
                 children=move |local_contain| view! {
                     <button
                         data-testid=format!("contain-{}", local_contain)
@@ -103,7 +103,7 @@ pub fn ContainingBlock() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [None, Some("inline-size"), Some("size")]
-                key=|local_container_type| format!("{:?}", local_container_type)
+                key=|local_container_type| format!("{local_container_type:?}")
                 children=move |local_container_type| view! {
                     <button
                         data-testid=format!("container-type-{}", local_container_type.unwrap_or("normal"))

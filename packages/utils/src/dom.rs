@@ -143,7 +143,7 @@ pub fn is_overflow_element(element: &Element) -> bool {
     let overflow_y = style.get_property_value("overflow-y").unwrap_or_default();
     let display = style.get_property_value("display").unwrap_or_default();
 
-    let overflow_combined = format!("{}{}{}", overflow, overflow_x, overflow_y);
+    let overflow_combined = format!("{overflow}{overflow_x}{overflow_y}");
 
     OVERFLOW_VALUES
         .into_iter()

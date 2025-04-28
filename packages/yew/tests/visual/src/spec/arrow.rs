@@ -117,7 +117,7 @@ pub fn Arrow() -> Html {
                     match static_side {
                         Side::Top => "-15px".to_owned(),
                         _ => match *arrow_y {
-                            Some(arrow_y) => format!("{}px", arrow_y),
+                            Some(arrow_y) => format!("{arrow_y}px"),
                             None => "".to_owned()
                         }
                     },
@@ -132,7 +132,7 @@ pub fn Arrow() -> Html {
                     match static_side {
                         Side::Left => "-15px".to_owned(),
                         _ => match *arrow_x {
-                            Some(arrow_x) => format!("{}px", arrow_x),
+                            Some(arrow_x) => format!("{arrow_x}px"),
                             None => "".to_owned()
                         }
                     }
@@ -276,7 +276,7 @@ pub fn Arrow() -> Html {
                         html! {
                             <button
                                 key={format!("{}", value)}
-                                data-testid={format!("add-offset-{}", value)}
+                                data-testid={format!("add-offset-{value}")}
                                 style={if *add_offset == value {
                                     "background-color: black;"
                                 } else {
@@ -308,7 +308,7 @@ pub fn Arrow() -> Html {
                         html! {
                             <button
                                 key={format!("{:?}", value)}
-                                data-testid={format!("Placement{:?}", value).to_case(Case::Kebab)}
+                                data-testid={format!("Placement{value:?}").to_case(Case::Kebab)}
                                 style={if *placement == value {
                                     "background-color: black;"
                                 } else {
@@ -326,7 +326,7 @@ pub fn Arrow() -> Html {
                                     }
                                 })}
                             >
-                                {format!("{:?}", value).to_case(Case::Kebab)}
+                                {format!("{value:?}").to_case(Case::Kebab)}
                             </button>
                         }
                     }).collect::<Html>()
@@ -340,7 +340,7 @@ pub fn Arrow() -> Html {
                         html! {
                             <button
                                 key={format!("{}", value)}
-                                data-testid={format!("svg-{}", value)}
+                                data-testid={format!("svg-{value}")}
                                 style={if *svg == value {
                                     "background-color: black;"
                                 } else {
@@ -370,7 +370,7 @@ pub fn Arrow() -> Html {
                         html! {
                             <button
                                 key={format!("{}", value)}
-                                data-testid={format!("nested-{}", value)}
+                                data-testid={format!("nested-{value}")}
                                 style={if *nested == value {
                                     "background-color: black;"
                                 } else {
@@ -400,7 +400,7 @@ pub fn Arrow() -> Html {
                         html! {
                             <button
                                 key={format!("{}", value)}
-                                data-testid={format!("centerOffset-{}", value)}
+                                data-testid={format!("centerOffset-{value}")}
                                 style={if *center_offset == value {
                                     "background-color: black;"
                                 } else {

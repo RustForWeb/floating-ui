@@ -140,10 +140,10 @@ pub fn Shift() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_PLACEMENTS
-                key=|local_placement| format!("{:?}", local_placement)
+                key=|local_placement| format!("{local_placement:?}")
                 children=move |local_placement| view! {
                     <button
-                        data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
+                        data-testid=format!("Placement{local_placement:?}").to_case(Case::Kebab)
                         style:background-color=move || if placement.get() == local_placement {
                             "black"
                         } else {
@@ -151,7 +151,7 @@ pub fn Shift() -> impl IntoView {
                         }
                         on:click=move |_| set_placement.set(local_placement)
                     >
-                        {format!("{:?}", local_placement).to_case(Case::Kebab)}
+                        {format!("{local_placement:?}").to_case(Case::Kebab)}
                     </button>
                 }
             />
@@ -161,7 +161,7 @@ pub fn Shift() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [0, 10]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("offset-{}", value)
@@ -172,7 +172,7 @@ pub fn Shift() -> impl IntoView {
                         }
                         on:click=move |_| set_offset_value.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
@@ -182,7 +182,7 @@ pub fn Shift() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("mainAxis-{}", value)
@@ -193,7 +193,7 @@ pub fn Shift() -> impl IntoView {
                         }
                         on:click=move |_| set_main_axis.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
@@ -203,7 +203,7 @@ pub fn Shift() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("crossAxis-{}", value)
@@ -214,7 +214,7 @@ pub fn Shift() -> impl IntoView {
                         }
                         on:click=move |_| set_cross_axis.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
@@ -224,7 +224,7 @@ pub fn Shift() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("limitShift-{}", value)
@@ -235,7 +235,7 @@ pub fn Shift() -> impl IntoView {
                         }
                         on:click=move |_| set_limit_shift.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
@@ -246,7 +246,7 @@ pub fn Shift() -> impl IntoView {
             <div class="controls">
                 <For
                     each=|| [true, false]
-                    key=|value| format!("{}", value)
+                    key=|value| format!("{value}")
                     children=move |value| view! {
                         <button
                             data-testid=format!("limitShift.mainAxis-{}", value)
@@ -257,7 +257,7 @@ pub fn Shift() -> impl IntoView {
                             }
                             on:click=move |_| set_limit_shift_main_axis.set(value)
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 />
@@ -267,7 +267,7 @@ pub fn Shift() -> impl IntoView {
             <div class="controls">
                 <For
                     each=|| [true, false]
-                    key=|value| format!("{}", value)
+                    key=|value| format!("{value}")
                     children=move |value| view! {
                         <button
                             data-testid=format!("limitShift.crossAxis-{}", value)
@@ -278,7 +278,7 @@ pub fn Shift() -> impl IntoView {
                             }
                             on:click=move |_| set_limit_shift_cross_axis.set(value)
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 />
@@ -291,7 +291,7 @@ pub fn Shift() -> impl IntoView {
                     key=|(name, _)| name.to_string()
                     children=move |(name, _)| view! {
                         <button
-                            data-testid=move || format!("limitShift.offset-{}", name)
+                            data-testid=move || format!("limitShift.offset-{name}")
                             style:background-color=move || if limit_shift_offset.get() == name {
                                 "black"
                             } else {

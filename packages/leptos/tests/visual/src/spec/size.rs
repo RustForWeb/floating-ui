@@ -91,11 +91,11 @@ pub fn Size() -> impl IntoView {
 
                             floating
                                 .style()
-                                .set_property("max-width", &format!("{}px", available_width))
+                                .set_property("max-width", &format!("{available_width}px"))
                                 .expect("Style should be updated.");
                             floating
                                 .style()
-                                .set_property("max-height", &format!("{}px", available_height))
+                                .set_property("max-height", &format!("{available_height}px"))
                                 .expect("Style should be updated.");
                         })
                         .detect_overflow(detect_overflow_options.clone()),
@@ -163,10 +163,10 @@ pub fn Size() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_PLACEMENTS
-                key=|local_placement| format!("{:?}", local_placement)
+                key=|local_placement| format!("{local_placement:?}")
                 children=move |local_placement| view! {
                     <button
-                        data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
+                        data-testid=format!("Placement{local_placement:?}").to_case(Case::Kebab)
                         style:background-color=move || if placement.get() == local_placement {
                             "black"
                         } else {
@@ -174,7 +174,7 @@ pub fn Size() -> impl IntoView {
                         }
                         on:click=move |_| set_placement.set(local_placement)
                     >
-                        {format!("{:?}", local_placement).to_case(Case::Kebab)}
+                        {format!("{local_placement:?}").to_case(Case::Kebab)}
                     </button>
                 }
             />
@@ -184,7 +184,7 @@ pub fn Size() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| {
                     view! {
                         <button
@@ -198,7 +198,7 @@ pub fn Size() -> impl IntoView {
                                 set_rtl.set(value);
                             }
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 }
@@ -209,7 +209,7 @@ pub fn Size() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("flip-{}", value)
@@ -220,7 +220,7 @@ pub fn Size() -> impl IntoView {
                         }
                         on:click=move |_| set_add_flip.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
@@ -230,10 +230,10 @@ pub fn Size() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [ShiftOrder::None, ShiftOrder::Before, ShiftOrder::After]
-                key=|value| format!("{:?}", value)
+                key=|value| format!("{value:?}")
                 children=move |value| view! {
                     <button
-                        data-testid=format!("shift-{}", format!("{:?}", value).to_case(Case::Camel))
+                        data-testid=format!("shift-{}", format!("{value:?}").to_case(Case::Camel))
                         style:background-color=move || if add_shift.get() == value {
                             "black"
                         } else {
@@ -241,7 +241,7 @@ pub fn Size() -> impl IntoView {
                         }
                         on:click=move |_| set_add_shift.set(value)
                     >
-                        {format!("{:?}", value).to_case(Case::Camel)}
+                        {format!("{value:?}").to_case(Case::Camel)}
                     </button>
                 }
             />
@@ -252,7 +252,7 @@ pub fn Size() -> impl IntoView {
             <div class="controls">
                 <For
                     each=|| [true, false]
-                    key=|value| format!("{}", value)
+                    key=|value| format!("{value}")
                     children=move |value| view! {
                         <button
                             data-testid=format!("shift.crossAxis-{}", value)
@@ -263,7 +263,7 @@ pub fn Size() -> impl IntoView {
                             }
                             on:click=move |_| set_shift_cross_axis.set(value)
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 />
@@ -273,7 +273,7 @@ pub fn Size() -> impl IntoView {
             <div class="controls">
                 <For
                     each=|| [true, false]
-                    key=|value| format!("{}", value)
+                    key=|value| format!("{value}")
                     children=move |value| view! {
                         <button
                             data-testid=format!("shift.limiter-{}", value)
@@ -284,7 +284,7 @@ pub fn Size() -> impl IntoView {
                             }
                             on:click=move |_| set_shift_limiter.set(value)
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 />

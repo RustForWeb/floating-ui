@@ -45,7 +45,7 @@ fn convert_value_to_coords<Element: Clone, Window: Clone>(
         if let Some(alignment_axis) = alignment_axis {
             cross_axis = match alignment {
                 Alignment::Start => alignment_axis,
-                Alignment::End => alignment_axis * -1.0,
+                Alignment::End => -alignment_axis,
             };
         }
     }

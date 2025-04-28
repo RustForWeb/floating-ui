@@ -109,7 +109,7 @@ pub fn AutoPlacement() -> impl IntoView {
                 <div
                     node_ref=reference_ref
                     class="reference"
-                    style=move || add_shift.get().then_some("width: 50px; height: 25px;").unwrap_or_default()
+                    style=move || if add_shift.get() { "width: 50px; height: 25px;" } else { Default::default() }
                 >
                     Reference
                 </div>
@@ -119,8 +119,8 @@ pub fn AutoPlacement() -> impl IntoView {
                     style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                     style:top=move || format!("{}px", y.get())
                     style:left=move || format!("{}px", x.get())
-                    style:width=move || add_shift.get().then_some("250px").unwrap_or_default()
-                    style:height=move || add_shift.get().then_some("250px").unwrap_or_default()
+                    style:width=move || if add_shift.get() { "250px" } else { Default::default() }
+                    style:height=move || if add_shift.get() { "250px" } else { Default::default() }
                 >
                     Floating
                 </div>
@@ -131,12 +131,12 @@ pub fn AutoPlacement() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_ALIGNMENTS
-                key=|local_alignment| format!("{:?}", local_alignment)
+                key=|local_alignment| format!("{local_alignment:?}")
                 children=move |local_alignment| view! {
                     <button
                         data-testid=move || format!("alignment-{}", match local_alignment {
                             None => "null".to_owned(),
-                            Some(local_alignment) => format!("{:?}", local_alignment).to_case(Case::Camel)
+                            Some(local_alignment) => format!("{local_alignment:?}").to_case(Case::Camel)
                         })
                         style:background-color=move || if alignment.get() == local_alignment {
                             "black"
@@ -147,7 +147,7 @@ pub fn AutoPlacement() -> impl IntoView {
                     >
                         {match local_alignment {
                             None => "null".to_owned(),
-                            Some(local_alignment) => format!("{:?}", local_alignment).to_case(Case::Camel)
+                            Some(local_alignment) => format!("{local_alignment:?}").to_case(Case::Camel)
                         }}
                     </button>
                 }
@@ -158,7 +158,7 @@ pub fn AutoPlacement() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| {
                     view! {
                         <button
@@ -170,7 +170,7 @@ pub fn AutoPlacement() -> impl IntoView {
                             }
                             on:click=move |_| set_auto_alignment.set(value)
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 }
@@ -181,13 +181,13 @@ pub fn AutoPlacement() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_ALLOWED_PLACEMENTS
-                key=|local_allowed_placements| format!("{:?}", local_allowed_placements)
+                key=|local_allowed_placements| format!("{local_allowed_placements:?}")
                 children=move |local_allowed_placements| {
                     view! {
                         <button
                             data-testid=move || format!("allowedPlacements-{}", match local_allowed_placements {
                                 AllowedPlacements::None => "undefined".to_owned(),
-                                _ => format!("{:?}", local_allowed_placements).replace("Comma", ",").to_case(Case::Kebab)
+                                _ => format!("{local_allowed_placements:?}").replace("Comma", ",").to_case(Case::Kebab)
                             })
                             style:background-color=move || if allowed_placements.get() == local_allowed_placements {
                                 "black"
@@ -198,7 +198,7 @@ pub fn AutoPlacement() -> impl IntoView {
                         >
                             {match local_allowed_placements {
                                 AllowedPlacements::None => "undefined".to_owned(),
-                                _ => format!("{:?}", local_allowed_placements).replace("Comma", ",").to_case(Case::Kebab)
+                                _ => format!("{local_allowed_placements:?}").replace("Comma", ",").to_case(Case::Kebab)
                             }}
                         </button>
                     }
@@ -210,7 +210,7 @@ pub fn AutoPlacement() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| {
                     view! {
                         <button
@@ -222,7 +222,7 @@ pub fn AutoPlacement() -> impl IntoView {
                             }
                             on:click=move |_| set_cross_axis.set(value)
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 }
@@ -233,7 +233,7 @@ pub fn AutoPlacement() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| {
                     view! {
                         <button
@@ -245,7 +245,7 @@ pub fn AutoPlacement() -> impl IntoView {
                             }
                             on:click=move |_| set_add_shift.set(value)
                         >
-                            {format!("{}", value)}
+                            {format!("{value}")}
                         </button>
                     }
                 }

@@ -45,12 +45,12 @@ pub fn App() -> impl IntoView {
     let arrow_x = Signal::derive(move || {
         arrow_data
             .get()
-            .and_then(|arrow_data| arrow_data.x.map(|x| format!("{}px", x)))
+            .and_then(|arrow_data| arrow_data.x.map(|x| format!("{x}px")))
     });
     let arrow_y = Signal::derive(move || {
         arrow_data
             .get()
-            .and_then(|arrow_data| arrow_data.y.map(|y| format!("{}px", y)))
+            .and_then(|arrow_data| arrow_data.y.map(|y| format!("{y}px")))
     });
 
     view! {

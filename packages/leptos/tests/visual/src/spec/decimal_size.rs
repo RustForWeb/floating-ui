@@ -111,7 +111,7 @@ pub fn DecimalSize() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| SIZES
-                key=|local_size| format!("{:?}", local_size)
+                key=|local_size| format!("{local_size:?}")
                 children=move |local_size| view! {
                     <button
                         data-testid=format!("decimal-size-{}", match local_size {
@@ -138,7 +138,7 @@ pub fn DecimalSize() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("truncate-{}", value)
@@ -149,7 +149,7 @@ pub fn DecimalSize() -> impl IntoView {
                         }
                         on:click=move |_| set_truncate.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />

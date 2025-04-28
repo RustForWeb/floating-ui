@@ -100,7 +100,7 @@ pub fn Flip() -> impl IntoView {
                     style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                     style:top=move || format!("{}px", y.get())
                     style:left=move || format!("{}px", x.get())
-                    style:width=move || add_shift.get().then_some("400px").unwrap_or_default()
+                    style:width=move || if add_shift.get() { "400px" } else { Default::default() }
                 >
                     Floating
                 </div>
@@ -111,10 +111,10 @@ pub fn Flip() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_PLACEMENTS
-                key=|local_placement| format!("{:?}", local_placement)
+                key=|local_placement| format!("{local_placement:?}")
                 children=move |local_placement| view! {
                     <button
-                        data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
+                        data-testid=format!("Placement{local_placement:?}").to_case(Case::Kebab)
                         style:background-color=move || if placement.get() == local_placement {
                             "black"
                         } else {
@@ -122,7 +122,7 @@ pub fn Flip() -> impl IntoView {
                         }
                         on:click=move |_| set_placement.set(local_placement)
                     >
-                        {format!("{:?}", local_placement).to_case(Case::Kebab)}
+                        {format!("{local_placement:?}").to_case(Case::Kebab)}
                     </button>
                 }
             />
@@ -132,7 +132,7 @@ pub fn Flip() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("mainAxis-{}", value)
@@ -143,7 +143,7 @@ pub fn Flip() -> impl IntoView {
                         }
                         on:click=move |_| set_main_axis.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
@@ -153,7 +153,7 @@ pub fn Flip() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("crossAxis-{}", value)
@@ -164,7 +164,7 @@ pub fn Flip() -> impl IntoView {
                         }
                         on:click=move |_| set_cross_axis.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
@@ -174,7 +174,7 @@ pub fn Flip() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [FallbackPlacements::None, FallbackPlacements::Empty, FallbackPlacements::All]
-                key=|value| format!("{:?}", value)
+                key=|value| format!("{value:?}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("fallbackPlacements-{}", match value {
@@ -192,7 +192,7 @@ pub fn Flip() -> impl IntoView {
                         {match value {
                             FallbackPlacements::None => "undefined".to_owned(),
                             FallbackPlacements::Empty => "[]".to_owned(),
-                            FallbackPlacements::All => format!("[{}]", ALL_PLACEMENTS.map(|p| format!("{:?}", p).to_case(Case::Kebab)).join(", ")),
+                            FallbackPlacements::All => format!("[{}]", ALL_PLACEMENTS.map(|p| format!("{p:?}").to_case(Case::Kebab)).join(", ")),
                         }}
                     </button>
                 }
@@ -203,10 +203,10 @@ pub fn Flip() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [FallbackStrategy::BestFit, FallbackStrategy::InitialPlacement]
-                key=|local_fallback_strategy| format!("{:?}", local_fallback_strategy)
+                key=|local_fallback_strategy| format!("{local_fallback_strategy:?}")
                 children=move |local_fallback_strategy| view! {
                     <button
-                        data-testid=format!("fallbackStrategy-{}", format!("{:?}", local_fallback_strategy).to_case(Case::Camel))
+                        data-testid=format!("fallbackStrategy-{}", format!("{local_fallback_strategy:?}").to_case(Case::Camel))
                         style:background-color=move || if fallback_strategy.get() == local_fallback_strategy {
                             "black"
                         } else {
@@ -214,7 +214,7 @@ pub fn Flip() -> impl IntoView {
                         }
                         on:click=move |_| set_fallback_strategy.set(local_fallback_strategy)
                     >
-                        {format!("{:?}", local_fallback_strategy).to_case(Case::Camel)}
+                        {format!("{local_fallback_strategy:?}").to_case(Case::Camel)}
                     </button>
                 }
             />
@@ -224,7 +224,7 @@ pub fn Flip() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("flipAlignment-{}", value)
@@ -235,7 +235,7 @@ pub fn Flip() -> impl IntoView {
                         }
                         on:click=move |_| set_flip_alignment.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
@@ -245,7 +245,7 @@ pub fn Flip() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("shift-{}", value)
@@ -256,7 +256,7 @@ pub fn Flip() -> impl IntoView {
                         }
                         on:click=move |_| set_add_shift.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
