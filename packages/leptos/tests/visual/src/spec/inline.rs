@@ -199,10 +199,10 @@ pub fn Inline() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_PLACEMENTS
-                key=|local_placement| format!("{:?}", local_placement)
+                key=|local_placement| format!("{local_placement:?}")
                 children=move |local_placement| view! {
                     <button
-                        data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
+                        data-testid=format!("Placement{local_placement:?}").to_case(Case::Kebab)
                         style:background-color=move || if placement.get() == local_placement {
                             "black"
                         } else {
@@ -210,7 +210,7 @@ pub fn Inline() -> impl IntoView {
                         }
                         on:click=move |_| set_placement.set(local_placement)
                     >
-                        {format!("{:?}", local_placement).to_case(Case::Kebab)}
+                        {format!("{local_placement:?}").to_case(Case::Kebab)}
                     </button>
                 }
             />
@@ -220,7 +220,7 @@ pub fn Inline() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("open-{}", value)
@@ -231,7 +231,7 @@ pub fn Inline() -> impl IntoView {
                         }
                         on:click=move |_| set_open.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
@@ -241,7 +241,7 @@ pub fn Inline() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [ConnectedStatus::One, ConnectedStatus::TwoDisjoined, ConnectedStatus::TwoJoined, ConnectedStatus::Three]
-                key=|value| format!("{:?}", value)
+                key=|value| format!("{value:?}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("connected-{}", match value {

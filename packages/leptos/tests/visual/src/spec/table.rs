@@ -102,7 +102,7 @@ pub fn Table() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("inside-{}", value)
@@ -113,7 +113,7 @@ pub fn Table() -> impl IntoView {
                         }
                         on:click=move |_| set_same_parent.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />
@@ -123,10 +123,10 @@ pub fn Table() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_NODES
-                key=|local_node| format!("{:?}", local_node)
+                key=|local_node| format!("{local_node:?}")
                 children=move |local_node| view! {
                     <button
-                        data-testid=move || format!("reference-{}", format!("{:?}", local_node).to_case(Case::Camel))
+                        data-testid=move || format!("reference-{}", format!("{local_node:?}").to_case(Case::Camel))
                         style:background-color=move || if node.get() == local_node {
                             "black"
                         } else {
@@ -134,7 +134,7 @@ pub fn Table() -> impl IntoView {
                         }
                         on:click=move |_| set_node.set(local_node)
                     >
-                        {format!("{:?}", local_node).to_case(Case::Camel)}
+                        {format!("{local_node:?}").to_case(Case::Camel)}
                     </button>
                 }
             />

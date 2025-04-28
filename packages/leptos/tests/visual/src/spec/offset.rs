@@ -123,7 +123,7 @@ pub fn Offset() -> impl IntoView {
                 key=|(name, _)| name.to_string()
                 children=move |(name, _)| view! {
                     <button
-                        data-testid=move || format!("offset-{}", name)
+                        data-testid=move || format!("offset-{name}")
                         style:background-color=move || if offset_options.get() == name {
                             "black"
                         } else {
@@ -141,10 +141,10 @@ pub fn Offset() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_PLACEMENTS
-                key=|local_placement| format!("{:?}", local_placement)
+                key=|local_placement| format!("{local_placement:?}")
                 children=move |local_placement| view! {
                     <button
-                        data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
+                        data-testid=format!("Placement{local_placement:?}").to_case(Case::Kebab)
                         style:background-color=move || if placement.get() == local_placement {
                             "black"
                         } else {
@@ -152,7 +152,7 @@ pub fn Offset() -> impl IntoView {
                         }
                         on:click=move |_| set_placement.set(local_placement)
                     >
-                        {format!("{:?}", local_placement).to_case(Case::Kebab)}
+                        {format!("{local_placement:?}").to_case(Case::Kebab)}
                     </button>
                 }
             />
@@ -162,7 +162,7 @@ pub fn Offset() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [true, false]
-                key=|value| format!("{}", value)
+                key=|value| format!("{value}")
                 children=move |value| view! {
                     <button
                         data-testid=format!("rtl-{}", value)
@@ -173,7 +173,7 @@ pub fn Offset() -> impl IntoView {
                         }
                         on:click=move |_| set_rtl.set(value)
                     >
-                        {format!("{}", value)}
+                        {format!("{value}")}
                     </button>
                 }
             />

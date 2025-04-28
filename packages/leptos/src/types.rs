@@ -202,14 +202,12 @@ impl Display for FloatingStyles {
             self.transform
                 .as_ref()
                 .map_or("".to_owned(), |transform| format!(
-                    " transform: {};",
-                    transform
+                    " transform: {transform};"
                 ),),
             self.will_change
                 .as_ref()
                 .map_or("".to_owned(), |will_change| format!(
-                    " will-change: {};",
-                    will_change
+                    " will-change: {will_change};"
                 ))
         )
     }

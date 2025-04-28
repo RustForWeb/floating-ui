@@ -72,7 +72,7 @@ pub fn Hide() -> impl IntoView {
 
                             floating
                                 .style()
-                                .set_property("max-height", &format!("{}px", available_height))
+                                .set_property("max-height", &format!("{available_height}px"))
                                 .expect("Style should be updated.");
                         }
                     } else {
@@ -323,10 +323,10 @@ pub fn Hide() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_PLACEMENTS
-                key=|local_placement| format!("{:?}", local_placement)
+                key=|local_placement| format!("{local_placement:?}")
                 children=move |local_placement| view! {
                     <button
-                        data-testid=format!("Placement{:?}", local_placement).to_case(Case::Kebab)
+                        data-testid=format!("Placement{local_placement:?}").to_case(Case::Kebab)
                         style:background-color=move || if placement.get() == local_placement {
                             "black"
                         } else {
@@ -334,7 +334,7 @@ pub fn Hide() -> impl IntoView {
                         }
                         on:click=move |_| set_placement.set(local_placement)
                     >
-                        {format!("{:?}", local_placement).to_case(Case::Kebab)}
+                        {format!("{local_placement:?}").to_case(Case::Kebab)}
                     </button>
                 }
             />
@@ -344,7 +344,7 @@ pub fn Hide() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ['a', 'b', 'c', 'd', 'e', 'f', 'g','h','i','j','k','l','m','n','o','p','q']
-                key=|local_hierarchy| format!("{:?}", local_hierarchy)
+                key=|local_hierarchy| format!("{local_hierarchy:?}")
                 children=move |local_hierarchy| view! {
                     <button
                         data-testid=format!("hierarchy-{}", local_hierarchy)

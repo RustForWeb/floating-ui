@@ -108,12 +108,12 @@ pub fn Relative() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_NODES
-                key=|local_node| format!("{:?}", local_node)
+                key=|local_node| format!("{local_node:?}")
                 children=move |local_node| view! {
                     <button
                         data-testid=move || format!("relative-{}", match local_node {
                             Node::None => "null".to_owned(),
-                            _ => format!("{:?}", local_node).to_case(Case::Camel)
+                            _ => format!("{local_node:?}").to_case(Case::Camel)
                         })
                         style:background-color=move || if node.get() == local_node {
                             "black"
@@ -122,7 +122,7 @@ pub fn Relative() -> impl IntoView {
                         }
                         on:click=move |_| set_node.set(local_node)
                     >
-                        {format!("{:?}", local_node).to_case(Case::Camel)}
+                        {format!("{local_node:?}").to_case(Case::Camel)}
                     </button>
                 }
             />
@@ -132,7 +132,7 @@ pub fn Relative() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| [0, 100]
-                key=|local_offset| format!("{:?}", local_offset)
+                key=|local_offset| format!("{local_offset:?}")
                 children=move |local_offset| {
                     view! {
                         <button

@@ -61,7 +61,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let upstream_config = read_config()?;
     let current_releases = &upstream_config.releases;
 
-    log::debug!("Current releases:\n{:#?}", current_releases);
+    log::debug!("Current releases:\n{current_releases:#?}");
 
     let new_releases = fetch_new_releases(current_releases).await?;
 
@@ -137,11 +137,11 @@ async fn fetch_new_releases(
 
             let tag_name = &release.tag_name["@floating-ui/".len()..];
             if let Some((package_name, package_version)) = tag_name.split_once('@') {
-                log::debug!("{} | {} {}", tag_name, package_name, package_version);
+                log::debug!("{tag_name} | {package_name} {package_version}");
 
                 let upstream_package = UpstreamPackage::from_str(package_name).ok();
                 if let Some(upstream_package) = upstream_package {
-                    log::debug!("Release for package {:?}.", upstream_package);
+                    log::debug!("Release for package {upstream_package:?}.");
 
                     if *releases_found_by_pacakge
                         .get(&upstream_package)
@@ -165,24 +165,22 @@ async fn fetch_new_releases(
                         .matches(&Version::parse(package_version)?)
                     {
                         log::debug!(
-                            "Not newer than current version {} <= {}.",
-                            package_version,
-                            current_version
+                            "Not newer than current version {package_version} <= {current_version}."
                         );
                         continue;
                     }
 
-                    log::debug!("Found new release {}.", package_version);
+                    log::debug!("Found new release {package_version}.");
                     releases_by_package
                         .entry(upstream_package)
                         .or_default()
                         .insert(0, release);
                 } else {
-                    log::debug!("Not a relevant package {}", package_name);
+                    log::debug!("Not a relevant package {package_name}");
                     continue;
                 }
             } else {
-                log::debug!("Not the correct version format {}.", tag_name);
+                log::debug!("Not the correct version format {tag_name}.");
                 continue;
             }
         }
@@ -197,16 +195,12 @@ async fn create_pull_request(
     current_version: &str,
     release: Release,
 ) -> Result<(), Box<dyn Error>> {
-    let current_tag = format!("@floating-ui/{}@{}", upstream_package, current_version);
+    let current_tag = format!("@floating-ui/{upstream_package}@{current_version}");
     let new_tag = release.tag_name;
     let (_, new_version) = new_tag.split_at(new_tag.rfind('@').expect("Tag should contain @.") + 1);
-    let directory = format!("packages/{}", upstream_package);
+    let directory = format!("packages/{upstream_package}");
 
-    log::debug!(
-        "Creating pull request for version {} of {}.",
-        new_version,
-        upstream_package
-    );
+    log::debug!("Creating pull request for version {new_version} of {upstream_package}.");
 
     let temp_dir = tempdir()?;
 
@@ -218,10 +212,10 @@ async fn create_pull_request(
         .status()?
         .exit_ok()?;
 
-    log::debug!("git diff {}..{} -- {}", current_tag, new_tag, directory);
+    log::debug!("git diff {current_tag}..{new_tag} -- {directory}");
     let output = Command::new("git")
         .arg("diff")
-        .arg(format!("{}..{}", current_tag, new_tag))
+        .arg(format!("{current_tag}..{new_tag}"))
         .arg("--")
         .arg(&directory)
         .current_dir(&temp_dir)
@@ -230,11 +224,10 @@ async fn create_pull_request(
 
     let diff = if diff.len() > 60_000 {
         format!(
-            "Diff is too big for GitHub pull request description.\n\n```sh\ngit clone https://github.com/floating-ui/floating-ui.git /tmp/floating-ui\n(cd /tmp/floating-ui && git diff {}..{} -- {})\nrm -rf /tmp/floating-ui\n```",
-            current_tag, new_tag, directory
+            "Diff is too big for GitHub pull request description.\n\n```sh\ngit clone https://github.com/floating-ui/floating-ui.git /tmp/floating-ui\n(cd /tmp/floating-ui && git diff {current_tag}..{new_tag} -- {directory})\nrm -rf /tmp/floating-ui\n```"
         )
     } else {
-        format!("```diff\n{}```", diff)
+        format!("```diff\n{diff}```")
     };
 
     let octocrab = octocrab::instance();
@@ -242,10 +235,10 @@ async fn create_pull_request(
 
     let main_ref = repo.get_ref(&Reference::Branch("main".to_owned())).await?;
 
-    let branch = format!("upstream/{}-{}", upstream_package, new_version);
+    let branch = format!("upstream/{upstream_package}-{new_version}");
     let branch_ref = repo.get_ref(&Reference::Branch(branch.clone())).await.ok();
     if branch_ref.is_some() {
-        log::debug!("Branch {} already exists.", branch);
+        log::debug!("Branch {branch} already exists.");
         return Ok(());
     }
 
@@ -264,7 +257,7 @@ async fn create_pull_request(
         .first()
         .expect("Content item should exist");
 
-    let message = format!("Update to upstream {}", new_tag);
+    let message = format!("Update to upstream {new_tag}");
     let author = CommitAuthor {
         name: env::var("GIT_USER_NAME")?,
         email: env::var("GIT_USER_EMAIL")?,
@@ -276,7 +269,7 @@ async fn create_pull_request(
         .releases
         .insert(upstream_package, new_version.into());
     let new_content = toml::to_string_pretty(&new_upstream_config)?;
-    log::debug!("Updating upstream.toml to:\n{}", new_content);
+    log::debug!("Updating upstream.toml to:\n{new_content}");
 
     repo.update_file(
         "upstream.toml",
@@ -291,10 +284,8 @@ async fn create_pull_request(
     .await?;
 
     let title = message;
-    let compare_url = format!(
-        "https://github.com/floating-ui/floating-ui/compare/{}...{}",
-        current_tag, new_tag
-    );
+    let compare_url =
+        format!("https://github.com/floating-ui/floating-ui/compare/{current_tag}...{new_tag}");
     let body = format!(
         "**Release**\n[{}]({})\n\n\
         **Diff for `{}`**\n<details>\n    <summary>Diff</summary>\n\n{}\n</details>\n\n\

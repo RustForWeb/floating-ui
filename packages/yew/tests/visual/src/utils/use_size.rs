@@ -27,7 +27,7 @@ pub fn use_size(initial_size: Option<i32>, key: Option<&'static str>) -> UseStat
 
     Reflect::set(
         &window().expect("Window should exist."),
-        &format!("__handleSizeChange_{}", key).into(),
+        &format!("__handleSizeChange_{key}").into(),
         &closure.into_js_value(),
     )
     .expect("Reflect set should be successful.");

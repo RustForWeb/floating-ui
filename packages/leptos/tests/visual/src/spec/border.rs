@@ -129,13 +129,13 @@ pub fn Border() -> impl IntoView {
         <div class="controls">
             <For
                 each=|| ALL_NODES
-                key=|local_node| format!("{:?}", local_node)
+                key=|local_node| format!("{local_node:?}")
                 children=move |local_node| view! {
                     <button
                         data-testid=move || format!("border-{}", match local_node {
                             Node::None => "null".to_owned(),
                             Node::ContentBox => "content-box".to_owned(),
-                            _ => format!("{:?}", local_node).to_case(Case::Camel)
+                            _ => format!("{local_node:?}").to_case(Case::Camel)
                         })
                         style:background-color=move || if node.get() == local_node {
                             "black"
@@ -144,7 +144,7 @@ pub fn Border() -> impl IntoView {
                         }
                         on:click=move |_| set_node.set(local_node)
                     >
-                        {format!("{:?}", local_node).to_case(Case::Camel)}
+                        {format!("{local_node:?}").to_case(Case::Camel)}
                     </button>
                 }
             />

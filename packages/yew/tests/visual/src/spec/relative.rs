@@ -125,7 +125,7 @@ pub fn Relative() -> Html {
                                 key={format!("{:?}", value)}
                                 data-testid={format!("relative-{}", match value {
                                     Node::None => "null".to_owned(),
-                                    _ => format!("{:?}", value).to_case(Case::Camel)
+                                    _ => format!("{value:?}").to_case(Case::Camel)
                                 })}
                                 style={if *node == value {
                                     "background-color: black;"
@@ -138,7 +138,7 @@ pub fn Relative() -> Html {
                                     move |_| node.set(value)
                                 })}
                             >
-                                {format!("{:?}", value).to_case(Case::Camel)}
+                                {format!("{value:?}").to_case(Case::Camel)}
                             </button>
                         }
                     }).collect::<Html>()
@@ -152,7 +152,7 @@ pub fn Relative() -> Html {
                         html! {
                             <button
                                 key={format!("{}", value)}
-                                data-testid={format!("offset-{}", value)}
+                                data-testid={format!("offset-{value}")}
                                 style={if *offset == value {
                                     "background-color: black;"
                                 } else {
