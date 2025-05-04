@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
-    FallbackStrategy, Flip, FlipOptions, MiddlewareVec, Placement, Shift, ShiftOptions,
-    UseFloatingOptions, UseFloatingReturn, use_floating,
+    Alignment, CrossAxis, FallbackStrategy, Flip, FlipOptions, MiddlewareVec, Placement, Shift,
+    ShiftOptions, UseFloatingOptions, UseFloatingReturn, use_floating,
 };
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;
@@ -26,11 +26,13 @@ pub fn Flip() -> impl IntoView {
 
     let (placement, set_placement) = signal(Placement::Bottom);
     let (main_axis, set_main_axis) = signal(true);
-    let (cross_axis, set_cross_axis) = signal(true);
+    let (cross_axis, set_cross_axis) = signal(CrossAxis::True);
     let (fallback_placements, set_fallback_placements) = signal(FallbackPlacements::None);
     let (fallback_strategy, set_fallback_strategy) = signal(FallbackStrategy::BestFit);
     let (flip_alignment, set_flip_alignment) = signal(true);
     let (add_shift, set_add_shift) = signal(false);
+    let (fallback_axis_side_direction, set_fallback_axis_side_direction) =
+        signal(None::<Alignment>);
 
     let UseFloatingReturn {
         x,
@@ -49,9 +51,10 @@ pub fn Flip() -> impl IntoView {
                     .main_axis(main_axis.get())
                     .cross_axis(cross_axis.get())
                     .fallback_strategy(fallback_strategy.get())
-                    .flip_alignment(flip_alignment.get());
+                    .flip_alignment(flip_alignment.get())
+                    .fallback_axis_side_direction(Alignment::End);
 
-                options = if add_shift.get() {
+                options = if add_shift.get() && fallback_axis_side_direction.get().is_none() {
                     options.fallback_placements(vec![Placement::Bottom])
                 } else {
                     match fallback_placements.get() {
@@ -100,7 +103,8 @@ pub fn Flip() -> impl IntoView {
                     style:position=move || format!("{:?}", strategy.get()).to_lowercase()
                     style:top=move || format!("{}px", y.get())
                     style:left=move || format!("{}px", x.get())
-                    style:width=move || if add_shift.get() { "400px" } else { Default::default() }
+                    style:width=move || if add_shift.get() { if fallback_axis_side_direction.get().is_none() { "400px" } else { "200px" } } else { Default::default() }
+                    style:height=move || if add_shift.get() { if fallback_axis_side_direction.get().is_none() { Default::default() } else { "50px" } } else { Default::default() }
                 >
                     Floating
                 </div>
@@ -152,11 +156,11 @@ pub fn Flip() -> impl IntoView {
         <h2>crossAxis</h2>
         <div class="controls">
             <For
-                each=|| [true, false]
-                key=|value| format!("{value}")
+                each=|| [CrossAxis::True, CrossAxis::False, CrossAxis::Alignment]
+                key=|value| format!("{value:?}")
                 children=move |value| view! {
                     <button
-                        data-testid=format!("crossAxis-{}", value)
+                        data-testid=format!("crossAxis-{}", format!("{value:?}").to_case(Case::Camel))
                         style:background-color=move || if cross_axis.get() == value {
                             "black"
                         } else {
@@ -164,7 +168,7 @@ pub fn Flip() -> impl IntoView {
                         }
                         on:click=move |_| set_cross_axis.set(value)
                     >
-                        {format!("{value}")}
+                        {format!("{value:?}").to_case(Case::Camel)}
                     </button>
                 }
             />
@@ -257,6 +261,35 @@ pub fn Flip() -> impl IntoView {
                         on:click=move |_| set_add_shift.set(value)
                     >
                         {format!("{value}")}
+                    </button>
+                }
+            />
+        </div>
+
+        <h2>fallbackAxisSideDirection</h2>
+        <div class="controls">
+            <For
+                each=|| [Some(Alignment::Start), Some(Alignment::End), None]
+                key=|value| format!("{value:?}")
+                children=move |value| view! {
+                    <button
+                        data-testid=format!("fallbackAxisSideDirection-{}", match value {
+                            Some(Alignment::Start) => "start",
+                            Some(Alignment::End) => "end",
+                            None => "none"
+                        })
+                        style:background-color=move || if fallback_axis_side_direction.get() == value {
+                            "black"
+                        } else {
+                            ""
+                        }
+                        on:click=move |_| set_fallback_axis_side_direction.set(value)
+                    >
+                        {match value {
+                            Some(Alignment::Start) => "start",
+                            Some(Alignment::End) => "end",
+                            None => "none"
+                        }}
                     </button>
                 }
             />

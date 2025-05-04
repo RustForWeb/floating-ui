@@ -16,6 +16,17 @@ use crate::{
 /// Name of the [`Flip`] middleware.
 pub const FLIP_NAME: &str = "flip";
 
+/// Cross axis option used by [`Flip`] middleware.
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum CrossAxis {
+    /// Whether to check cross axis overflow for both side and alignment flipping.
+    True,
+    /// Whether to disable all cross axis overflow checking.
+    False,
+    /// Whether to check cross axis overflow for alignment flipping only.
+    Alignment,
+}
+
 /// Fallback strategy used by [`Flip`] middleware.
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub enum FallbackStrategy {
@@ -38,9 +49,12 @@ pub struct FlipOptions<Element: Clone> {
     pub main_axis: Option<bool>,
 
     /// The axis that runs along the alignment of the floating element. Determines whether overflow along this axis is checked to perform a flip.
+    /// - [`CrossAxis::True`]: Whether to check cross axis overflow for both side and alignment flipping.
+    /// - [`CrossAxis::False`]: Whether to disable all cross axis overflow checking.
+    /// - [`CrossAxis::Alignment`]: Whether to check cross axis overflow for alignment flipping only.
     ///
     /// Defaults to `true`.
-    pub cross_axis: Option<bool>,
+    pub cross_axis: Option<CrossAxis>,
 
     /// Placements to try sequentially if the preferred `placement` does not fit.
     ///
@@ -77,7 +91,7 @@ impl<Element: Clone> FlipOptions<Element> {
     }
 
     /// Set `cross_axis` option.
-    pub fn cross_axis(mut self, value: bool) -> Self {
+    pub fn cross_axis(mut self, value: CrossAxis) -> Self {
         self.cross_axis = Some(value);
         self
     }
@@ -203,7 +217,7 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
         });
 
         let check_main_axis = options.main_axis.unwrap_or(true);
-        let check_cross_axis = options.cross_axis.unwrap_or(true);
+        let check_cross_axis = options.cross_axis.unwrap_or(CrossAxis::True);
         let specified_fallback_placements = options.fallback_placements.clone();
         let fallback_strategy = options.fallback_strategy.unwrap_or_default();
         let fallback_axis_side_direction = options.fallback_axis_side_direction;
@@ -264,7 +278,7 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
         if check_main_axis {
             overflows.push(overflow.side(side));
         }
-        if check_cross_axis {
+        if check_cross_axis == CrossAxis::True || check_cross_axis == CrossAxis::Alignment {
             let sides = get_alignment_sides(placement, rects, rtl);
             overflows.push(overflow.side(sides.0));
             overflows.push(overflow.side(sides.1));
@@ -281,22 +295,34 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
             let next_placement = placements.get(next_index);
 
             if let Some(next_placement) = next_placement {
-                // Try next placement and re-run the lifecycle.
-                return MiddlewareReturn {
-                    x: None,
-                    y: None,
-                    data: Some(
-                        serde_json::to_value(FlipData {
-                            index: next_index,
-                            overflows: overflows_data,
-                        })
-                        .expect("Data should be valid JSON."),
-                    ),
-                    reset: Some(Reset::Value(ResetValue {
-                        placement: Some(*next_placement),
-                        rects: None,
-                    })),
+                let ignore_cross_axis_overflow = if check_cross_axis == CrossAxis::Alignment {
+                    initial_side_axis != get_side_axis(*next_placement)
+                } else {
+                    false
                 };
+                let has_initial_main_axis_overflow = overflows_data
+                    .first()
+                    .and_then(|overflow| overflow.overflows.first())
+                    .is_some_and(|overflow| *overflow > 0.0);
+
+                if !ignore_cross_axis_overflow || has_initial_main_axis_overflow {
+                    // Try next placement and re-run the lifecycle.
+                    return MiddlewareReturn {
+                        x: None,
+                        y: None,
+                        data: Some(
+                            serde_json::to_value(FlipData {
+                                index: next_index,
+                                overflows: overflows_data,
+                            })
+                            .expect("Data should be valid JSON."),
+                        ),
+                        reset: Some(Reset::Value(ResetValue {
+                            placement: Some(*next_placement),
+                            rects: None,
+                        })),
+                    };
+                }
             }
 
             // First, find the candidates that fit on the main axis side of overflow, then find the placement that fits the best on the main cross axis side.
