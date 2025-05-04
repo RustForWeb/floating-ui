@@ -32,6 +32,12 @@ pub fn get_rect_relative_to_offset_parent(
     let mut scroll = NodeScroll::new(0.0);
     let mut offsets = Coords::new(0.0);
 
+    // If the <body> scrollbar appears on the left (e.g. RTL systems).
+    // Use Firefox with layout.scrollbar.side = 3 in about:config to test this.
+    let set_left_rtl_scrollbar_offset = |offsets: &mut Coords| {
+        offsets.x = get_window_scroll_bar_x(&document_element, None);
+    };
+
     #[allow(clippy::nonminimal_bool)]
     if is_offset_parent_an_element || (!is_offset_parent_an_element && !is_fixed) {
         if get_node_name((&offset_parent).into()) != "body"
@@ -52,11 +58,13 @@ pub fn get_rect_relative_to_offset_parent(
                 offsets.y = offset_rect.y + offset_parent.client_top() as f64;
             }
             DomElementOrWindow::Window(_) => {
-                // If the <body> scrollbar appears on the left (e.g. RTL systems).
-                // Use Firefox with layout.scrollbar.side = 3 in about:config to test this.
-                offsets.x = get_window_scroll_bar_x(&document_element, None);
+                set_left_rtl_scrollbar_offset(&mut offsets);
             }
         }
+    }
+
+    if is_fixed && !is_offset_parent_an_element {
+        set_left_rtl_scrollbar_offset(&mut offsets);
     }
 
     let html_offset = if !is_offset_parent_an_element && !is_fixed {
