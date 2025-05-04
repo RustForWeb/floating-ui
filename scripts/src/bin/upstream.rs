@@ -257,7 +257,7 @@ async fn create_pull_request(
         .first()
         .expect("Content item should exist");
 
-    let message = format!("Update to upstream {new_tag}");
+    let message = format!("feat: update to upstream {new_tag}");
     let author = CommitAuthor {
         name: env::var("GIT_USER_NAME")?,
         email: env::var("GIT_USER_EMAIL")?,
