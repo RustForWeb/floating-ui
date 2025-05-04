@@ -6,9 +6,9 @@ use web_sys::{Element, Window};
 
 pub use floating_ui_core::middleware::{
     ARROW_NAME, AUTO_PLACEMENT_NAME, ApplyState, ArrowData, ArrowOptions, AutoPlacementData,
-    AutoPlacementDataOverflow, AutoPlacementOptions, DefaultLimiter, FLIP_NAME, FallbackStrategy,
-    FlipData, FlipDataOverflow, FlipOptions, HIDE_NAME, HideData, HideOptions, HideStrategy,
-    INLINE_NAME, InlineOptions, LimitShift, LimitShiftOffset, LimitShiftOffsetValues,
+    AutoPlacementDataOverflow, AutoPlacementOptions, CrossAxis, DefaultLimiter, FLIP_NAME,
+    FallbackStrategy, FlipData, FlipDataOverflow, FlipOptions, HIDE_NAME, HideData, HideOptions,
+    HideStrategy, INLINE_NAME, InlineOptions, LimitShift, LimitShiftOffset, LimitShiftOffsetValues,
     LimitShiftOptions, OFFSET_NAME, OffsetData, OffsetOptions, OffsetOptionsValues, SHIFT_NAME,
     SIZE_NAME, ShiftData, ShiftOptions, SizeOptions,
 };
