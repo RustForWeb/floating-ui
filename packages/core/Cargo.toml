@@ -12,6 +12,6 @@ version.workspace = true
 [dependencies]
 dyn_derive.workspace = true
 dyn_std.workspace = true
-floating-ui-utils = { path = "../utils", version = "0.3.0" }
+floating-ui-utils.workspace = true
 serde.workspace = true
 serde_json.workspace = true

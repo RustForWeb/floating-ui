@@ -12,7 +12,7 @@ version.workspace = true
 [dependencies]
 console_error_panic_hook.workspace = true
 console_log.workspace = true
-floating-ui-leptos = { path = ".." }
+floating-ui-leptos.workspace = true
 leptos = { workspace = true, features = ["csr"] }
 leptos-node-ref.workspace = true
 log.workspace = true
