@@ -59,6 +59,9 @@ jobs:
                   message: ${{ steps.extract-version.outputs.VERSION }}
                   token: ${{ steps.app-token.outputs.token }}
 
+            - name: Reset and pull
+              run: git reset --hard && git pull
+
             - name: Tag
               uses: bruno-fs/repo-tagger@1.0.0
               with:
