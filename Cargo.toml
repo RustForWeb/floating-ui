@@ -13,7 +13,7 @@ authors = ["Rust For Web <info@rustforweb.org>"]
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/RustForWeb/floating-ui"
-version = "0.3.1"
+version = "0.4.0"
 
 [workspace.dependencies]
 cfg-if = "1.0.0"
@@ -21,11 +21,11 @@ console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
 dyn_derive = "0.3.4"
 dyn_std = "0.3.3"
-floating-ui-core = { path = "./packages/core", version = "0.3.1" }
-floating-ui-dom = { path = "./packages/dom", version = "0.3.1" }
-floating-ui-leptos = { path = "./packages/leptos", version = "0.3.1" }
-floating-ui-utils = { path = "./packages/utils", version = "0.3.1" }
-floating-ui-yew = { path = "./packages/yew", version = "0.3.1" }
+floating-ui-core = { path = "./packages/core", version = "0.4.0" }
+floating-ui-dom = { path = "./packages/dom", version = "0.4.0" }
+floating-ui-leptos = { path = "./packages/leptos", version = "0.4.0" }
+floating-ui-utils = { path = "./packages/utils", version = "0.4.0" }
+floating-ui-yew = { path = "./packages/yew", version = "0.4.0" }
 leptos = "0.8.0"
 leptos_router = "0.8.0"
 leptos-node-ref = "0.2.0"
