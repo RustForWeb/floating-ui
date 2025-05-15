@@ -14,8 +14,8 @@ This is the library to use Floating UI with Yew.
 
 See [the Rust Floating UI book](https://floating-ui.rustforweb.org/) for documentation.
 
-## Rust For Web
+## Rust for Web
 
-The Rust Floating UI project is part of [Rust For Web](https://github.com/RustForWeb).
+The Rust Floating UI project is part of [Rust for Web](https://github.com/RustForWeb).
 
-[Rust For Web](https://github.com/RustForWeb) creates and ports web UI libraries for Rust. All projects are free and open source.
+[Rust for Web](https://github.com/RustForWeb) creates and ports web UI libraries for Rust. All projects are free and open source.

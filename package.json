@@ -1,7 +1,7 @@
 {
     "name": "@rustforweb/floating-ui",
     "description": "Rust port of Floating UI.",
-    "author": "Rust For Web <info@rustforweb.org>",
+    "author": "Rust for Web <info@rustforweb.org>",
     "repository": "github:RustForWeb/floating-ui",
     "license": "MIT",
     "private": true,
