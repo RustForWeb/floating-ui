@@ -186,21 +186,21 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
 
         let get_bounding_client_rect = move || {
             // There are two rects and they are disjoined.
-            if client_rects.len() == 2 && client_rects[0].left > client_rects[1].right {
-                if let Some(x) = options.x {
-                    if let Some(y) = options.y {
-                        return client_rects
-                            .clone()
-                            .into_iter()
-                            .find(|rect| {
-                                x > rect.left - padding_object.left
-                                    && x < rect.right + padding_object.right
-                                    && y > rect.top - padding_object.top
-                                    && rect.y < rect.bottom + padding_object.bottom
-                            })
-                            .unwrap_or(fallback.clone());
-                    }
-                }
+            if client_rects.len() == 2
+                && client_rects[0].left > client_rects[1].right
+                && let Some(x) = options.x
+                && let Some(y) = options.y
+            {
+                return client_rects
+                    .clone()
+                    .into_iter()
+                    .find(|rect| {
+                        x > rect.left - padding_object.left
+                            && x < rect.right + padding_object.right
+                            && y > rect.top - padding_object.top
+                            && rect.y < rect.bottom + padding_object.bottom
+                    })
+                    .unwrap_or(fallback.clone());
             }
 
             // There are 2 or more connected rects.

@@ -391,10 +391,10 @@ pub fn get_overflow_ancestors(
             list.push(OverflowAncestor::Element(scrollable_ancestor.into()));
         }
 
-        if let Some(frame_element) = frame_element {
-            if traverse_iframe {
-                list.append(&mut get_overflow_ancestors(&frame_element, vec![], true))
-            }
+        if let Some(frame_element) = frame_element
+            && traverse_iframe
+        {
+            list.append(&mut get_overflow_ancestors(&frame_element, vec![], true))
         }
 
         list

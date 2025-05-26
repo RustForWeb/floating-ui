@@ -62,43 +62,43 @@ pub fn AutoUpdate() -> impl IntoView {
         let update = update.clone();
 
         move |_| {
-            if let Some(reference) = reference_ref.get() {
-                if let Some(floating) = floating_ref.get() {
-                    if let Some(cleanup) = &*cleanup.read_value() {
-                        cleanup();
-                    }
-
-                    let size_factor = match layout_shift.get() {
-                        LayoutShift::Move => 0.9,
-                        _ => 1.0,
-                    };
-
-                    // Match React test behaviour by moving the size change from style attributes to here.
-                    // The style attributes update after this effect, so `auto_update` would not use the correct size.
-                    let style = reference.unchecked_ref::<web_sys::HtmlElement>().style();
-
-                    style
-                        .set_property(
-                            "width",
-                            &format!("{}px", reference_size.get() as f64 * size_factor),
-                        )
-                        .expect("Style should be updated.");
-                    style
-                        .set_property(
-                            "height",
-                            &format!("{}px", reference_size.get() as f64 * size_factor),
-                        )
-                        .expect("Style should be updated.");
-
-                    cleanup.set_value(Some(SendWrapper::new(auto_update(
-                        (&reference).into(),
-                        &floating,
-                        (*update).clone(),
-                        options
-                            .get()
-                            .layout_shift(layout_shift.get() != LayoutShift::None),
-                    ))));
+            if let Some(reference) = reference_ref.get()
+                && let Some(floating) = floating_ref.get()
+            {
+                if let Some(cleanup) = &*cleanup.read_value() {
+                    cleanup();
                 }
+
+                let size_factor = match layout_shift.get() {
+                    LayoutShift::Move => 0.9,
+                    _ => 1.0,
+                };
+
+                // Match React test behaviour by moving the size change from style attributes to here.
+                // The style attributes update after this effect, so `auto_update` would not use the correct size.
+                let style = reference.unchecked_ref::<web_sys::HtmlElement>().style();
+
+                style
+                    .set_property(
+                        "width",
+                        &format!("{}px", reference_size.get() as f64 * size_factor),
+                    )
+                    .expect("Style should be updated.");
+                style
+                    .set_property(
+                        "height",
+                        &format!("{}px", reference_size.get() as f64 * size_factor),
+                    )
+                    .expect("Style should be updated.");
+
+                cleanup.set_value(Some(SendWrapper::new(auto_update(
+                    (&reference).into(),
+                    &floating,
+                    (*update).clone(),
+                    options
+                        .get()
+                        .layout_shift(layout_shift.get() != LayoutShift::None),
+                ))));
             }
         }
     });

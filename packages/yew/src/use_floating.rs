@@ -148,34 +148,34 @@ pub fn use_floating(
                 middleware_data,
                 is_positioned,
             )| {
-                if let Some(reference_element) = reference.get() {
-                    if let Some(floating_element) = floating.get() {
-                        let config = ComputePositionConfig {
-                            placement: Some(**placement_option),
-                            strategy: Some(**strategy_option),
-                            middleware: Some((**middleware_option).clone()),
-                        };
+                if let Some(reference_element) = reference.get()
+                    && let Some(floating_element) = floating.get()
+                {
+                    let config = ComputePositionConfig {
+                        placement: Some(**placement_option),
+                        strategy: Some(**strategy_option),
+                        middleware: Some((**middleware_option).clone()),
+                    };
 
-                        let open = *open_option;
+                    let open = *open_option;
 
-                        let position = compute_position(
-                            (&reference_element).into(),
-                            floating_element
-                                .dyn_ref()
-                                .expect("Floating element should be an Element."),
-                            config,
-                        );
-                        x.set(position.x);
-                        y.set(position.y);
-                        strategy.set(position.strategy);
-                        placement.set(position.placement);
-                        middleware_data.set(position.middleware_data);
-                        // The floating element's position may be recomputed while it's closed
-                        // but still mounted (such as when transitioning out). To ensure
-                        // `is_positioned` will be `false` initially on the next open,
-                        // avoid setting it to `true` when `open === false` (must be specified).
-                        is_positioned.set(open);
-                    }
+                    let position = compute_position(
+                        (&reference_element).into(),
+                        floating_element
+                            .dyn_ref()
+                            .expect("Floating element should be an Element."),
+                        config,
+                    );
+                    x.set(position.x);
+                    y.set(position.y);
+                    strategy.set(position.strategy);
+                    placement.set(position.placement);
+                    middleware_data.set(position.middleware_data);
+                    // The floating element's position may be recomputed while it's closed
+                    // but still mounted (such as when transitioning out). To ensure
+                    // `is_positioned` will be `false` initially on the next open,
+                    // avoid setting it to `true` when `open === false` (must be specified).
+                    is_positioned.set(open);
                 }
             }
         },
@@ -215,24 +215,24 @@ pub fn use_floating(
                 cleanup.emit(());
 
                 if let Some(while_elements_mounted) = while_elements_mounted_option {
-                    if let Some(reference_element) = reference.get() {
-                        if let Some(floating_element) = floating.get() {
-                            while_elements_mounted_cleanup.replace(Some(ShallowRc::from(
-                                (**while_elements_mounted)(
-                                    (&reference_element).into(),
-                                    floating_element
-                                        .dyn_ref()
-                                        .expect("Floating element should be an Element."),
-                                    Rc::new({
-                                        let update = update.clone();
+                    if let Some(reference_element) = reference.get()
+                        && let Some(floating_element) = floating.get()
+                    {
+                        while_elements_mounted_cleanup.replace(Some(ShallowRc::from(
+                            (**while_elements_mounted)(
+                                (&reference_element).into(),
+                                floating_element
+                                    .dyn_ref()
+                                    .expect("Floating element should be an Element."),
+                                Rc::new({
+                                    let update = update.clone();
 
-                                        move || {
-                                            update.emit(());
-                                        }
-                                    }),
-                                ),
-                            )));
-                        }
+                                    move || {
+                                        update.emit(());
+                                    }
+                                }),
+                            ),
+                        )));
                     }
                 } else {
                     update.emit(());
