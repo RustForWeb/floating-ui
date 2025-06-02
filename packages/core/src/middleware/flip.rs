@@ -300,12 +300,14 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
                 } else {
                     false
                 };
-                let has_initial_main_axis_overflow = overflows_data
-                    .first()
-                    .and_then(|overflow| overflow.overflows.first())
-                    .is_some_and(|overflow| *overflow > 0.0);
 
-                if !ignore_cross_axis_overflow || has_initial_main_axis_overflow {
+                if !ignore_cross_axis_overflow ||
+                    // We leave the current main axis only if every placement on that axis overflows the main axis.
+                    overflows_data.iter().all(|d| {
+                        d.overflows.first().is_some_and(|overflow| *overflow > 0.0)
+                            && get_side_axis(d.placement) == initial_side_axis
+                    })
+                {
                     // Try next placement and re-run the lifecycle.
                     return MiddlewareReturn {
                         x: None,
