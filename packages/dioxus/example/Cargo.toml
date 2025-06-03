@@ -1,0 +1,19 @@
+[package]
+name = "floating-ui-dioxus-example"
+description = "Example for Floating UI Dioxus."
+publish = false
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+console_error_panic_hook.workspace = true
+console_log.workspace = true
+dioxus.workspace = true
+floating-ui-dioxus.workspace = true
+log.workspace = true
+wasm-bindgen.workspace = true
+web-sys.workspace = true

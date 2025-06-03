@@ -19,9 +19,11 @@ version = "0.4.1"
 cfg-if = "1.0.0"
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
+dioxus = "0.6.3"
 dyn_derive = "0.3.4"
 dyn_std = "0.3.3"
 floating-ui-core = { path = "./packages/core", version = "0.4.0" }
+floating-ui-dioxus = { path = "./packages/dioxus", version = "0.4.0" }
 floating-ui-dom = { path = "./packages/dom", version = "0.4.0" }
 floating-ui-leptos = { path = "./packages/leptos", version = "0.4.0" }
 floating-ui-utils = { path = "./packages/utils", version = "0.4.0" }

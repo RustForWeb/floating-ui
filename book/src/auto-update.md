@@ -67,6 +67,27 @@ cleanup();
 ```
 
 {{#endtab }}
+{{#tab name="Dioxus" }}
+
+If you're conditionally rendering the floating element (recommended), use the `while_elements_mounted` option:
+
+```rust,ignore
+use floating_ui_dioxus::{use_auto_update, use_floating, UseFloatingOptions};
+
+let auto_update = use_auto_update();
+
+use_floating(
+    reference_el,
+    floating_el,
+    UseFloatingOptions::default().while_elements_mounted((*(auto_update())).clone()),
+);
+```
+
+`while_elements_mounted` automatically handles calling and cleaning up `auto_update` based on the presence of the reference and floating element.
+
+See the documentation on [docs.rs](https://docs.rs/floating-ui-dioxus/latest/floating_ui_dioxus/#functions) for all alternatives of the `use_auto_update` hook.
+
+{{#endtab }}
 {{#tab name="Leptos" }}
 
 If you're conditionally rendering the floating element (recommended), use the `while_elements_mounted` option:

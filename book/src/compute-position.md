@@ -25,6 +25,17 @@ use floating_ui_dom::compute_position;
 -   [View source](https://github.com/RustForWeb/floating-ui/tree/main/packages/dom)
 
 {{#endtab }}
+{{#tab name="Dioxus" }}
+
+<div class="warning">
+
+**Non-framework API**
+
+[`use_floating()`](./frameworks/dioxus.md) should be used instead with a framework. If you are using a base package, change the package with the package switcher above.
+
+</div>
+
+{{#endtab }}
 {{#tab name="Leptos" }}
 
 <div class="warning">
@@ -192,6 +203,17 @@ let cleanup = auto_update(reference_el, floating_el, Rc::new(|| {
 // ...later, when it's removed from the DOM:
 cleanup();
 ```
+
+{{#endtab }}
+{{#tab name="Dioxus" }}
+
+<div class="warning">
+
+**Non-framework API**
+
+[`use_floating()`](./frameworks/leptos.md) should be used instead with a framework. If you are using a base package, change the package with the package switcher above.
+
+</div>
 
 {{#endtab }}
 {{#tab name="Leptos" }}
