@@ -27,8 +27,8 @@ pub fn Scrollbars() -> impl IntoView {
         reference_ref,
         floating_ref,
         UseFloatingOptions::default()
-            .placement(placement.into())
-            .middleware(SendWrapper::new(middleware).into())
+            .placement(placement)
+            .middleware(SendWrapper::new(middleware))
             .while_elements_mounted_auto_update(),
     );
 

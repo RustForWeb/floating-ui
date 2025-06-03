@@ -33,9 +33,9 @@ pub fn App() -> impl IntoView {
         reference_ref,
         floating_ref,
         UseFloatingOptions::default()
-            .open(open.into())
-            .placement(Placement::Top.into())
-            .middleware(SendWrapper::new(middleware).into())
+            .open(open)
+            .placement(Placement::Top)
+            .middleware(SendWrapper::new(middleware))
             .while_elements_mounted_auto_update(),
     );
 

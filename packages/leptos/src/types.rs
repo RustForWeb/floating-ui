@@ -51,41 +51,41 @@ pub struct UseFloatingOptions {
 
 impl UseFloatingOptions {
     /// Set `open` option.
-    pub fn open(mut self, value: MaybeProp<bool>) -> Self {
-        self.open = value;
+    pub fn open<I: Into<MaybeProp<bool>>>(mut self, value: I) -> Self {
+        self.open = value.into();
         self
     }
 
     /// Set `placement` option.
-    pub fn placement(mut self, value: MaybeProp<Placement>) -> Self {
-        self.placement = value;
+    pub fn placement<I: Into<MaybeProp<Placement>>>(mut self, value: I) -> Self {
+        self.placement = value.into();
         self
     }
 
     /// Set `strategy` option.
-    pub fn strategy(mut self, value: MaybeProp<Strategy>) -> Self {
-        self.strategy = value;
+    pub fn strategy<I: Into<MaybeProp<Strategy>>>(mut self, value: I) -> Self {
+        self.strategy = value.into();
         self
     }
 
     /// Set `middleware` option.
-    pub fn middleware(mut self, value: MaybeProp<WrappedMiddleware>) -> Self {
-        self.middleware = value;
+    pub fn middleware<I: Into<MaybeProp<WrappedMiddleware>>>(mut self, value: I) -> Self {
+        self.middleware = value.into();
         self
     }
 
     /// Set `transform` option.
-    pub fn transform(mut self, value: MaybeProp<bool>) -> Self {
-        self.transform = value;
+    pub fn transform<I: Into<MaybeProp<bool>>>(mut self, value: I) -> Self {
+        self.transform = value.into();
         self
     }
 
     /// Set `while_elements_mounted` option.
-    pub fn while_elements_mounted(
+    pub fn while_elements_mounted<I: Into<MaybeProp<SendWrapper<Rc<WhileElementsMountedFn>>>>>(
         mut self,
-        value: MaybeProp<SendWrapper<Rc<WhileElementsMountedFn>>>,
+        value: I,
     ) -> Self {
-        self.while_elements_mounted = value;
+        self.while_elements_mounted = value.into();
         self
     }
 
@@ -95,7 +95,7 @@ impl UseFloatingOptions {
             SendWrapper::new(Rc::new(|reference, floating, update| {
                 auto_update(reference, floating, update, AutoUpdateOptions::default())
             }));
-        self.while_elements_mounted(auto_update_rc.into())
+        self.while_elements_mounted(auto_update_rc)
     }
 
     /// Set `while_elements_mounted` option to [`auto_update`] with [`AutoUpdateOptions::default`] when `enabled` is `true`.

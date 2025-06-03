@@ -34,7 +34,7 @@ pub fn Hide() -> impl IntoView {
         reference_ref,
         floating_ref,
         UseFloatingOptions::default()
-            .placement(placement.into())
+            .placement(placement)
             .strategy(MaybeProp::derive(move || {
                 Some(if is_fixed_strategy() {
                     Strategy::Fixed

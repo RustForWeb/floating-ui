@@ -19,7 +19,7 @@ pub fn ContainingBlock() -> impl IntoView {
         reference_ref,
         floating_ref,
         UseFloatingOptions::default()
-            .strategy(Strategy::Absolute.into())
+            .strategy(Strategy::Absolute)
             .while_elements_mounted_auto_update(),
     );
 

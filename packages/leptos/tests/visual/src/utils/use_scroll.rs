@@ -59,9 +59,9 @@ pub fn use_scroll(
         reference_ref,
         indicator_floating_ref,
         UseFloatingOptions::default()
-            .strategy(Strategy::Fixed.into())
-            .placement(Placement::Top.into())
-            .middleware(SendWrapper::new(middleware).into()),
+            .strategy(Strategy::Fixed)
+            .placement(Placement::Top)
+            .middleware(SendWrapper::new(middleware)),
     );
     let indicator_update_rc = Rc::new(indicator_update);
 

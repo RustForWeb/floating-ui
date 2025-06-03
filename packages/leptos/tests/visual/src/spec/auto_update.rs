@@ -51,7 +51,7 @@ pub fn AutoUpdate() -> impl IntoView {
         reference_ref,
         floating_ref,
         UseFloatingOptions::default()
-            .strategy(Strategy::Fixed.into())
+            .strategy(Strategy::Fixed)
             .while_elements_mounted_auto_update_with_enabled(while_elements_mounted.into()),
     );
 

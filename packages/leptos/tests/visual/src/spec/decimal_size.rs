@@ -44,7 +44,7 @@ pub fn DecimalSize() -> impl IntoView {
     } = use_floating(
         reference_ref,
         floating_ref,
-        UseFloatingOptions::default().middleware(SendWrapper::new(middleware).into()),
+        UseFloatingOptions::default().middleware(SendWrapper::new(middleware)),
     );
 
     Effect::new(move || {
