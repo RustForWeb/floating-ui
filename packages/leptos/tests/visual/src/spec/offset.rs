@@ -79,7 +79,7 @@ pub fn Offset() -> impl IntoView {
         reference_ref,
         floating_ref,
         UseFloatingOptions::default()
-            .placement(placement.into())
+            .placement(placement)
             .while_elements_mounted_auto_update()
             .middleware(MaybeProp::derive(move || {
                 let options = values()

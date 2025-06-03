@@ -39,7 +39,7 @@ pub fn VirtualElement() -> impl IntoView {
         virtual_element,
         floating_ref,
         UseFloatingOptions::default()
-            .strategy(Strategy::Fixed.into())
+            .strategy(Strategy::Fixed)
             .while_elements_mounted_auto_update(),
     );
 

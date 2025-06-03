@@ -32,7 +32,7 @@ pub fn Scroll() -> impl IntoView {
     let UseFloatingReturn { x, y, update, .. } = use_floating(
         reference_ref,
         floating_ref,
-        UseFloatingOptions::default().strategy(strategy.into()),
+        UseFloatingOptions::default().strategy(strategy),
     );
 
     let UseScrollReturn {

@@ -83,7 +83,7 @@ pub fn Transform() -> impl IntoView {
         reference_signal,
         floating_ref,
         UseFloatingOptions::default()
-            .middleware(SendWrapper::new(middleware).into())
+            .middleware(SendWrapper::new(middleware))
             .while_elements_mounted_auto_update(),
     );
 
