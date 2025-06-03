@@ -1,0 +1,20 @@
+[package]
+name = "floating-ui-dioxus"
+description = "Floating UI for Dioxus."
+homepage = "https://floating-ui.rustforweb.org/frameworks/dioxus.html"
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+dyn_derive.workspace = true
+dyn_std.workspace = true
+floating-ui-dom.workspace = true
+dioxus = { workspace = true, features = ["web"] }
+web-sys.workspace = true
+
+[dev-dependencies]
+wasm-bindgen-test.workspace = true

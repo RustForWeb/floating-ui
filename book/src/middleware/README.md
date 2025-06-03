@@ -35,6 +35,19 @@ compute_position(
 ```
 
 {{#endtab }}
+{{#tab name="Dioxus" }}
+
+```rust,ignore
+use_floating(
+    reference_el,
+    floating_el,
+    UseFloatingOptions::default()
+        .position(Placement::Right)
+        .middleware(vec![]),
+);
+```
+
+{{#endtab }}
 {{#tab name="Leptos" }}
 
 ```rust,ignore
@@ -122,6 +135,21 @@ compute_position(
     reference_el,
     floating_el,
     ComputePositionConfig::default()
+        .position(Placement::Right)
+        .middleware(vec![
+            Box::new(ShiftByOnePixel::new())
+        ]),
+);
+```
+
+{{#endtab }}
+{{#tab name="Dioxus" }}
+
+```rust,ignore
+use_floating(
+    reference_el,
+    floating_el,
+    UseFloatingOptions::default()
         .position(Placement::Right)
         .middleware(vec![
             Box::new(ShiftByOnePixel::new())
@@ -250,6 +278,28 @@ let ComputePositionReturn {
     reference_el,
     floating_el,
     ComputePositionConfig::default()
+        .position(Placement::Right)
+        .middleware(vec![
+            Box::new(ShiftByOnePixel::new())
+        ]),
+);
+
+if let Some(data) = middleware_data.get_as::<ShiftByOnePixelData>(SHIFT_BY_ONE_PIXEL_NAME) {
+    log::info!("{:#?}", data);
+}
+```
+
+{{#endtab }}
+{{#tab name="Dioxus" }}
+
+```rust,ignore
+let UseFloatingReturn {
+    middleware_data,
+    ..
+} = use_floating(
+    reference_el,
+    floating_el,
+    UseFloatingOptions::default()
         .position(Placement::Right)
         .middleware(vec![
             Box::new(ShiftByOnePixel::new())

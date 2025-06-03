@@ -43,6 +43,22 @@ compute_position(
 ```
 
 {{#endtab }}
+{{#tab name="Dioxus" }}
+
+```rust,ignore
+use floating_ui_dioxus::{use_floating, Shift, ShiftOptions, UseFloatingOptions};
+
+use_floating(
+    reference_el,
+    floating_el,
+    UseFloatingOptions::default()
+        .middleware(vec![
+            Box::new(Shift::new(ShiftOptions::default())),
+        ]),
+);
+```
+
+{{#endtab }}
 {{#tab name="Leptos" }}
 
 ```rust,ignore

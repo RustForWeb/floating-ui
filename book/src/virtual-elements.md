@@ -41,6 +41,13 @@ compute_position(virtual_el.into(), floating_el, ComputePositionConfig::default(
 ```
 
 {{#endtab }}
+{{#tab name="Dioxus" }}
+
+```rust,ignore
+use_floating(virtual_el.into(), floating_el, UseFloatingOptions::default())
+```
+
+{{#endtab }}
 {{#tab name="Leptos" }}
 
 ```rust,ignore

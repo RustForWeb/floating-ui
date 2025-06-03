@@ -44,6 +44,22 @@ compute_position(
 ```
 
 {{#endtab }}
+{{#tab name="Dioxys" }}
+
+```rust,ignore
+use floating_ui_dioxus::{use_floating, Offset, OffsetOptions, UseFloatingOptions};
+
+use_floating(
+    reference_el,
+    floating_el,
+    UseFloatingOptions::default()
+        .middleware(vec![
+            Box::new(Offset::new(OffsetOptions::default())),
+        ]),
+);
+```
+
+{{#endtab }}
 {{#tab name="Leptos" }}
 
 ```rust,ignore

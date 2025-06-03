@@ -19,6 +19,7 @@
 -   [Platform](./platform.md)
 -   [Frameworks](./frameworks/README.md)
     -   [DOM](./frameworks/dom.md)
+    -   [Dioxus](./frameworks/dioxus.md)
     -   [Leptos](./frameworks/leptos.md)
     -   [Yew](./frameworks/yew.md)
 -   [Contributing]()
