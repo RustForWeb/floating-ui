@@ -44,7 +44,7 @@ compute_position(
 ```
 
 {{#endtab }}
-{{#tab name="Dioxys" }}
+{{#tab name="Dioxus" }}
 
 ```rust,ignore
 use floating_ui_dioxus::{use_floating, Offset, OffsetOptions, UseFloatingOptions};
