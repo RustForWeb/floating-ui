@@ -219,7 +219,7 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
 impl<Element: Clone, Window: Clone> MiddlewareWithOptions<Element, Window, ArrowOptions<Element>>
     for Arrow<'_, Element, Window>
 {
-    fn options(&self) -> &Derivable<Element, Window, ArrowOptions<Element>> {
+    fn options(&self) -> &Derivable<'_, Element, Window, ArrowOptions<Element>> {
         &self.options
     }
 }

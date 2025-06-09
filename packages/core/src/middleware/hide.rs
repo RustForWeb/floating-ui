@@ -203,7 +203,7 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
 impl<Element: Clone, Window: Clone> MiddlewareWithOptions<Element, Window, HideOptions<Element>>
     for Hide<'_, Element, Window>
 {
-    fn options(&self) -> &Derivable<Element, Window, HideOptions<Element>> {
+    fn options(&self) -> &Derivable<'_, Element, Window, HideOptions<Element>> {
         &self.options
     }
 }

@@ -372,7 +372,7 @@ impl<Element: Clone, Window: Clone>
     MiddlewareWithOptions<Element, Window, AutoPlacementOptions<Element>>
     for AutoPlacement<'_, Element, Window>
 {
-    fn options(&self) -> &Derivable<Element, Window, AutoPlacementOptions<Element>> {
+    fn options(&self) -> &Derivable<'_, Element, Window, AutoPlacementOptions<Element>> {
         &self.options
     }
 }
