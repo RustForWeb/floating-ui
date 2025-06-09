@@ -269,7 +269,7 @@ impl<'a, Element: Clone, Window: Clone>
     MiddlewareWithOptions<Element, Window, SizeOptions<'a, Element, Window>>
     for Size<'a, Element, Window>
 {
-    fn options(&self) -> &Derivable<Element, Window, SizeOptions<'a, Element, Window>> {
+    fn options(&self) -> &Derivable<'_, Element, Window, SizeOptions<'a, Element, Window>> {
         &self.options
     }
 }

@@ -317,7 +317,7 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
 impl<Element: Clone, Window: Clone> MiddlewareWithOptions<Element, Window, InlineOptions>
     for Inline<'_, Element, Window>
 {
-    fn options(&self) -> &Derivable<Element, Window, InlineOptions> {
+    fn options(&self) -> &Derivable<'_, Element, Window, InlineOptions> {
         &self.options
     }
 }

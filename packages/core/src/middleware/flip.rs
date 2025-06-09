@@ -402,7 +402,7 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
 impl<Element: Clone, Window: Clone> MiddlewareWithOptions<Element, Window, FlipOptions<Element>>
     for Flip<'_, Element, Window>
 {
-    fn options(&self) -> &Derivable<Element, Window, FlipOptions<Element>> {
+    fn options(&self) -> &Derivable<'_, Element, Window, FlipOptions<Element>> {
         &self.options
     }
 }

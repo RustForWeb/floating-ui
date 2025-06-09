@@ -252,7 +252,7 @@ impl<Element: Clone, Window: Clone>
     MiddlewareWithOptions<Element, Window, ShiftOptions<Element, Window>>
     for Shift<'_, Element, Window>
 {
-    fn options(&self) -> &Derivable<Element, Window, ShiftOptions<Element, Window>> {
+    fn options(&self) -> &Derivable<'_, Element, Window, ShiftOptions<Element, Window>> {
         &self.options
     }
 }
