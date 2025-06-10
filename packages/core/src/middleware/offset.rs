@@ -41,13 +41,13 @@ fn convert_value_to_coords<Element: Clone, Window: Clone>(
         ),
     };
 
-    if let Some(alignment) = alignment
-        && let Some(alignment_axis) = alignment_axis
-    {
-        cross_axis = match alignment {
-            Alignment::Start => alignment_axis,
-            Alignment::End => -alignment_axis,
-        };
+    if let Some(alignment) = alignment {
+        if let Some(alignment_axis) = alignment_axis {
+            cross_axis = match alignment {
+                Alignment::Start => alignment_axis,
+                Alignment::End => -alignment_axis,
+            };
+        }
     }
 
     if is_vertical {
@@ -192,20 +192,20 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
         let diff_coords = convert_value_to_coords(state, &options);
 
         // If the placement is the same and the arrow caused an alignment offset then we don't need to change the positioning coordinates.
-        if let Some(data_placement) = data.map(|data| data.placement)
-            && placement == data_placement
-        {
-            let arrow_data: Option<ArrowData> = middleware_data.get_as(ARROW_NAME);
-            if arrow_data
-                .and_then(|arrow_data| arrow_data.alignment_offset)
-                .is_some()
-            {
-                return MiddlewareReturn {
-                    x: None,
-                    y: None,
-                    data: None,
-                    reset: None,
-                };
+        if let Some(data_placement) = data.map(|data| data.placement) {
+            if placement == data_placement {
+                let arrow_data: Option<ArrowData> = middleware_data.get_as(ARROW_NAME);
+                if arrow_data
+                    .and_then(|arrow_data| arrow_data.alignment_offset)
+                    .is_some()
+                {
+                    return MiddlewareReturn {
+                        x: None,
+                        y: None,
+                        data: None,
+                        reset: None,
+                    };
+                }
             }
         }
 

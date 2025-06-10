@@ -277,7 +277,7 @@ pub trait Middleware<Element: Clone + 'static, Window: Clone + 'static>: Clone +
 /// Middleware with options.
 pub trait MiddlewareWithOptions<Element: Clone, Window: Clone, O: Clone> {
     /// The options passed to this middleware.
-    fn options(&self) -> &Derivable<Element, Window, O>;
+    fn options(&self) -> &Derivable<'_, Element, Window, O>;
 }
 
 pub struct Elements<'a, Element: Clone + 'static> {
