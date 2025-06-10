@@ -29,18 +29,19 @@ pub fn get_true_offset_parent(element: &Element, polyfill: &Option<Polyfill>) ->
 
             // Firefox returns the <html> element as the offsetParent if it's non-static, while Chrome and Safari return the <body> element.
             // The <body> element must be used to perform the correct calculations even if the <html> element is non-static.
-            if let Some(raw_offset_parent) = raw_offset_parent.as_ref()
-                && get_document_element(Some(DomNodeOrWindow::Node(raw_offset_parent)))
+            if let Some(raw_offset_parent) = raw_offset_parent.as_ref() {
+                if get_document_element(Some(DomNodeOrWindow::Node(raw_offset_parent)))
                     == *raw_offset_parent
-            {
-                return Some(
-                    raw_offset_parent
-                        .owner_document()
-                        .expect("Element should have owner document.")
-                        .body()
-                        .expect("Document should have body.")
-                        .unchecked_into::<Element>(),
-                );
+                {
+                    return Some(
+                        raw_offset_parent
+                            .owner_document()
+                            .expect("Element should have owner document.")
+                            .body()
+                            .expect("Document should have body.")
+                            .unchecked_into::<Element>(),
+                    );
+                }
             }
 
             raw_offset_parent
@@ -87,12 +88,13 @@ pub fn get_offset_parent(
         }
     }
 
-    if let Some(parent) = offset_parent.as_ref()
-        && is_last_traversable_node(parent)
-        && is_static_positioned(parent)
-        && !is_containing_block(parent.into())
-    {
-        return OwnedElementOrWindow::Window(window);
+    if let Some(parent) = offset_parent.as_ref() {
+        if is_last_traversable_node(parent)
+            && is_static_positioned(parent)
+            && !is_containing_block(parent.into())
+        {
+            return OwnedElementOrWindow::Window(window);
+        }
     }
 
     offset_parent
