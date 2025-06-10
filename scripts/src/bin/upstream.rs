@@ -1,5 +1,3 @@
-#![feature(exit_status_error)]
-
 use std::{
     collections::{BTreeMap, HashMap},
     env,
@@ -13,7 +11,7 @@ use octocrab::{
     models::repos::{CommitAuthor, Release},
     params::repos::Reference,
 };
-use scripts::ref_sha;
+use scripts::{ExitStatusExt, ref_sha};
 use semver::{Version, VersionReq};
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumString, VariantArray};
@@ -210,7 +208,7 @@ async fn create_pull_request(
         .arg("https://github.com/floating-ui/floating-ui.git")
         .arg(temp_dir.path().to_str().expect("Path is valid UTF-8."))
         .status()?
-        .exit_ok()?;
+        .stable_exit_ok()?;
 
     log::debug!("git diff {current_tag}..{new_tag} -- {directory}");
     let output = Command::new("git")

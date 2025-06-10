@@ -346,17 +346,18 @@ pub fn auto_update(
             let update = update.clone();
 
             move |entries: Vec<ResizeObserverEntry>| {
-                if let Some(first_entry) = entries.first()
-                    && resize_reference_element
+                if let Some(first_entry) = entries.first() {
+                    if resize_reference_element
                         .as_ref()
                         .is_some_and(|reference_element| first_entry.target() == *reference_element)
-                {
-                    if let Some(reobserve_frame) = reobserve_frame.take() {
-                        cancel_animation_frame(reobserve_frame);
-                    }
+                    {
+                        if let Some(reobserve_frame) = reobserve_frame.take() {
+                            cancel_animation_frame(reobserve_frame);
+                        }
 
-                    reobserve_frame
-                        .replace(Some(request_animation_frame(reobserve_closure.as_ref())));
+                        reobserve_frame
+                            .replace(Some(request_animation_frame(reobserve_closure.as_ref())));
+                    }
                 }
 
                 update();
@@ -368,14 +369,14 @@ pub fn auto_update(
                 .expect("Resize observer should be created."),
         ));
 
-        if let Some(reference) = reference_element.as_ref()
-            && !animation_frame
-        {
-            resize_observer
-                .borrow()
-                .as_ref()
-                .expect("Resize observer should exist.")
-                .observe(reference);
+        if let Some(reference) = reference_element.as_ref() {
+            if !animation_frame {
+                resize_observer
+                    .borrow()
+                    .as_ref()
+                    .expect("Resize observer should exist.")
+                    .observe(reference);
+            }
         }
 
         resize_observer
@@ -405,10 +406,10 @@ pub fn auto_update(
             let next_ref_rect =
                 get_bounding_client_rect((&owned_reference).into(), false, false, None);
 
-            if let Some(prev_ref_rect) = prev_ref_rect.borrow().as_ref()
-                && !rects_are_equal(prev_ref_rect, &next_ref_rect)
-            {
-                update();
+            if let Some(prev_ref_rect) = prev_ref_rect.borrow().as_ref() {
+                if !rects_are_equal(prev_ref_rect, &next_ref_rect) {
+                    update();
+                }
             }
 
             prev_ref_rect.replace(Some(next_ref_rect));
@@ -426,13 +427,14 @@ pub fn auto_update(
 
         let next_ref_rect = get_bounding_client_rect((&owned_reference).into(), false, false, None);
 
-        if let Some(prev_ref_rect) = prev_ref_rect.borrow().as_ref()
-            && (next_ref_rect.x != prev_ref_rect.x
+        if let Some(prev_ref_rect) = prev_ref_rect.borrow().as_ref() {
+            if next_ref_rect.x != prev_ref_rect.x
                 || next_ref_rect.y != prev_ref_rect.y
                 || next_ref_rect.width != prev_ref_rect.width
-                || next_ref_rect.height != prev_ref_rect.height)
-        {
-            update();
+                || next_ref_rect.height != prev_ref_rect.height
+            {
+                update();
+            }
         }
 
         prev_ref_rect.replace(Some(next_ref_rect));
