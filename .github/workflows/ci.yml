@@ -19,7 +19,7 @@ jobs:
               uses: actions/checkout@v4
 
             - name: Set up Rust toolchain
-              run: rustup toolchain install nightly --no-self-update --profile default --target wasm32-unknown-unknown
+              run: rustup toolchain install stable --no-self-update --profile default --target wasm32-unknown-unknown
 
             - name: Set up Rust cache
               uses: swatinem/rust-cache@v2
@@ -41,6 +41,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
+            # TODO: Investigate why tests fail on stable toolchain.
             - name: Set up Rust toolchain
               run: rustup toolchain install nightly --no-self-update --profile default --target wasm32-unknown-unknown
 
@@ -66,8 +67,9 @@ jobs:
               with:
                   version: 'latest'
 
+            # TODO: See comment above about nightly toolchain.
             - name: Test
-              run: cargo test --all-features
+              run: cargo +nightly test --all-features
 
             - name: Upload visual snapshot diffs
               uses: actions/upload-artifact@v4

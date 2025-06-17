@@ -86,40 +86,42 @@ pub fn compute_position<Element: Clone, Window: Clone>(
             middleware_data.set(middleware.name(), new_data);
         }
 
-        if let Some(reset) = reset
-            && reset_count <= 50
-        {
-            reset_count += 1;
+        if let Some(reset) = reset {
+            if reset_count <= 50 {
+                reset_count += 1;
 
-            match reset {
-                Reset::True => {}
-                Reset::Value(value) => {
-                    if let Some(reset_placement) = value.placement {
-                        stateful_placement = reset_placement;
-                    }
-
-                    if let Some(reset_rects) = value.rects {
-                        rects = match reset_rects {
-                            ResetRects::True => platform.get_element_rects(GetElementRectsArgs {
-                                reference: reference.clone(),
-                                floating,
-                                strategy,
-                            }),
-                            ResetRects::Value(element_rects) => element_rects,
+                match reset {
+                    Reset::True => {}
+                    Reset::Value(value) => {
+                        if let Some(reset_placement) = value.placement {
+                            stateful_placement = reset_placement;
                         }
+
+                        if let Some(reset_rects) = value.rects {
+                            rects = match reset_rects {
+                                ResetRects::True => {
+                                    platform.get_element_rects(GetElementRectsArgs {
+                                        reference: reference.clone(),
+                                        floating,
+                                        strategy,
+                                    })
+                                }
+                                ResetRects::Value(element_rects) => element_rects,
+                            }
+                        }
+
+                        let Coords {
+                            x: next_x,
+                            y: next_y,
+                        } = compute_coords_from_placement(&rects, stateful_placement, rtl);
+                        x = next_x;
+                        y = next_y;
                     }
-
-                    let Coords {
-                        x: next_x,
-                        y: next_y,
-                    } = compute_coords_from_placement(&rects, stateful_placement, rtl);
-                    x = next_x;
-                    y = next_y;
                 }
-            }
 
-            i = 0;
-            continue;
+                i = 0;
+                continue;
+            }
         }
 
         i += 1;
