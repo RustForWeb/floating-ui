@@ -134,7 +134,7 @@ pub fn is_html_element(node: &Node) -> bool {
 }
 
 const OVERFLOW_VALUES: [&str; 5] = ["auto", "scroll", "overlay", "hidden", "clip"];
-const DISPLAY_VALUES: [&str; 2] = ["inline", "contents"];
+const INVALID_OVERFLOW_DISPLAY_VALUES: [&str; 2] = ["inline", "contents"];
 
 pub fn is_overflow_element(element: &Element) -> bool {
     let style = get_computed_style(element);
@@ -148,19 +148,28 @@ pub fn is_overflow_element(element: &Element) -> bool {
     OVERFLOW_VALUES
         .into_iter()
         .any(|s| overflow_combined.contains(s))
-        && !DISPLAY_VALUES.into_iter().any(|s| display == s)
+        && !INVALID_OVERFLOW_DISPLAY_VALUES
+            .into_iter()
+            .any(|s| display == s)
 }
+
+const TABLE_ELEMENTS: [&str; 3] = ["table", "td", "th"];
 
 pub fn is_table_element(element: &Element) -> bool {
     let node_name = get_node_name(element.into());
-    ["table", "td", "th"].into_iter().any(|s| node_name == s)
+    TABLE_ELEMENTS.into_iter().any(|s| node_name == s)
 }
 
+const TOP_LAYER_SELECTORS: [&str; 2] = [":popover-open", ":modal"];
+
 pub fn is_top_layer(element: &Element) -> bool {
-    [":popover-open", ":modal"]
+    TOP_LAYER_SELECTORS
         .into_iter()
         .any(|selector| element.matches(selector).unwrap_or(false))
 }
+
+const TRANSFORM_PROPERTIES: [&str; 5] =
+    ["transform", "translate", "scale", "rotate", "perspective"];
 
 const WILL_CHANGE_VALUES: [&str; 6] = [
     "transform",
@@ -170,6 +179,7 @@ const WILL_CHANGE_VALUES: [&str; 6] = [
     "perspective",
     "filter",
 ];
+
 const CONTAIN_VALUES: [&str; 4] = ["paint", "layout", "strict", "content"];
 
 pub enum ElementOrCss<'a> {
@@ -204,17 +214,14 @@ pub fn is_containing_block(element: ElementOrCss) -> bool {
 
     // https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block
     // https://drafts.csswg.org/css-transforms-2/#individual-transforms
-    ["transform", "translate", "scale", "rotate", "perspective"]
-        .into_iter()
-        .any(|property| {
-            css.get_property_value(property)
-                .map(|value| value != "none")
-                .unwrap_or(false)
-        })
-        || css
-            .get_property_value("container-type")
-            .map(|value| value != "normal")
+    TRANSFORM_PROPERTIES.into_iter().any(|property| {
+        css.get_property_value(property)
+            .map(|value| value != "none")
             .unwrap_or(false)
+    }) || css
+        .get_property_value("container-type")
+        .map(|value| value != "normal")
+        .unwrap_or(false)
         || (!webkit
             && css
                 .get_property_value("backdrop-filter")
@@ -262,9 +269,11 @@ pub fn is_web_kit() -> bool {
     css::supports_with_value("-webkit-backdrop-filter", "none").unwrap_or(false)
 }
 
+const LAST_TRAVERSABLE_NODE_NAMES: [&str; 3] = ["html", "body", "#document"];
+
 pub fn is_last_traversable_node(node: &Node) -> bool {
     let node_name = get_node_name(node.into());
-    ["html", "body", "#document"]
+    LAST_TRAVERSABLE_NODE_NAMES
         .into_iter()
         .any(|s| node_name == s)
 }

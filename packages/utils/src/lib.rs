@@ -657,29 +657,34 @@ pub fn get_opposite_alignment_placement(placement: Placement) -> Placement {
     placement.opposite_alignment()
 }
 
-pub fn get_side_list(side: Side, is_start: bool, rtl: Option<bool>) -> Vec<Side> {
+const LR_SIDE_LIST: [Side; 2] = [Side::Left, Side::Right];
+const RL_SIDE_LIST: [Side; 2] = [Side::Right, Side::Left];
+const TB_SIDE_LIST: [Side; 2] = [Side::Top, Side::Bottom];
+const BT_SIDE_LIST: [Side; 2] = [Side::Bottom, Side::Top];
+
+pub fn get_side_list(side: Side, is_start: bool, rtl: Option<bool>) -> [Side; 2] {
     match side {
         Side::Top | Side::Bottom => match rtl {
             Some(true) => {
                 if is_start {
-                    vec![Side::Right, Side::Left]
+                    RL_SIDE_LIST
                 } else {
-                    vec![Side::Left, Side::Right]
+                    LR_SIDE_LIST
                 }
             }
             _ => {
                 if is_start {
-                    vec![Side::Left, Side::Right]
+                    LR_SIDE_LIST
                 } else {
-                    vec![Side::Right, Side::Left]
+                    RL_SIDE_LIST
                 }
             }
         },
         Side::Right | Side::Left => {
             if is_start {
-                vec![Side::Top, Side::Bottom]
+                TB_SIDE_LIST
             } else {
-                vec![Side::Bottom, Side::Top]
+                BT_SIDE_LIST
             }
         }
     }
