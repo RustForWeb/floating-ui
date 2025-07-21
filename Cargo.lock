@@ -344,14 +344,14 @@ dependencies = [
 
 [[package]]
 name = "config"
-version = "0.15.11"
+version = "0.15.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "595aae20e65c3be792d05818e8c63025294ac3cb7e200f11459063a352a6ef80"
+checksum = "5b1eb4fb07bc7f012422df02766c7bd5971effb894f573865642f06fa3265440"
 dependencies = [
  "convert_case 0.6.0",
  "pathdiff",
  "serde",
- "toml 0.8.23",
+ "toml",
  "winnow 0.7.10",
 ]
 
@@ -398,9 +398,9 @@ dependencies = [
 
 [[package]]
 name = "const-str"
-version = "0.6.2"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e991226a70654b49d34de5ed064885f0bef0348a8e70018b8ff1ac80aa984a2"
+checksum = "041fbfcf8e7054df725fb9985297e92422cdc80fcf313665f5ca3d761bb63f4c"
 
 [[package]]
 name = "const_format"
@@ -974,9 +974,9 @@ checksum = "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719"
 
 [[package]]
 name = "either_of"
-version = "0.1.5"
+version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "169ae1dd00fb612cf27fd069b3b10f325ea60ac551f08e5b931b4413972a847d"
+checksum = "216d23e0ec69759a17f05e1c553f3a6870e5ec73420fbb07807a6f34d5d1d5a4"
 dependencies = [
  "paste",
  "pin-project-lite",
@@ -2284,9 +2284,9 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
 name = "leptos"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c202a7897aa73c90ac4ce73713512d871f75e79847558d9e88f778659b164dc"
+checksum = "02c54fd8eb78e9b4415be1e23dd2f3d4e8cab18d7a59118d8c8df227b7c059c7"
 dependencies = [
  "any_spawner",
  "cfg-if",
@@ -2308,7 +2308,7 @@ dependencies = [
  "send_wrapper",
  "serde",
  "serde_qs 0.15.0",
- "server_fn 0.8.3",
+ "server_fn 0.8.4",
  "slotmap",
  "tachys",
  "thiserror 2.0.12",
@@ -2331,9 +2331,9 @@ dependencies = [
 
 [[package]]
 name = "leptos_config"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74eec2103dfa808f4b13c149dfbd3842f13a5948489fda3de31cc565fb28dbec"
+checksum = "54a28c4f95e63a97e61e7db41f0bc96ba77ab1b758625fade48515e8137ef8f6"
 dependencies = [
  "config",
  "regex",
@@ -2344,9 +2344,9 @@ dependencies = [
 
 [[package]]
 name = "leptos_dom"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "25b845379c33884f0dead9abb5aa3d258d7bd507789fc2527a5972f82c0757c7"
+checksum = "b2e51275b4a973e793f7388ff12c3b5861ba1414151998ea5d819a2e8129b000"
 dependencies = [
  "js-sys",
  "or_poisoned",
@@ -2359,9 +2359,9 @@ dependencies = [
 
 [[package]]
 name = "leptos_hot_reload"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fae732329192df886803f076515d73c883166a4c8cbc5532584d0d1e43539300"
+checksum = "b734d3898d498983902ac183c2bc60178b37dde87e55baba87eacab7b86ffed5"
 dependencies = [
  "anyhow",
  "camino",
@@ -2377,9 +2377,9 @@ dependencies = [
 
 [[package]]
 name = "leptos_macro"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e32ae8783d4b64838167e026ef773dbc53399e9e6658e9c2f65e0ce67a5ccec"
+checksum = "c7ffe0af54e5817fc6426c1e0a82771f821d3148fda2844b385a2955a8061851"
 dependencies = [
  "attribute-derive",
  "cfg-if",
@@ -2393,16 +2393,16 @@ dependencies = [
  "quote",
  "rstml",
  "rustc_version",
- "server_fn_macro 0.8.3",
+ "server_fn_macro 0.8.4",
  "syn 2.0.104",
  "uuid",
 ]
 
 [[package]]
 name = "leptos_router"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1b6df1b107c301bd39c114768a1196a8dfcbdae869364b3f0247e3f554b503a"
+checksum = "32d0d1f42778ae6b43eccd6f94df3f15a584c8130f904b375ac5f8d82ab25f29"
 dependencies = [
  "any_spawner",
  "either_of",
@@ -2424,9 +2424,9 @@ dependencies = [
 
 [[package]]
 name = "leptos_router_macro"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d35d4bb7922e74546fac3e852b0f3252e9996e04fca12c359aba1e5958cfda8"
+checksum = "efc262fd5b4eb2a4353ef05f7e344c80b842be328fdd2321d103925b5ada9079"
 dependencies = [
  "proc-macro-error2",
  "proc-macro2",
@@ -2436,9 +2436,9 @@ dependencies = [
 
 [[package]]
 name = "leptos_server"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "26851048e161998b8f9fb3261a833ec64df2a2669ea95f360c54b7f47a1e07cb"
+checksum = "5cbb1e41aa049b80ca928663d3a4c162f7e6ff9515153d6f18dd6e10e99ba63b"
 dependencies = [
  "any_spawner",
  "base64",
@@ -2450,7 +2450,7 @@ dependencies = [
  "send_wrapper",
  "serde",
  "serde_json",
- "server_fn 0.8.3",
+ "server_fn 0.8.4",
  "tachys",
 ]
 
@@ -2885,7 +2885,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f4c021e1093a56626774e81216a4ce732a735e5bad4868a03f3ed65ca0c3919"
 dependencies = [
  "once_cell",
- "toml_edit 0.19.15",
+ "toml_edit",
 ]
 
 [[package]]
@@ -3053,9 +3053,9 @@ dependencies = [
 
 [[package]]
 name = "reactive_graph"
-version = "0.2.0"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72a2b7d6c997a1d0024142726a6a044cd061827dd25709429fdc99ca294dedc8"
+checksum = "9e7f297f79ff0c10f757196cf09abe0b2d5a87aa95b90a4ac2b060941b36c1a4"
 dependencies = [
  "any_spawner",
  "async-lock",
@@ -3075,9 +3075,9 @@ dependencies = [
 
 [[package]]
 name = "reactive_stores"
-version = "0.2.0"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a19194e9cd482f92fa24fac9b96e0b0295af0b519b1ebc2df9f048ea95fff1e9"
+checksum = "d61da12137399aaee7078d38230256f8f184f2a20933e917a6bdc944b0dd56a1"
 dependencies = [
  "dashmap 6.1.0",
  "guardian",
@@ -3092,9 +3092,9 @@ dependencies = [
 
 [[package]]
 name = "reactive_stores_macro"
-version = "0.2.0"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69f5d6b557ce3b0ac9644faf1677b8f45253c02fa69e14acc55d9695955e4af9"
+checksum = "dc3aef9a98a74e0a5dffb84fe059d74fb19490d0380f9904be1990e1b37b2f21"
 dependencies = [
  "convert_case 0.8.0",
  "proc-macro-error2",
@@ -3308,7 +3308,7 @@ dependencies = [
  "strum",
  "tempfile",
  "tokio",
- "toml 0.9.2",
+ "toml",
 ]
 
 [[package]]
@@ -3446,15 +3446,6 @@ dependencies = [
 
 [[package]]
 name = "serde_spanned"
-version = "0.6.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf41e0cfaf7226dca15e8197172c295a782857fcb97fad1808a166870dee75a3"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "serde_spanned"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40734c41988f7306bb04f0ecf60ec0f3f1caa34290e4e8ea471dcd3346483b83"
@@ -3504,9 +3495,9 @@ dependencies = [
 
 [[package]]
 name = "server_fn"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c27fbd25ecc066481e383e2ed62ab2480e708aa3fe46cba36e95f58e61dfd04"
+checksum = "b6c8cf599b35fb8676744ab57f64fa35747be6de8b24e2b2d1e3ddd7f04e37f1"
 dependencies = [
  "base64",
  "bytes",
@@ -3524,7 +3515,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_qs 0.15.0",
- "server_fn_macro_default 0.8.3",
+ "server_fn_macro_default 0.8.4",
  "thiserror 2.0.12",
  "throw_error",
  "url",
@@ -3551,9 +3542,9 @@ dependencies = [
 
 [[package]]
 name = "server_fn_macro"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9d530c872590473016016679c94e3bddf47372941fc924f687ffd11a1778a71"
+checksum = "eb49d7bd176738e31d6ebb0e821e8dc1ffb0560b0b88f050ac965e67f5fc8315"
 dependencies = [
  "const_format",
  "convert_case 0.8.0",
@@ -3576,11 +3567,11 @@ dependencies = [
 
 [[package]]
 name = "server_fn_macro_default"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca7abc92ed696648275ed9ff171131a83d571af11748593dc2e6eb6a4e22a5b9"
+checksum = "3bcd78e5bf1bd14642d2504e6de7942fa73acc40359eb0aae0876ae88d86491b"
 dependencies = [
- "server_fn_macro 0.8.3",
+ "server_fn_macro 0.8.4",
  "syn 2.0.104",
 ]
 
@@ -3802,9 +3793,9 @@ dependencies = [
 
 [[package]]
 name = "tachys"
-version = "0.2.0"
+version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd309a35ec8282f0793ff8b58ebd4764779fd056f447c58a026331443b77ddae"
+checksum = "f04692645d5451fe3d1a8efff2a269ae070aabef89b04a6329dbcf529a690933"
 dependencies = [
  "any_spawner",
  "async-trait",
@@ -3820,7 +3811,6 @@ dependencies = [
  "linear-map",
  "next_tuple",
  "oco_ref",
- "once_cell",
  "or_poisoned",
  "parking_lot",
  "paste",
@@ -4024,25 +4014,13 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "0.8.23"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc1beb996b9d83529a9e75c17a1686767d148d70663143c7854d8b4a09ced362"
-dependencies = [
- "serde",
- "serde_spanned 0.6.9",
- "toml_datetime 0.6.11",
- "toml_edit 0.22.27",
-]
-
-[[package]]
-name = "toml"
 version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed0aee96c12fa71097902e0bb061a5e1ebd766a6636bb605ba401c45c1650eac"
 dependencies = [
  "indexmap",
  "serde",
- "serde_spanned 1.0.0",
+ "serde_spanned",
  "toml_datetime 0.7.0",
  "toml_parser",
  "toml_writer",
@@ -4054,9 +4032,6 @@ name = "toml_datetime"
 version = "0.6.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "22cddaf88f4fbc13c51aebbf5f8eceb5c7c5a9da2ac40a13519eb5b0a0e8f11c"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "toml_datetime"
@@ -4076,19 +4051,6 @@ dependencies = [
  "indexmap",
  "toml_datetime 0.6.11",
  "winnow 0.5.40",
-]
-
-[[package]]
-name = "toml_edit"
-version = "0.22.27"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41fe8c660ae4257887cf66394862d21dbca4a6ddd26f04a3560410406a2f819a"
-dependencies = [
- "indexmap",
- "serde",
- "serde_spanned 0.6.9",
- "toml_datetime 0.6.11",
- "winnow 0.7.10",
 ]
 
 [[package]]
