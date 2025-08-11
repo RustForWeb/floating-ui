@@ -84,10 +84,10 @@ pub fn Inline() -> impl IntoView {
     let handle_mouse_up = move |event: MouseEvent| {
         let target: web_sys::Node = event_target(&event);
 
-        if let Some(floating) = floating_ref.get() {
-            if floating.contains(Some(&target)) {
-                return;
-            }
+        if let Some(floating) = floating_ref.get()
+            && floating.contains(Some(&target))
+        {
+            return;
         }
 
         set_timeout(
@@ -137,10 +137,10 @@ pub fn Inline() -> impl IntoView {
     let handle_mouse_down = move |event: MouseEvent| {
         let target: web_sys::Node = event_target(&event);
 
-        if let Some(floating) = floating_ref.get() {
-            if floating.contains(Some(&target)) {
-                return;
-            }
+        if let Some(floating) = floating_ref.get()
+            && floating.contains(Some(&target))
+        {
+            return;
         }
 
         if window()

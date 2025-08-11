@@ -214,38 +214,33 @@ pub fn use_floating<R: Into<Reference>>(
 
     let update = Rc::new({
         move || {
-            if let Some(reference) = reference.get_untracked() {
-                if let Some(reference_element) = reference.get_untracked() {
-                    if let Some(floating_element) = floating
-                        .get_untracked()
-                        .and_then(|floating| floating.dyn_into::<web_sys::Element>().ok())
-                    {
-                        let config = ComputePositionConfig {
-                            placement: Some(placement_option_untracked()),
-                            strategy: Some(strategy_option_untracked()),
-                            middleware: middleware_option_untracked()
-                                .map(|middleware| middleware.deref().clone()),
-                        };
+            if let Some(reference) = reference.get_untracked()
+                && let Some(reference_element) = reference.get_untracked()
+                && let Some(floating_element) = floating
+                    .get_untracked()
+                    .and_then(|floating| floating.dyn_into::<web_sys::Element>().ok())
+            {
+                let config = ComputePositionConfig {
+                    placement: Some(placement_option_untracked()),
+                    strategy: Some(strategy_option_untracked()),
+                    middleware: middleware_option_untracked()
+                        .map(|middleware| middleware.deref().clone()),
+                };
 
-                        let open = open_option.get_untracked();
+                let open = open_option.get_untracked();
 
-                        let position = compute_position(
-                            (&reference_element).into(),
-                            &floating_element,
-                            config,
-                        );
-                        set_x.set(position.x);
-                        set_y.set(position.y);
-                        set_strategy.set(position.strategy);
-                        set_placement.set(position.placement);
-                        set_middleware_data.set(position.middleware_data);
-                        // The floating element's position may be recomputed while it's closed
-                        // but still mounted (such as when transitioning out). To ensure
-                        // `is_positioned` will be `false` initially on the next open,
-                        // avoid setting it to `true` when `open === false` (must be specified).
-                        set_is_positioned.set(open);
-                    }
-                }
+                let position =
+                    compute_position((&reference_element).into(), &floating_element, config);
+                set_x.set(position.x);
+                set_y.set(position.y);
+                set_strategy.set(position.strategy);
+                set_placement.set(position.placement);
+                set_middleware_data.set(position.middleware_data);
+                // The floating element's position may be recomputed while it's closed
+                // but still mounted (such as when transitioning out). To ensure
+                // `is_positioned` will be `false` initially on the next open,
+                // avoid setting it to `true` when `open === false` (must be specified).
+                set_is_positioned.set(open);
             }
         }
     });
@@ -278,22 +273,20 @@ pub fn use_floating<R: Into<Reference>>(
 
             match while_elements_mounted_untracked() {
                 Some(while_elements_mounted) => {
-                    if let Some(reference) = reference.get_untracked() {
-                        if let Some(reference_element) = reference.get_untracked() {
-                            if let Some(floating_element) = floating
-                                .get_untracked()
-                                .and_then(|floating| floating.dyn_into::<web_sys::Element>().ok())
-                            {
-                                *while_elements_mounted_cleanup
-                                    .lock()
-                                    .expect("Lock should be acquired.") =
-                                    Some(SendWrapper::new(while_elements_mounted(
-                                        (&reference_element).into(),
-                                        &floating_element,
-                                        update.clone(),
-                                    )));
-                            }
-                        }
+                    if let Some(reference) = reference.get_untracked()
+                        && let Some(reference_element) = reference.get_untracked()
+                        && let Some(floating_element) = floating
+                            .get_untracked()
+                            .and_then(|floating| floating.dyn_into::<web_sys::Element>().ok())
+                    {
+                        *while_elements_mounted_cleanup
+                            .lock()
+                            .expect("Lock should be acquired.") =
+                            Some(SendWrapper::new(while_elements_mounted(
+                                (&reference_element).into(),
+                                &floating_element,
+                                update.clone(),
+                            )));
                     }
                 }
                 _ => {
