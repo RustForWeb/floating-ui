@@ -16,7 +16,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             - name: Set up Rust toolchain
               run: rustup toolchain install stable --no-self-update --profile default --target wasm32-unknown-unknown
@@ -39,7 +39,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             # TODO: Investigate why tests fail on stable toolchain.
             - name: Set up Rust toolchain
