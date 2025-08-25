@@ -14,6 +14,4 @@ console_error_panic_hook.workspace = true
 console_log.workspace = true
 floating-ui-yew.workspace = true
 log.workspace = true
-wasm-bindgen.workspace = true
-web-sys.workspace = true
 yew = { workspace = true, features = ["csr"] }

@@ -10,10 +10,8 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-dyn_derive.workspace = true
-dyn_std.workspace = true
-floating-ui-dom.workspace = true
 dioxus = { workspace = true, features = ["web"] }
+floating-ui-dom.workspace = true
 web-sys.workspace = true
 
 [dev-dependencies]

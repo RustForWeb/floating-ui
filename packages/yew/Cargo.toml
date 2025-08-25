@@ -11,8 +11,8 @@ version.workspace = true
 
 [dependencies]
 floating-ui-dom.workspace = true
-yew.workspace = true
 web-sys.workspace = true
+yew.workspace = true
 
 [dev-dependencies]
 wasm-bindgen-test.workspace = true

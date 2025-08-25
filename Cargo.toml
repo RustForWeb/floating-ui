@@ -29,8 +29,8 @@ floating-ui-leptos = { path = "./packages/leptos", version = "0.5.0" }
 floating-ui-utils = { path = "./packages/utils", version = "0.5.0" }
 floating-ui-yew = { path = "./packages/yew", version = "0.5.0" }
 leptos = "0.8.0"
-leptos_router = "0.8.0"
 leptos-node-ref = "0.2.0"
+leptos_router = "0.8.0"
 log = "0.4.22"
 send_wrapper = "0.6.0"
 serde = { version = "1.0.209", features = ["derive"] }

@@ -17,5 +17,3 @@ leptos = { workspace = true, features = ["csr"] }
 leptos-node-ref.workspace = true
 log.workspace = true
 send_wrapper.workspace = true
-wasm-bindgen.workspace = true
-web-sys.workspace = true

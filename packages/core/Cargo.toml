@@ -9,6 +9,9 @@ license.workspace = true
 repository.workspace = true
 version.workspace = true
 
+[package.metadata.cargo-machete]
+ignored = ["dyn_std"]
+
 [dependencies]
 dyn_derive.workspace = true
 dyn_std.workspace = true

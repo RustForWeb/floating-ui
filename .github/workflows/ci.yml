@@ -27,12 +27,26 @@ jobs:
                   components: clippy, rustfmt
                   target: wasm32-unknown-unknown
 
-            - name: Check formatting
-              run: cargo fmt --all --check
+            - name: Install Cargo Binary Install
+              uses: cargo-bins/cargo-binstall@main
+
+            - name: Install crates
+              run: cargo binstall -y --force cargo-deny cargo-machete cargo-sort
 
             - name: Lint
               run: cargo clippy --all-features --locked
 
+            - name: Check dependencies
+              run: cargo deny check
+
+            - name: Check unused dependencies
+              run: cargo machete
+
+            - name: Check manifest formatting
+              run: cargo sort --workspace --check
+
+            - name: Check formatting
+              run: cargo fmt --all --check
     test:
         name: Test
         runs-on: ubuntu-latest
@@ -42,7 +56,6 @@ jobs:
               uses: actions/checkout@v5
 
             # TODO: Investigate why tests fail on stable toolchain.
-
             - name: Set up Rust toolchain
               uses: actions-rust-lang/setup-rust-toolchain@v1
               with:
