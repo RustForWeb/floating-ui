@@ -10,8 +10,6 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-dyn_derive.workspace = true
-dyn_std.workspace = true
 floating-ui-dom.workspace = true
 leptos.workspace = true
 leptos-node-ref.workspace = true

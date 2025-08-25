@@ -15,5 +15,3 @@ console_log.workspace = true
 dioxus.workspace = true
 floating-ui-dioxus.workspace = true
 log.workspace = true
-wasm-bindgen.workspace = true
-web-sys.workspace = true

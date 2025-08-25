@@ -574,9 +574,9 @@ checksum = "2a2330da5de22e8a3cb63252ce2abb30116bf5265e89c0e01bc17015ce30a476"
 
 [[package]]
 name = "deranged"
-version = "0.4.1"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28cfac68e08048ae1883171632c2aef3ebc555621ae56fbccce1cbf22dd7f058"
+checksum = "9c9e6a11ca8224451684bc0d7d5a7adbf8f2fd6887261a1cfc3c0432f9d4068e"
 dependencies = [
  "powerfmt",
 ]
@@ -1127,8 +1127,6 @@ name = "floating-ui-dioxus"
 version = "0.5.0"
 dependencies = [
  "dioxus",
- "dyn_derive",
- "dyn_std",
  "floating-ui-dom",
  "wasm-bindgen-test",
  "web-sys",
@@ -1143,8 +1141,6 @@ dependencies = [
  "dioxus",
  "floating-ui-dioxus",
  "log",
- "wasm-bindgen",
- "web-sys",
 ]
 
 [[package]]
@@ -1172,8 +1168,6 @@ dependencies = [
 name = "floating-ui-leptos"
 version = "0.5.0"
 dependencies = [
- "dyn_derive",
- "dyn_std",
  "floating-ui-dom",
  "leptos",
  "leptos-node-ref",
@@ -1193,8 +1187,6 @@ dependencies = [
  "leptos-node-ref",
  "log",
  "send_wrapper",
- "wasm-bindgen",
- "web-sys",
 ]
 
 [[package]]
@@ -1243,8 +1235,6 @@ dependencies = [
  "console_log",
  "floating-ui-yew",
  "log",
- "wasm-bindgen",
- "web-sys",
  "yew",
 ]
 

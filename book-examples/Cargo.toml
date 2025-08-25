@@ -9,6 +9,15 @@ license.workspace = true
 repository.workspace = true
 version.workspace = true
 
+[features]
+default = ["arrow", "flip", "placement", "shift", "size", "virtual"]
+arrow = []
+flip = []
+placement = []
+shift = []
+size = []
+virtual = []
+
 [dependencies]
 console_error_panic_hook.workspace = true
 console_log.workspace = true
@@ -19,12 +28,3 @@ leptos-node-ref.workspace = true
 log.workspace = true
 send_wrapper.workspace = true
 tailwind_fuse = "0.3.1"
-
-[features]
-default = ["arrow", "flip", "placement", "shift", "size", "virtual"]
-arrow = []
-flip = []
-placement = []
-shift = []
-size = []
-virtual = []

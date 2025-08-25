@@ -9,16 +9,19 @@ license.workspace = true
 repository.workspace = true
 version.workspace = true
 
+[package.metadata.docs.rs]
+all-features = true
+
+[package.metadata.cargo-machete]
+ignored = ["dyn_std"]
+
+[features]
+default = []
+dom = ["dep:web-sys"]
+
 [dependencies]
 cfg-if.workspace = true
 dyn_derive.workspace = true
 dyn_std.workspace = true
 serde.workspace = true
 web-sys = { workspace = true, optional = true }
-
-[features]
-default = []
-dom = ["dep:web-sys"]
-
-[package.metadata.docs.rs]
-all-features = true
