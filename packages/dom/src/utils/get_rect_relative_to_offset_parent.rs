@@ -68,7 +68,7 @@ pub fn get_rect_relative_to_offset_parent(
     }
 
     let html_offset = if !is_offset_parent_an_element && !is_fixed {
-        get_html_offset(&document_element, &scroll, None)
+        get_html_offset(&document_element, &scroll)
     } else {
         Coords::new(0.0)
     };
