@@ -16,10 +16,10 @@ It also provides features to avoid collisions with the viewport, as absolute pos
 
 Rust Floating UI is available for the following frameworks:
 
--   [DOM (`web-sys`)](https://rustwasm.github.io/wasm-bindgen/web-sys/index.html)
--   [Dioxus](https://dioxuslabs.com/)
--   [Leptos](https://leptos.dev/)
--   [Yew](https://yew.rs/)
+- [DOM (`web-sys`)](https://rustwasm.github.io/wasm-bindgen/web-sys/index.html)
+- [Dioxus](https://dioxuslabs.com/)
+- [Leptos](https://leptos.dev/)
+- [Yew](https://yew.rs/)
 
 See [Frameworks](./frameworks/index.md) for documentation for each framework.
 
@@ -35,4 +35,4 @@ This project is available under the [MIT license](https://github.com/RustForWeb/
 
 The Rust Floating UI project is part of [Rust for Web](https://github.com/RustForWeb).
 
-[Rust for Web](https://github.com/RustForWeb) creates and ports web UI libraries for Rust. All projects are free and open source.
+[Rust for Web](https://github.com/RustForWeb) creates and ports web libraries for Rust. All projects are free and open source.
