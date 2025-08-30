@@ -69,7 +69,7 @@ pub fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
     }
 
     let html_offset = if !is_offset_parent_an_element && !is_fixed {
-        get_html_offset(&document_element, &scroll, Some(true))
+        get_html_offset(&document_element, &scroll)
     } else {
         Coords::new(0.0)
     };
