@@ -13,7 +13,7 @@ authors = ["Rust for Web <info@rustforweb.org>"]
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/RustForWeb/floating-ui"
-version = "0.5.0"
+version = "0.5.1"
 
 [workspace.dependencies]
 cfg-if = "1.0.0"
