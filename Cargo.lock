@@ -98,7 +98,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1384d3fe1eecb464229fcf6eebb72306591c56bf27b373561489458a7c73027d"
 dependencies = [
  "futures",
- "thiserror 2.0.12",
+ "thiserror 2.0.16",
  "wasm-bindgen-futures",
 ]
 
@@ -139,9 +139,9 @@ checksum = "4288f83726785267c6f2ef073a3d83dc3f9b81464e9f99898240cced85fce35a"
 
 [[package]]
 name = "async-trait"
-version = "0.1.88"
+version = "0.1.89"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e539d3fca749fcee5236ab05e93a52867dd549cc157c8cb7f99595f3cedffdb5"
+checksum = "9035ad2d096bed7955a320ee7e2230574d28fd3c3a0f186cbea1ff3c7eed5dbb"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -330,7 +330,7 @@ checksum = "0f18d705321923b1a9358e3fc3c57c3b50171196827fc7f5f10b053242aca627"
 dependencies = [
  "serde",
  "serde_json",
- "thiserror 2.0.12",
+ "thiserror 2.0.16",
 ]
 
 [[package]]
@@ -2286,9 +2286,9 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
 name = "leptos"
-version = "0.8.8"
+version = "0.8.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7a8710b4908a0e7b693113b906e4cf1bc87123b685404d090cdcd3e220bcab4"
+checksum = "52efe8eff3278b12f7897a15bdf067bbbb02212773e379d6fc121592752eb718"
 dependencies = [
  "any_spawner",
  "cfg-if",
@@ -2311,10 +2311,10 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_qs 0.15.0",
- "server_fn 0.8.6",
+ "server_fn 0.8.7",
  "slotmap",
  "tachys",
- "thiserror 2.0.12",
+ "thiserror 2.0.16",
  "throw_error",
  "typed-builder",
  "typed-builder-macro",
@@ -2343,7 +2343,7 @@ dependencies = [
  "config",
  "regex",
  "serde",
- "thiserror 2.0.12",
+ "thiserror 2.0.16",
  "typed-builder",
 ]
 
@@ -2405,9 +2405,9 @@ dependencies = [
 
 [[package]]
 name = "leptos_router"
-version = "0.8.6"
+version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f13e0e0a70f40e4717da84415f6f1002091146ef247246b6a447d76947ab2e30"
+checksum = "6a35447cd0ffcd6fcee0c4e424186c3e967507f36d9d4aaff4ab9976e5faab68"
 dependencies = [
  "any_spawner",
  "either_of",
@@ -2421,7 +2421,7 @@ dependencies = [
  "rustc_version",
  "send_wrapper",
  "tachys",
- "thiserror 2.0.12",
+ "thiserror 2.0.16",
  "url",
  "wasm-bindgen",
  "web-sys",
@@ -2455,7 +2455,7 @@ dependencies = [
  "send_wrapper",
  "serde",
  "serde_json",
- "server_fn 0.8.6",
+ "server_fn 0.8.7",
  "tachys",
 ]
 
@@ -2682,7 +2682,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed0423ff9973dea4d6bd075934fdda86ebb8c05bdf9d6b0507067d4a1226371d"
 dependencies = [
  "serde",
- "thiserror 2.0.12",
+ "thiserror 2.0.16",
 ]
 
 [[package]]
@@ -3058,9 +3058,9 @@ dependencies = [
 
 [[package]]
 name = "reactive_graph"
-version = "0.2.6"
+version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "27e4f808d01701256dc220e398d518684781bcd1b3b1a6c1c107fd41374f0624"
+checksum = "37b9e227617c8e257900ea3c9aa536319b138bf961e950a258214edea3c2d591"
 dependencies = [
  "any_spawner",
  "async-lock",
@@ -3075,7 +3075,7 @@ dependencies = [
  "send_wrapper",
  "serde",
  "slotmap",
- "thiserror 2.0.12",
+ "thiserror 2.0.16",
  "web-sys",
 ]
 
@@ -3179,7 +3179,7 @@ dependencies = [
  "quote",
  "syn 2.0.106",
  "syn_derive",
- "thiserror 2.0.12",
+ "thiserror 2.0.16",
 ]
 
 [[package]]
@@ -3458,7 +3458,7 @@ checksum = "f3faaf9e727533a19351a43cc5a8de957372163c7d35cc48c90b75cdda13c352"
 dependencies = [
  "percent-encoding",
  "serde",
- "thiserror 2.0.12",
+ "thiserror 2.0.16",
 ]
 
 [[package]]
@@ -3512,9 +3512,9 @@ dependencies = [
 
 [[package]]
 name = "server_fn"
-version = "0.8.6"
+version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4efa7bb741386fb31a68269c81b1469c917d9adb1f4102a2d2684f11e3235389"
+checksum = "7f77e178602e84703fd88cc3633b11bfcdcca51def9004ed467387a52e1434ba"
 dependencies = [
  "base64",
  "bytes",
@@ -3533,7 +3533,7 @@ dependencies = [
  "serde_json",
  "serde_qs 0.15.0",
  "server_fn_macro_default 0.8.5",
- "thiserror 2.0.12",
+ "thiserror 2.0.16",
  "throw_error",
  "url",
  "wasm-bindgen",
@@ -3646,7 +3646,7 @@ checksum = "297f631f50729c8c99b84667867963997ec0b50f32b2a7dbcab828ef0541e8bb"
 dependencies = [
  "num-bigint",
  "num-traits",
- "thiserror 2.0.12",
+ "thiserror 2.0.16",
  "time",
 ]
 
@@ -3831,9 +3831,9 @@ dependencies = [
 
 [[package]]
 name = "tachys"
-version = "0.2.7"
+version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dacbb26ffb2bbe6743702ee27c3e994c0caae86c92137278de9a9d92d383765c"
+checksum = "5db6367a7dfbdb427d421ada82425d804bee78ed5297a7c467c10cc993037923"
 dependencies = [
  "any_spawner",
  "async-trait",
@@ -3896,11 +3896,11 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "2.0.12"
+version = "2.0.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "567b8a2dae586314f7be2a752ec7474332959c6460e02bde30d702a66d488708"
+checksum = "3467d614147380f2e4e374161426ff399c91084acd2363eaf549172b3d5e60c0"
 dependencies = [
- "thiserror-impl 2.0.12",
+ "thiserror-impl 2.0.16",
 ]
 
 [[package]]
@@ -3916,9 +3916,9 @@ dependencies = [
 
 [[package]]
 name = "thiserror-impl"
-version = "2.0.12"
+version = "2.0.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f7cf42b4507d8ea322120659672cf1b9dbb93f8f2d4ecfd6e51350ff5b17a1d"
+checksum = "6c5e1be1c48b9172ee610da68fd9cd2770e7a4056cb3fc98710ee6906f0c7960"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4234,18 +4234,18 @@ dependencies = [
 
 [[package]]
 name = "typed-builder"
-version = "0.21.0"
+version = "0.21.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce63bcaf7e9806c206f7d7b9c1f38e0dce8bb165a80af0898161058b19248534"
+checksum = "fef81aec2ca29576f9f6ae8755108640d0a86dd3161b2e8bca6cfa554e98f77d"
 dependencies = [
  "typed-builder-macro",
 ]
 
 [[package]]
 name = "typed-builder-macro"
-version = "0.21.0"
+version = "0.21.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60d8d828da2a3d759d3519cdf29a5bac49c77d039ad36d0782edadbf9cd5415b"
+checksum = "1ecb9ecf7799210407c14a8cfdfe0173365780968dc57973ed082211958e0b18"
 dependencies = [
  "proc-macro2",
  "quote",
