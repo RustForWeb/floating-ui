@@ -258,7 +258,7 @@ async fn create_pull_request(
     let message = format!("feat: update to upstream {new_tag}");
     let author = CommitAuthor {
         name: env::var("GIT_USER_NAME")?,
-        email: env::var("GIT_USER_EMAIL")?,
+        email: Some(env::var("GIT_USER_EMAIL")?),
         date: None,
     };
 
