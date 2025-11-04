@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc};
 
-use dioxus::{prelude::*, web::WebEventExt};
+use dioxus::{core::use_drop, prelude::*, web::WebEventExt};
 use floating_ui_dom::{
     ComputePositionConfig, MiddlewareData, Placement, Strategy, compute_position,
 };

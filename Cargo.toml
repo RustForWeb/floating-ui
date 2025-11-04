@@ -19,7 +19,7 @@ version = "0.5.1"
 cfg-if = "1.0.0"
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
-dioxus = "0.6.3"
+dioxus = "0.7.0"
 dyn_derive = "0.3.4"
 dyn_std = "0.3.3"
 floating-ui-core = { path = "./packages/core", version = "0.5.0" }
