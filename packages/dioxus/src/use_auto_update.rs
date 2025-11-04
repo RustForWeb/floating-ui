@@ -22,7 +22,7 @@ pub fn use_auto_update() -> Memo<ShallowRc<WhileElementsMountedFn>> {
 ///
 /// Can be passed to [`UseFloatingOptions::while_elements_mounted`][crate::types::UseFloatingOptions::while_elements_mounted].
 pub fn use_auto_update_with_options(
-    options: ReadOnlySignal<AutoUpdateOptions>,
+    options: ReadSignal<AutoUpdateOptions>,
 ) -> Memo<ShallowRc<WhileElementsMountedFn>> {
     use_memo(move || {
         let options = options();
