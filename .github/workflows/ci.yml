@@ -55,13 +55,11 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v6
 
-            # TODO: Investigate why tests fail on stable toolchain.
             - name: Set up Rust toolchain
               uses: actions-rust-lang/setup-rust-toolchain@v1
               with:
                   components: clippy, rustfmt
                   target: wasm32-unknown-unknown
-                  toolchain: nightly
 
             - name: Install Cargo Binary Install
               uses: cargo-bins/cargo-binstall@main
@@ -79,9 +77,8 @@ jobs:
               with:
                   version: 'latest'
 
-            # TODO: See comment above about nightly toolchain.
             - name: Test
-              run: cargo +nightly test --all-features --locked --release
+              run: cargo test --all-features --locked --release
 
             - name: Upload visual snapshot diffs
               uses: actions/upload-artifact@v5
