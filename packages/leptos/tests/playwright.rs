@@ -124,7 +124,7 @@ pub fn playwright() {
 
     let config_content = fs::read_to_string(repository_playwright_config_path.clone())
         .expect("Reading Playwright config file failed.")
-        .replace("retries: 3,", "retries: 0,\n  timeout: 10 * 1000,")
+        .replace("retries: 3,", "retries: 0,\n  timeout: 10 * 1000,\nexpect: {toMatchSnapshot: {maxDiffPixelRatio: 0.01}},")
         .replace(
             "command: 'pnpm run dev',",
             &format!(

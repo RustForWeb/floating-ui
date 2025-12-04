@@ -165,7 +165,7 @@ pub fn Inline() -> impl IntoView {
         <p>The floating element should choose the most appropriate rect.</p>
         <div class="container">
             <p class="prose" style:padding="10px">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.{' '}
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
                 <strong
                     node_ref=reference_ref
                     style:color="royalblue"
@@ -173,12 +173,12 @@ pub fn Inline() -> impl IntoView {
                     on:mouseleave=handle_mouse_leave
                 >
                     {text}
-                </strong>. Ut eu magna eu augue efficitur bibendum id commodo tellus. Nullam
+                </strong>". Ut eu magna eu augue efficitur bibendum id commodo tellus. Nullam
                 gravida, mi nec sodales tincidunt, lorem orci aliquam ex, id commodo
                 erat libero ut risus. Nam molestie non lectus sit amet tempus. Vivamus
-                accumsan{' '}
-                <strong style:color={"red"}>nunc quis faucibus egestas</strong>.
-                Duis cursus nisi massa, non dictum turpis interdum at.
+                accumsan "
+                <strong style:color={"red"}>"nunc quis faucibus egestas"</strong>". "
+                "Duis cursus nisi massa, non dictum turpis interdum at."
             </p>
 
             <Show when=move || open.get()>
