@@ -6,6 +6,7 @@ ignore = [
     { id = "RUSTSEC-2023-0071", reason = "No safe upgrade is available `rsa`." },
     { id = "RUSTSEC-2024-0370", reason = "No safe upgrade is available `proc-macro-error`." },
     { id = "RUSTSEC-2024-0436", reason = "No maintained version available for `paste`." },
+    { id = "RUSTSEC-2025-0141", reason = "No maintained version available for `bincode`." },
 ]
 
 [bans]
