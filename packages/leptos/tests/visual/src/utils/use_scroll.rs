@@ -108,6 +108,7 @@ pub fn use_scroll(
                 let event_target: &EventTarget = match parent {
                     OverflowAncestor::Element(element) => element,
                     OverflowAncestor::Window(window) => window,
+                    OverflowAncestor::VisualViewport(visual_viewport) => visual_viewport,
                 };
 
                 event_target
@@ -142,11 +143,10 @@ pub fn use_scroll(
 
     let cleanup = SendWrapper::new(move || {
         for ancestor in ancestors.get().iter() {
-            let event_target = match ancestor {
-                OverflowAncestor::Element(element) => {
-                    element.unchecked_ref::<web_sys::EventTarget>()
-                }
-                OverflowAncestor::Window(window) => window.unchecked_ref::<web_sys::EventTarget>(),
+            let event_target: &EventTarget = match ancestor {
+                OverflowAncestor::Element(element) => element,
+                OverflowAncestor::Window(window) => window,
+                OverflowAncestor::VisualViewport(visual_viewport) => visual_viewport,
             };
 
             event_target

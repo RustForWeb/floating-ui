@@ -96,6 +96,7 @@ fn get_clipping_element_ancestors(element: &Element) -> Vec<Element> {
                 (get_node_name((&element).into()) != "body").then_some(element)
             }
             OverflowAncestor::Window(_) => None,
+            OverflowAncestor::VisualViewport(_) => None,
         })
         .collect();
     let mut current_containing_block_computed_style: Option<CssStyleDeclaration> = None;
