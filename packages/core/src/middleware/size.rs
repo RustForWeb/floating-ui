@@ -3,7 +3,7 @@ use std::ptr;
 use floating_ui_utils::{Alignment, Axis, Rect, Side, get_side_axis};
 
 use crate::{
-    detect_overflow::{DetectOverflowOptions, detect_overflow},
+    detect_overflow::DetectOverflowOptions,
     middleware::shift::{SHIFT_NAME, ShiftData},
     types::{
         Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
@@ -142,7 +142,7 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
             ..
         } = state;
 
-        let overflow = detect_overflow(
+        let overflow = platform.detect_overflow(
             MiddlewareState {
                 elements: elements.clone(),
                 ..state

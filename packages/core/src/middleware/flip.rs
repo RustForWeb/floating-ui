@@ -5,7 +5,7 @@ use floating_ui_utils::{
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    detect_overflow::{DetectOverflowOptions, detect_overflow},
+    detect_overflow::DetectOverflowOptions,
     middleware::arrow::{ARROW_NAME, ArrowData},
     types::{
         Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
@@ -264,7 +264,7 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
 
         placements.insert(0, initial_placement);
 
-        let overflow = detect_overflow(
+        let overflow = platform.detect_overflow(
             MiddlewareState {
                 elements: elements.clone(),
                 ..state

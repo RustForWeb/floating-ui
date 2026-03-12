@@ -1,6 +1,9 @@
-use floating_ui_utils::{Dimensions, ElementRects, Rect};
+use floating_ui_utils::{Dimensions, ElementRects, Rect, SideObject};
 
-use crate::types::{GetClippingRectArgs, GetElementRectsArgs, Platform};
+use crate::{
+    detect_overflow::{DetectOverflowOptions, detect_overflow},
+    types::{GetClippingRectArgs, GetElementRectsArgs, MiddlewareState, Platform},
+};
 
 #[derive(Clone, Debug)]
 pub struct Element {}
@@ -48,6 +51,14 @@ impl Platform<Element, Window> for TestPlatform {
             width: 10.0,
             height: 10.0,
         }
+    }
+
+    fn detect_overflow(
+        &self,
+        state: MiddlewareState<Element, Window>,
+        options: DetectOverflowOptions<Element>,
+    ) -> SideObject {
+        detect_overflow(state, options)
     }
 }
 
