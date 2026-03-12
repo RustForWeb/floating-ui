@@ -198,7 +198,7 @@ impl From<CssStyleDeclaration> for ElementOrCss<'_> {
 }
 
 fn is_not_none(value: Result<String, JsValue>) -> bool {
-    value.is_ok_and(|value| value != "normal")
+    value.is_ok_and(|value| value != "none")
 }
 
 pub fn is_containing_block(element: ElementOrCss) -> bool {
