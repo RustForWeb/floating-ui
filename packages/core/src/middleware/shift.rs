@@ -5,7 +5,7 @@ use floating_ui_utils::{Axis, Coords, Side, clamp, get_opposite_axis, get_side_a
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    detect_overflow::{DetectOverflowOptions, detect_overflow},
+    detect_overflow::DetectOverflowOptions,
     middleware::{OFFSET_NAME, OffsetData},
     types::{
         Derivable, DerivableFn, Middleware, MiddlewareReturn, MiddlewareState,
@@ -166,7 +166,11 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
         let options = self.options.evaluate(state.clone());
 
         let MiddlewareState {
-            x, y, placement, ..
+            x,
+            y,
+            placement,
+            platform,
+            ..
         } = state;
 
         let check_main_axis = options.main_axis.unwrap_or(true);
@@ -175,7 +179,7 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
         let limiter = options.limiter.unwrap_or(Box::<DefaultLimiter>::default());
 
         let coords = Coords { x, y };
-        let overflow = detect_overflow(
+        let overflow = platform.detect_overflow(
             MiddlewareState {
                 elements: state.elements.clone(),
                 ..state

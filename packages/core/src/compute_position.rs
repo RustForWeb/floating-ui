@@ -6,6 +6,9 @@ use crate::types::{
     MiddlewareReturn, MiddlewareState, Reset, ResetRects,
 };
 
+/// Maximum number of resets that can occur before bailing to avoid infinite reset loops.
+const MAX_RESET_COUNT: i32 = 50;
+
 /// Computes the `x` and `y` coordinates that will place the floating element next to a given reference element.
 ///
 /// This export does not have any `platform` interface logic. You will need to write one for the platform you are using Floating UI with.
@@ -87,7 +90,7 @@ pub fn compute_position<Element: Clone, Window: Clone>(
         }
 
         if let Some(reset) = reset
-            && reset_count <= 50
+            && reset_count < MAX_RESET_COUNT
         {
             reset_count += 1;
 

@@ -6,8 +6,10 @@ use serde::{Serialize, de::DeserializeOwned};
 
 use floating_ui_utils::{
     ClientRectObject, Coords, Dimensions, ElementOrVirtual, ElementOrWindow, ElementRects, Length,
-    OwnedElementOrWindow, Placement, Rect, Strategy,
+    OwnedElementOrWindow, Placement, Rect, SideObject, Strategy,
 };
+
+use crate::detect_overflow::DetectOverflowOptions;
 
 pub type DerivableFn<'a, Element, Window, T> = &'a dyn Fn(MiddlewareState<Element, Window>) -> T;
 
@@ -133,6 +135,12 @@ pub trait Platform<Element: Clone, Window: Clone>: Debug {
     fn get_client_length(&self, _element: &Element, _length: Length) -> Option<f64> {
         None
     }
+
+    fn detect_overflow(
+        &self,
+        state: MiddlewareState<Element, Window>,
+        options: DetectOverflowOptions<Element>,
+    ) -> SideObject;
 }
 
 /// Data stored by middleware.

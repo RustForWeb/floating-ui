@@ -2,7 +2,7 @@ use floating_ui_utils::{ALL_SIDES, Rect, SideObject};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    detect_overflow::{DetectOverflowOptions, detect_overflow},
+    detect_overflow::DetectOverflowOptions,
     types::{
         Derivable, DerivableFn, ElementContext, Middleware, MiddlewareReturn, MiddlewareState,
         MiddlewareWithOptions,
@@ -132,14 +132,17 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
         let options = self.options.evaluate(state.clone());
 
         let MiddlewareState {
-            elements, rects, ..
+            elements,
+            rects,
+            platform,
+            ..
         } = state;
 
         let strategy = options.strategy.unwrap_or_default();
 
         match strategy {
             HideStrategy::ReferenceHidden => {
-                let overflow = detect_overflow(
+                let overflow = platform.detect_overflow(
                     MiddlewareState {
                         elements: elements.clone(),
                         ..state
@@ -168,7 +171,7 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
                 }
             }
             HideStrategy::Escaped => {
-                let overflow = detect_overflow(
+                let overflow = platform.detect_overflow(
                     MiddlewareState {
                         elements: elements.clone(),
                         ..state

@@ -9,12 +9,14 @@ pub mod get_scale;
 pub mod is_rtl;
 
 use floating_ui_core::{
-    ConvertOffsetParentRelativeRectToViewportRelativeRectArgs, GetClippingRectArgs,
-    GetElementRectsArgs, Platform as CorePlatform,
+    ConvertOffsetParentRelativeRectToViewportRelativeRectArgs, DetectOverflowOptions,
+    GetClippingRectArgs, GetElementRectsArgs, MiddlewareState, Platform as CorePlatform,
+    detect_overflow,
 };
 use floating_ui_utils::dom::get_document_element;
 use floating_ui_utils::{
     ClientRectObject, Coords, Dimensions, ElementRects, Length, OwnedElementOrWindow, Rect,
+    SideObject,
 };
 use web_sys::{Element, Window};
 
@@ -78,5 +80,13 @@ impl CorePlatform<Element, Window> for Platform {
 
     fn get_client_length(&self, element: &Element, length: Length) -> Option<f64> {
         Some(get_client_length(element, length))
+    }
+
+    fn detect_overflow(
+        &self,
+        state: MiddlewareState<Element, Window>,
+        options: DetectOverflowOptions<Element>,
+    ) -> SideObject {
+        detect_overflow(state, options)
     }
 }
