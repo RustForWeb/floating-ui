@@ -193,25 +193,25 @@ pub fn get_clipping_rect(
         .chain(vec![ElementOrRootBoundary::RootBoundary(root_boundary)])
         .collect();
 
-    let init =
+    let first_rect =
         get_client_rect_from_clipping_ancestor(element, clipping_ancestors[0].clone(), strategy);
-    let clipping_rect = clipping_ancestors
-        .into_iter()
-        .fold(init, |mut acc, clipping_ancestor| {
-            let rect = get_client_rect_from_clipping_ancestor(element, clipping_ancestor, strategy);
+    let mut top = first_rect.top;
+    let mut right = first_rect.right;
+    let mut bottom = first_rect.bottom;
+    let mut left = first_rect.left;
 
-            acc.top = acc.top.max(rect.top);
-            acc.right = acc.right.min(rect.right);
-            acc.bottom = acc.bottom.min(rect.bottom);
-            acc.left = acc.left.max(rect.left);
-
-            acc
-        });
+    for clipping_ancestor in clipping_ancestors.into_iter().skip(1) {
+        let rect = get_client_rect_from_clipping_ancestor(element, clipping_ancestor, strategy);
+        top = top.max(rect.top);
+        right = right.min(rect.right);
+        bottom = bottom.min(rect.bottom);
+        left = left.max(rect.left);
+    }
 
     Rect {
-        x: clipping_rect.left,
-        y: clipping_rect.top,
-        width: clipping_rect.right - clipping_rect.left,
-        height: clipping_rect.bottom - clipping_rect.top,
+        x: left,
+        y: top,
+        width: right - left,
+        height: bottom - top,
     }
 }
