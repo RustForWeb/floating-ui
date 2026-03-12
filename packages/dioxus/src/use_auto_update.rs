@@ -11,7 +11,12 @@ use crate::{ShallowRc, types::WhileElementsMountedFn};
 pub fn use_auto_update() -> Memo<ShallowRc<WhileElementsMountedFn>> {
     use_memo(|| {
         let rc: Rc<WhileElementsMountedFn> = Rc::new(|reference, floating, update| {
-            auto_update(reference, floating, update, AutoUpdateOptions::default())
+            auto_update(
+                reference,
+                Some(floating),
+                update,
+                AutoUpdateOptions::default(),
+            )
         });
 
         rc.into()
@@ -28,7 +33,7 @@ pub fn use_auto_update_with_options(
         let options = options();
 
         let rc: Rc<WhileElementsMountedFn> = Rc::new(move |reference, floating, update| {
-            auto_update(reference, floating, update, options.clone())
+            auto_update(reference, Some(floating), update, options.clone())
         });
 
         rc.into()

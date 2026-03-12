@@ -12,7 +12,13 @@ use crate::types::WhileElementsMountedFn;
 pub fn use_auto_update() -> Rc<Rc<WhileElementsMountedFn>> {
     use_memo((), |_| {
         let rc: Rc<WhileElementsMountedFn> = Rc::new(|reference, floating, update| {
-            auto_update(reference, floating, update, AutoUpdateOptions::default()).into()
+            auto_update(
+                reference,
+                Some(floating),
+                update,
+                AutoUpdateOptions::default(),
+            )
+            .into()
         });
 
         rc
@@ -28,7 +34,7 @@ pub fn use_auto_update_with_options(options: AutoUpdateOptions) -> Rc<Rc<WhileEl
         let options = options.clone();
 
         let rc: Rc<WhileElementsMountedFn> = Rc::new(move |reference, floating, update| {
-            auto_update(reference, floating, update, options.clone()).into()
+            auto_update(reference, Some(floating), update, options.clone()).into()
         });
 
         rc

@@ -1,5 +1,5 @@
 [releases]
 core = "1.7.5"
-dom = "1.7.4"
+dom = "1.7.6"
 utils = "0.2.11"
 vue = "1.1.9"

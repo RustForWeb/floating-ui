@@ -93,7 +93,12 @@ impl UseFloatingOptions {
     pub fn while_elements_mounted_auto_update(self) -> Self {
         let auto_update_rc: SendWrapper<Rc<WhileElementsMountedFn>> =
             SendWrapper::new(Rc::new(|reference, floating, update| {
-                auto_update(reference, floating, update, AutoUpdateOptions::default())
+                auto_update(
+                    reference,
+                    Some(floating),
+                    update,
+                    AutoUpdateOptions::default(),
+                )
             }));
         self.while_elements_mounted(auto_update_rc)
     }
@@ -102,7 +107,12 @@ impl UseFloatingOptions {
     pub fn while_elements_mounted_auto_update_with_enabled(self, enabled: Signal<bool>) -> Self {
         let auto_update_rc: SendWrapper<Rc<WhileElementsMountedFn>> =
             SendWrapper::new(Rc::new(|reference, floating, update| {
-                auto_update(reference, floating, update, AutoUpdateOptions::default())
+                auto_update(
+                    reference,
+                    Some(floating),
+                    update,
+                    AutoUpdateOptions::default(),
+                )
             }));
         self.while_elements_mounted(MaybeProp::derive(move || {
             if enabled.get() {
@@ -121,7 +131,7 @@ impl UseFloatingOptions {
         let auto_update_rc =
             move |options: AutoUpdateOptions| -> SendWrapper<Rc<WhileElementsMountedFn>> {
                 SendWrapper::new(Rc::new(move |reference, floating, update| {
-                    auto_update(reference, floating, update, options.clone())
+                    auto_update(reference, Some(floating), update, options.clone())
                 }))
             };
 
@@ -139,7 +149,7 @@ impl UseFloatingOptions {
         let auto_update_rc =
             move |options: AutoUpdateOptions| -> SendWrapper<Rc<WhileElementsMountedFn>> {
                 SendWrapper::new(Rc::new(move |reference, floating, update| {
-                    auto_update(reference, floating, update, options.clone())
+                    auto_update(reference, Some(floating), update, options.clone())
                 }))
             };
 

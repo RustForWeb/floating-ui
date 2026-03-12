@@ -93,7 +93,7 @@ pub fn AutoUpdate() -> impl IntoView {
 
                 cleanup.set_value(Some(SendWrapper::new(auto_update(
                     (&reference).into(),
-                    &floating,
+                    Some(&floating),
                     (*update).clone(),
                     options
                         .get()

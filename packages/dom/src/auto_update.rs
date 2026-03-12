@@ -254,7 +254,7 @@ impl AutoUpdateOptions {
 /// Should only be called when the floating element is mounted on the DOM or visible on the screen.
 pub fn auto_update(
     reference: ElementOrVirtual,
-    floating: &Element,
+    floating: Option<&Element>,
     update: Rc<dyn Fn()>,
     options: AutoUpdateOptions,
 ) -> Box<dyn Fn()> {
@@ -278,7 +278,9 @@ pub fn auto_update(
             ancestors = get_overflow_ancestors(reference, ancestors, true);
         }
 
-        ancestors.append(&mut get_overflow_ancestors(floating, vec![], true));
+        if let Some(floating) = floating {
+            ancestors.append(&mut get_overflow_ancestors(floating, vec![], true));
+        }
 
         ancestors
     } else {
@@ -327,16 +329,18 @@ pub fn auto_update(
     let resize_observer: Rc<RefCell<Option<ResizeObserver>>> = Rc::new(RefCell::new(None));
 
     if element_resize {
-        let reobserve_floating = floating.clone();
         let reobserve_closure: Rc<Closure<dyn FnMut()>> = Rc::new(Closure::new({
+            let floating = floating.cloned();
             let resize_observer = resize_observer.clone();
 
             move || {
-                resize_observer
-                    .borrow()
-                    .as_ref()
-                    .expect("Resize observer should exist.")
-                    .observe(&reobserve_floating);
+                if let Some(floating) = floating.as_ref() {
+                    resize_observer
+                        .borrow()
+                        .as_ref()
+                        .expect("Resize observer should exist.")
+                        .observe(floating);
+                }
             }
         }));
 
@@ -378,11 +382,13 @@ pub fn auto_update(
                 .observe(reference);
         }
 
-        resize_observer
-            .borrow()
-            .as_ref()
-            .expect("Resize observer should exist.")
-            .observe(floating);
+        if let Some(floating) = floating {
+            resize_observer
+                .borrow()
+                .as_ref()
+                .expect("Resize observer should exist.")
+                .observe(floating);
+        }
     }
 
     let frame_id: Rc<RefCell<Option<i32>>> = Rc::new(RefCell::new(None));
