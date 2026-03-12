@@ -115,6 +115,7 @@ pub fn use_scroll(options: UseScrollOptions) -> UseScrollReturn {
                         let event_target: &EventTarget = match parent {
                             OverflowAncestor::Element(element) => element,
                             OverflowAncestor::Window(window) => window,
+                            OverflowAncestor::VisualViewport(visual_viewport) => visual_viewport,
                         };
 
                         event_target
@@ -165,9 +166,10 @@ pub fn use_scroll(options: UseScrollOptions) -> UseScrollReturn {
 
                 move || {
                     for parent in parents {
-                        let event_target: EventTarget = match parent {
-                            OverflowAncestor::Element(element) => element.into(),
-                            OverflowAncestor::Window(window) => window.into(),
+                        let event_target: &EventTarget = match &parent {
+                            OverflowAncestor::Element(element) => element,
+                            OverflowAncestor::Window(window) => window,
+                            OverflowAncestor::VisualViewport(visual_viewport) => visual_viewport,
                         };
 
                         event_target

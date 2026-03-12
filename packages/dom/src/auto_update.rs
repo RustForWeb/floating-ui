@@ -299,6 +299,7 @@ pub fn auto_update(
         let event_target: &EventTarget = match ancestor {
             OverflowAncestor::Element(element) => element,
             OverflowAncestor::Window(window) => window,
+            OverflowAncestor::VisualViewport(visual_viewport) => visual_viewport,
         };
 
         if ancestor_scoll {
@@ -457,6 +458,7 @@ pub fn auto_update(
             let event_target: &EventTarget = match ancestor {
                 OverflowAncestor::Element(element) => element,
                 OverflowAncestor::Window(window) => window,
+                OverflowAncestor::VisualViewport(visual_viewport) => visual_viewport,
             };
 
             if ancestor_scoll {

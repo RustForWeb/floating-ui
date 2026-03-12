@@ -1,7 +1,8 @@
 //! Utility functions for the DOM. Requires `dom` feature.
 
 use web_sys::{
-    CssStyleDeclaration, Document, Element, HtmlElement, Node, ShadowRoot, Window, css,
+    CssStyleDeclaration, Document, Element, HtmlElement, Node, ShadowRoot, VisualViewport, Window,
+    css,
     js_sys::Object,
     wasm_bindgen::{JsCast, JsValue},
     window,
@@ -357,8 +358,7 @@ pub fn get_nearest_overflow_ancestor(node: &Node) -> HtmlElement {
 pub enum OverflowAncestor {
     Element(Element),
     Window(Window),
-    // TODO
-    // VisualViewport(VisualViewport)
+    VisualViewport(VisualViewport),
 }
 
 pub fn get_overflow_ancestors(
@@ -376,8 +376,11 @@ pub fn get_overflow_ancestors(
     if is_body {
         let frame_element = get_frame_element(&window);
 
-        list.push(OverflowAncestor::Window(window));
-        // TODO: visual viewport
+        list.push(OverflowAncestor::Window(window.clone()));
+
+        if let Some(visual_viewport) = window.visual_viewport() {
+            list.push(OverflowAncestor::VisualViewport(visual_viewport));
+        }
 
         if is_overflow_element(&scrollable_ancestor) {
             list.push(OverflowAncestor::Element(scrollable_ancestor.into()));
