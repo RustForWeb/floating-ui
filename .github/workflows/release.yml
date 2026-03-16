@@ -53,7 +53,7 @@ jobs:
               run: git add .
 
             - name: Commit
-              uses: dsanders11/github-app-commit-action@v1
+              uses: dsanders11/github-app-commit-action@v2
               with:
                   message: ${{ steps.extract-version.outputs.VERSION }}
                   token: ${{ steps.app-token.outputs.token }}
