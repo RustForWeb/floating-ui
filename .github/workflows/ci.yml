@@ -73,7 +73,7 @@ jobs:
                   node-version: 'lts/*'
 
             - name: Set up pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v5
               with:
                   version: 'latest'
 
