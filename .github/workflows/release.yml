@@ -23,10 +23,10 @@ jobs:
         steps:
             - name: Generate GitHub App token
               id: app-token
-              uses: getsentry/action-github-app-token@v3
+              uses: actions/create-github-app-token@v3
               with:
-                  app_id: ${{ secrets.APP_ID }}
-                  private_key: ${{ secrets.APP_PRIVATE_KEY }}
+                  client-id: ${{ secrets.APP_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
             - name: Checkout
               uses: actions/checkout@v6
@@ -53,6 +53,7 @@ jobs:
               run: git add .
 
             - name: Commit
+              id: commit
               uses: dsanders11/github-app-commit-action@v2
               with:
                   message: ${{ steps.extract-version.outputs.VERSION }}
@@ -62,11 +63,18 @@ jobs:
               run: git reset --hard && git pull
 
             - name: Tag
-              uses: bruno-fs/repo-tagger@1.0.0
-              with:
-                  tag: ${{ steps.extract-version.outputs.VERSION }}
+              uses: actions/github-script@v9
               env:
-                  GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+                  GIT_TAG: ${{ steps.extract-version.outputs.VERSION }}
+                  GIT_SHA: ${{ steps.commit.outputs.sha }}
+              with:
+                  script: |
+                      github.rest.git.createRef({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          ref: `refs/tags/${process.env.GIT_TAG}`,
+                          sha: process.env.GIT_SHA
+                      })
 
             - name: Release
               uses: softprops/action-gh-release@v3
@@ -75,6 +83,3 @@ jobs:
                   make_latest: true
                   tag_name: ${{ steps.extract-version.outputs.VERSION }}
                   token: ${{ steps.app-token.outputs.token }}
-
-            - name: Publish
-              run: cargo workspaces publish --publish-as-is --token "${{ secrets.CRATES_IO_TOKEN }}"
