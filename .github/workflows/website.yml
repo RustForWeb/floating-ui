@@ -1,4 +1,5 @@
 name: Website
+
 on:
     pull_request: {}
     push:
@@ -7,104 +8,14 @@ on:
 
 permissions:
     contents: read
+    id-token: write
+    pages: write
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
     cancel-in-progress: false
 
 jobs:
-    book-test:
-        name: Test Book
-        runs-on: ubuntu-latest
-
-        steps:
-            - uses: actions/checkout@v6
-
-            - name: Set up Rust toolchain
-              uses: actions-rust-lang/setup-rust-toolchain@v1
-              with:
-                  target: wasm32-unknown-unknown
-
-            - name: Install Cargo Binary Install
-              uses: cargo-bins/cargo-binstall@main
-
-            - name: Install mdBook
-              run: cargo binstall --force -y mdbook mdbook-tabs mdbook-trunk
-
-            - name: Run tests
-              run: mdbook test
-              working-directory: book
-
-    book-build:
-        name: Build Book
-        needs: book-test
-        runs-on: ubuntu-latest
-
-        steps:
-            - uses: actions/checkout@v6
-              with:
-                  fetch-depth: 0
-
-            - name: Set up Rust toolchain
-              uses: actions-rust-lang/setup-rust-toolchain@v1
-              with:
-                  target: wasm32-unknown-unknown
-
-            - name: Install Cargo Binary Install
-              uses: cargo-bins/cargo-binstall@main
-
-            - name: Install mdBook and Trunk
-              run: cargo binstall --force -y mdbook mdbook-tabs mdbook-trunk trunk
-
-            - name: Install Node.js dependencies
-              run: npm ci
-
-            - name: Build Book
-              run: mdbook build
-              working-directory: book
-
-            - name: Combine Book Outputs
-              run: mdbook-trunk combine
-              working-directory: book
-
-            - name: Upload artifact
-              uses: actions/upload-artifact@v7
-              with:
-                  name: book
-                  path: book/dist
-                  retention-days: 1
-                  if-no-files-found: error
-
-    deploy:
-        name: Deploy
-        needs: book-build
-        if: github.ref == 'refs/heads/main'
-        runs-on: ubuntu-latest
-
-        permissions:
-            contents: read
-            pages: write
-            id-token: write
-
-        steps:
-            - uses: actions/checkout@v6
-              with:
-                  fetch-depth: 0
-
-            - name: Download artifacts
-              uses: actions/download-artifact@v8
-              with:
-                  path: dist
-                  merge-multiple: true
-
-            - name: Setup Pages
-              uses: actions/configure-pages@v6
-
-            - name: Upload artifact
-              uses: actions/upload-pages-artifact@v5
-              with:
-                  path: dist
-
-            - name: Deploy to GitHub Pages
-              id: deployment
-              uses: actions/deploy-pages@v5
+    book:
+        name: Book
+        uses: RustForWeb/.github/.github/workflows/book.yml@373c25f8fd29e10c40f1343f13312f8be3514af0

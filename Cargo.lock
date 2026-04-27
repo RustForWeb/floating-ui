@@ -1613,7 +1613,6 @@ version = "0.7.0"
 dependencies = [
  "dioxus",
  "floating-ui-dom",
- "wasm-bindgen-test",
  "web-sys",
 ]
 
@@ -1707,7 +1706,6 @@ name = "floating-ui-yew"
 version = "0.7.0"
 dependencies = [
  "floating-ui-dom",
- "wasm-bindgen-test",
  "web-sys",
  "yew",
 ]

@@ -15,4 +15,4 @@ web-sys.workspace = true
 yew.workspace = true
 
 [dev-dependencies]
-wasm-bindgen-test.workspace = true
+# wasm-bindgen-test.workspace = true
