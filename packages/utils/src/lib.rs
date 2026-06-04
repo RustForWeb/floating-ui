@@ -712,7 +712,10 @@ pub fn get_opposite_axis_placements(
         .map(|side| get_placement(side, alignment))
         .collect();
 
-    if flip_alignment {
+    // The flip-alignment duplication only applies to aligned placements. In the
+    // JS source this block is nested inside `if (alignment)`; without that guard,
+    // base placements (e.g. Top/Bottom/Left/Right) are returned duplicated.
+    if flip_alignment && alignment.is_some() {
         let mut opposite_list: Vec<Placement> = list
             .clone()
             .into_iter()
@@ -760,5 +763,129 @@ pub fn rect_to_client_rect(rect: Rect) -> ClientRectObject {
         right: rect.x + rect.width,
         bottom: rect.y + rect.height,
         left: rect.x,
+    }
+}
+
+#[cfg(test)]
+mod opposite_axis_placements_tests {
+    // Ported from @floating-ui/utils
+    // packages/utils/test/getOppositeAxisPlacements.test.ts
+    use super::Placement::{
+        Bottom, BottomEnd, BottomStart, Left, LeftEnd, LeftStart, Right, RightEnd, RightStart, Top,
+        TopEnd, TopStart,
+    };
+    use super::{Alignment, Placement, get_opposite_axis_placements};
+
+    fn goap(placement: Placement, flip: bool, dir: Alignment) -> Vec<Placement> {
+        get_opposite_axis_placements(placement, flip, Some(dir), None)
+    }
+    fn goap_rtl(placement: Placement, flip: bool, dir: Alignment) -> Vec<Placement> {
+        get_opposite_axis_placements(placement, flip, Some(dir), Some(true))
+    }
+
+    // --- side ---
+    #[test]
+    fn side_top() {
+        assert_eq!(goap(Top, true, Alignment::Start), vec![Left, Right]);
+        assert_eq!(goap(Top, true, Alignment::End), vec![Right, Left]);
+    }
+    #[test]
+    fn side_bottom() {
+        assert_eq!(goap(Bottom, true, Alignment::Start), vec![Left, Right]);
+        assert_eq!(goap(Bottom, true, Alignment::End), vec![Right, Left]);
+    }
+    #[test]
+    fn side_left() {
+        assert_eq!(goap(Left, true, Alignment::Start), vec![Top, Bottom]);
+        assert_eq!(goap(Left, true, Alignment::End), vec![Bottom, Top]);
+    }
+    #[test]
+    fn side_right() {
+        assert_eq!(goap(Right, true, Alignment::Start), vec![Top, Bottom]);
+        assert_eq!(goap(Right, true, Alignment::End), vec![Bottom, Top]);
+    }
+
+    // --- start alignment ---
+    #[test]
+    fn start_top_start() {
+        assert_eq!(goap(TopStart, false, Alignment::Start), vec![LeftStart, RightStart]);
+        assert_eq!(goap(TopStart, false, Alignment::End), vec![RightStart, LeftStart]);
+        assert_eq!(goap(TopStart, true, Alignment::Start), vec![LeftStart, RightStart, LeftEnd, RightEnd]);
+        assert_eq!(goap(TopStart, true, Alignment::End), vec![RightStart, LeftStart, RightEnd, LeftEnd]);
+    }
+    #[test]
+    fn start_bottom_start() {
+        assert_eq!(goap(BottomStart, false, Alignment::Start), vec![LeftStart, RightStart]);
+        assert_eq!(goap(BottomStart, false, Alignment::End), vec![RightStart, LeftStart]);
+        assert_eq!(goap(BottomStart, true, Alignment::Start), vec![LeftStart, RightStart, LeftEnd, RightEnd]);
+        assert_eq!(goap(BottomStart, true, Alignment::End), vec![RightStart, LeftStart, RightEnd, LeftEnd]);
+    }
+    #[test]
+    fn start_left_start() {
+        assert_eq!(goap(LeftStart, false, Alignment::Start), vec![TopStart, BottomStart]);
+        assert_eq!(goap(LeftStart, false, Alignment::End), vec![BottomStart, TopStart]);
+        assert_eq!(goap(LeftStart, true, Alignment::Start), vec![TopStart, BottomStart, TopEnd, BottomEnd]);
+        assert_eq!(goap(LeftStart, true, Alignment::End), vec![BottomStart, TopStart, BottomEnd, TopEnd]);
+    }
+    #[test]
+    fn start_right_start() {
+        assert_eq!(goap(RightStart, false, Alignment::Start), vec![TopStart, BottomStart]);
+        assert_eq!(goap(RightStart, false, Alignment::End), vec![BottomStart, TopStart]);
+        assert_eq!(goap(RightStart, true, Alignment::Start), vec![TopStart, BottomStart, TopEnd, BottomEnd]);
+        assert_eq!(goap(RightStart, true, Alignment::End), vec![BottomStart, TopStart, BottomEnd, TopEnd]);
+    }
+
+    // --- end alignment ---
+    #[test]
+    fn end_top_end() {
+        assert_eq!(goap(TopEnd, false, Alignment::Start), vec![LeftEnd, RightEnd]);
+        assert_eq!(goap(TopEnd, false, Alignment::End), vec![RightEnd, LeftEnd]);
+        assert_eq!(goap(TopEnd, true, Alignment::Start), vec![LeftEnd, RightEnd, LeftStart, RightStart]);
+        assert_eq!(goap(TopEnd, true, Alignment::End), vec![RightEnd, LeftEnd, RightStart, LeftStart]);
+    }
+    #[test]
+    fn end_bottom_end() {
+        assert_eq!(goap(BottomEnd, false, Alignment::Start), vec![LeftEnd, RightEnd]);
+        assert_eq!(goap(BottomEnd, false, Alignment::End), vec![RightEnd, LeftEnd]);
+        assert_eq!(goap(BottomEnd, true, Alignment::Start), vec![LeftEnd, RightEnd, LeftStart, RightStart]);
+        assert_eq!(goap(BottomEnd, true, Alignment::End), vec![RightEnd, LeftEnd, RightStart, LeftStart]);
+    }
+    #[test]
+    fn end_left_end() {
+        // NOTE: upstream JS test asserts left-end for the non-flip cases and
+        // (verbatim, an upstream copy-paste) left-start for the flip cases.
+        assert_eq!(goap(LeftEnd, false, Alignment::Start), vec![TopEnd, BottomEnd]);
+        assert_eq!(goap(LeftEnd, false, Alignment::End), vec![BottomEnd, TopEnd]);
+        assert_eq!(goap(LeftStart, true, Alignment::Start), vec![TopStart, BottomStart, TopEnd, BottomEnd]);
+        assert_eq!(goap(LeftStart, true, Alignment::End), vec![BottomStart, TopStart, BottomEnd, TopEnd]);
+    }
+    #[test]
+    fn end_right_end() {
+        assert_eq!(goap(RightEnd, false, Alignment::Start), vec![TopEnd, BottomEnd]);
+        assert_eq!(goap(RightEnd, false, Alignment::End), vec![BottomEnd, TopEnd]);
+        assert_eq!(goap(RightEnd, true, Alignment::Start), vec![TopEnd, BottomEnd, TopStart, BottomStart]);
+        assert_eq!(goap(RightEnd, true, Alignment::End), vec![BottomEnd, TopEnd, BottomStart, TopStart]);
+    }
+
+    // --- rtl ---
+    #[test]
+    fn rtl_top() {
+        assert_eq!(goap_rtl(Top, true, Alignment::Start), vec![Right, Left]);
+        assert_eq!(goap_rtl(Top, true, Alignment::End), vec![Left, Right]);
+    }
+    #[test]
+    fn rtl_bottom() {
+        assert_eq!(goap_rtl(Bottom, true, Alignment::Start), vec![Right, Left]);
+        assert_eq!(goap_rtl(Bottom, true, Alignment::End), vec![Left, Right]);
+    }
+    #[test]
+    fn rtl_left() {
+        assert_eq!(goap_rtl(Left, true, Alignment::Start), vec![Top, Bottom]);
+        assert_eq!(goap_rtl(Left, true, Alignment::End), vec![Bottom, Top]);
+    }
+    #[test]
+    fn rtl_right() {
+        assert_eq!(goap_rtl(Right, true, Alignment::Start), vec![Top, Bottom]);
+        assert_eq!(goap_rtl(Right, true, Alignment::End), vec![Bottom, Top]);
     }
 }
