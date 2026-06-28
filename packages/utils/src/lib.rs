@@ -765,116 +765,366 @@ pub fn rect_to_client_rect(rect: Rect) -> ClientRectObject {
 
 #[cfg(test)]
 mod tests {
-    use super::Placement::{
-        Bottom, BottomEnd, BottomStart, Left, LeftEnd, LeftStart, Right, RightEnd, RightStart, Top,
-        TopEnd, TopStart,
-    };
     use super::{Alignment, Placement, get_opposite_axis_placements};
-
-    fn goap(placement: Placement, flip: bool, dir: Alignment) -> Vec<Placement> {
-        get_opposite_axis_placements(placement, flip, Some(dir), None)
-    }
-    fn goap_rtl(placement: Placement, flip: bool, dir: Alignment) -> Vec<Placement> {
-        get_opposite_axis_placements(placement, flip, Some(dir), Some(true))
-    }
 
     #[test]
     fn side_top() {
-        assert_eq!(goap(Top, true, Alignment::Start), vec![Left, Right]);
-        assert_eq!(goap(Top, true, Alignment::End), vec![Right, Left]);
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Top, true, Some(Alignment::Start), None),
+            vec![Placement::Left, Placement::Right]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Top, true, Some(Alignment::End), None),
+            vec![Placement::Right, Placement::Left]
+        );
     }
+
     #[test]
     fn side_bottom() {
-        assert_eq!(goap(Bottom, true, Alignment::Start), vec![Left, Right]);
-        assert_eq!(goap(Bottom, true, Alignment::End), vec![Right, Left]);
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Bottom, true, Some(Alignment::Start), None),
+            vec![Placement::Left, Placement::Right]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Bottom, true, Some(Alignment::End), None),
+            vec![Placement::Right, Placement::Left]
+        );
     }
+
     #[test]
     fn side_left() {
-        assert_eq!(goap(Left, true, Alignment::Start), vec![Top, Bottom]);
-        assert_eq!(goap(Left, true, Alignment::End), vec![Bottom, Top]);
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Left, true, Some(Alignment::Start), None),
+            vec![Placement::Top, Placement::Bottom]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Left, true, Some(Alignment::End), None),
+            vec![Placement::Bottom, Placement::Top]
+        );
     }
+
     #[test]
     fn side_right() {
-        assert_eq!(goap(Right, true, Alignment::Start), vec![Top, Bottom]);
-        assert_eq!(goap(Right, true, Alignment::End), vec![Bottom, Top]);
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Right, true, Some(Alignment::Start), None),
+            vec![Placement::Top, Placement::Bottom]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Right, true, Some(Alignment::End), None),
+            vec![Placement::Bottom, Placement::Top]
+        );
     }
 
     #[test]
     fn start_top_start() {
-        assert_eq!(goap(TopStart, false, Alignment::Start), vec![LeftStart, RightStart]);
-        assert_eq!(goap(TopStart, false, Alignment::End), vec![RightStart, LeftStart]);
-        assert_eq!(goap(TopStart, true, Alignment::Start), vec![LeftStart, RightStart, LeftEnd, RightEnd]);
-        assert_eq!(goap(TopStart, true, Alignment::End), vec![RightStart, LeftStart, RightEnd, LeftEnd]);
+        assert_eq!(
+            get_opposite_axis_placements(Placement::TopStart, false, Some(Alignment::Start), None),
+            vec![Placement::LeftStart, Placement::RightStart]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::TopStart, false, Some(Alignment::End), None),
+            vec![Placement::RightStart, Placement::LeftStart]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::TopStart, true, Some(Alignment::Start), None),
+            vec![
+                Placement::LeftStart,
+                Placement::RightStart,
+                Placement::LeftEnd,
+                Placement::RightEnd
+            ]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::TopStart, true, Some(Alignment::End), None),
+            vec![
+                Placement::RightStart,
+                Placement::LeftStart,
+                Placement::RightEnd,
+                Placement::LeftEnd
+            ]
+        );
     }
+
     #[test]
     fn start_bottom_start() {
-        assert_eq!(goap(BottomStart, false, Alignment::Start), vec![LeftStart, RightStart]);
-        assert_eq!(goap(BottomStart, false, Alignment::End), vec![RightStart, LeftStart]);
-        assert_eq!(goap(BottomStart, true, Alignment::Start), vec![LeftStart, RightStart, LeftEnd, RightEnd]);
-        assert_eq!(goap(BottomStart, true, Alignment::End), vec![RightStart, LeftStart, RightEnd, LeftEnd]);
+        assert_eq!(
+            get_opposite_axis_placements(
+                Placement::BottomStart,
+                false,
+                Some(Alignment::Start),
+                None
+            ),
+            vec![Placement::LeftStart, Placement::RightStart]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::BottomStart, false, Some(Alignment::End), None),
+            vec![Placement::RightStart, Placement::LeftStart]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(
+                Placement::BottomStart,
+                true,
+                Some(Alignment::Start),
+                None
+            ),
+            vec![
+                Placement::LeftStart,
+                Placement::RightStart,
+                Placement::LeftEnd,
+                Placement::RightEnd
+            ]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::BottomStart, true, Some(Alignment::End), None),
+            vec![
+                Placement::RightStart,
+                Placement::LeftStart,
+                Placement::RightEnd,
+                Placement::LeftEnd
+            ]
+        );
     }
+
     #[test]
     fn start_left_start() {
-        assert_eq!(goap(LeftStart, false, Alignment::Start), vec![TopStart, BottomStart]);
-        assert_eq!(goap(LeftStart, false, Alignment::End), vec![BottomStart, TopStart]);
-        assert_eq!(goap(LeftStart, true, Alignment::Start), vec![TopStart, BottomStart, TopEnd, BottomEnd]);
-        assert_eq!(goap(LeftStart, true, Alignment::End), vec![BottomStart, TopStart, BottomEnd, TopEnd]);
+        assert_eq!(
+            get_opposite_axis_placements(Placement::LeftStart, false, Some(Alignment::Start), None),
+            vec![Placement::TopStart, Placement::BottomStart]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::LeftStart, false, Some(Alignment::End), None),
+            vec![Placement::BottomStart, Placement::TopStart]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::LeftStart, true, Some(Alignment::Start), None),
+            vec![
+                Placement::TopStart,
+                Placement::BottomStart,
+                Placement::TopEnd,
+                Placement::BottomEnd
+            ]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::LeftStart, true, Some(Alignment::End), None),
+            vec![
+                Placement::BottomStart,
+                Placement::TopStart,
+                Placement::BottomEnd,
+                Placement::TopEnd
+            ]
+        );
     }
+
     #[test]
     fn start_right_start() {
-        assert_eq!(goap(RightStart, false, Alignment::Start), vec![TopStart, BottomStart]);
-        assert_eq!(goap(RightStart, false, Alignment::End), vec![BottomStart, TopStart]);
-        assert_eq!(goap(RightStart, true, Alignment::Start), vec![TopStart, BottomStart, TopEnd, BottomEnd]);
-        assert_eq!(goap(RightStart, true, Alignment::End), vec![BottomStart, TopStart, BottomEnd, TopEnd]);
+        assert_eq!(
+            get_opposite_axis_placements(
+                Placement::RightStart,
+                false,
+                Some(Alignment::Start),
+                None
+            ),
+            vec![Placement::TopStart, Placement::BottomStart]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::RightStart, false, Some(Alignment::End), None),
+            vec![Placement::BottomStart, Placement::TopStart]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::RightStart, true, Some(Alignment::Start), None),
+            vec![
+                Placement::TopStart,
+                Placement::BottomStart,
+                Placement::TopEnd,
+                Placement::BottomEnd
+            ]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::RightStart, true, Some(Alignment::End), None),
+            vec![
+                Placement::BottomStart,
+                Placement::TopStart,
+                Placement::BottomEnd,
+                Placement::TopEnd
+            ]
+        );
     }
 
     #[test]
     fn end_top_end() {
-        assert_eq!(goap(TopEnd, false, Alignment::Start), vec![LeftEnd, RightEnd]);
-        assert_eq!(goap(TopEnd, false, Alignment::End), vec![RightEnd, LeftEnd]);
-        assert_eq!(goap(TopEnd, true, Alignment::Start), vec![LeftEnd, RightEnd, LeftStart, RightStart]);
-        assert_eq!(goap(TopEnd, true, Alignment::End), vec![RightEnd, LeftEnd, RightStart, LeftStart]);
+        assert_eq!(
+            get_opposite_axis_placements(Placement::TopEnd, false, Some(Alignment::Start), None),
+            vec![Placement::LeftEnd, Placement::RightEnd]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::TopEnd, false, Some(Alignment::End), None),
+            vec![Placement::RightEnd, Placement::LeftEnd]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::TopEnd, true, Some(Alignment::Start), None),
+            vec![
+                Placement::LeftEnd,
+                Placement::RightEnd,
+                Placement::LeftStart,
+                Placement::RightStart
+            ]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::TopEnd, true, Some(Alignment::End), None),
+            vec![
+                Placement::RightEnd,
+                Placement::LeftEnd,
+                Placement::RightStart,
+                Placement::LeftStart
+            ]
+        );
     }
+
     #[test]
     fn end_bottom_end() {
-        assert_eq!(goap(BottomEnd, false, Alignment::Start), vec![LeftEnd, RightEnd]);
-        assert_eq!(goap(BottomEnd, false, Alignment::End), vec![RightEnd, LeftEnd]);
-        assert_eq!(goap(BottomEnd, true, Alignment::Start), vec![LeftEnd, RightEnd, LeftStart, RightStart]);
-        assert_eq!(goap(BottomEnd, true, Alignment::End), vec![RightEnd, LeftEnd, RightStart, LeftStart]);
+        assert_eq!(
+            get_opposite_axis_placements(Placement::BottomEnd, false, Some(Alignment::Start), None),
+            vec![Placement::LeftEnd, Placement::RightEnd]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::BottomEnd, false, Some(Alignment::End), None),
+            vec![Placement::RightEnd, Placement::LeftEnd]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::BottomEnd, true, Some(Alignment::Start), None),
+            vec![
+                Placement::LeftEnd,
+                Placement::RightEnd,
+                Placement::LeftStart,
+                Placement::RightStart
+            ]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::BottomEnd, true, Some(Alignment::End), None),
+            vec![
+                Placement::RightEnd,
+                Placement::LeftEnd,
+                Placement::RightStart,
+                Placement::LeftStart
+            ]
+        );
     }
+
     #[test]
     fn end_left_end() {
-        assert_eq!(goap(LeftEnd, false, Alignment::Start), vec![TopEnd, BottomEnd]);
-        assert_eq!(goap(LeftEnd, false, Alignment::End), vec![BottomEnd, TopEnd]);
-        assert_eq!(goap(LeftStart, true, Alignment::Start), vec![TopStart, BottomStart, TopEnd, BottomEnd]);
-        assert_eq!(goap(LeftStart, true, Alignment::End), vec![BottomStart, TopStart, BottomEnd, TopEnd]);
+        assert_eq!(
+            get_opposite_axis_placements(Placement::LeftEnd, false, Some(Alignment::Start), None),
+            vec![Placement::TopEnd, Placement::BottomEnd]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::LeftEnd, false, Some(Alignment::End), None),
+            vec![Placement::BottomEnd, Placement::TopEnd]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::LeftStart, true, Some(Alignment::Start), None),
+            vec![
+                Placement::TopStart,
+                Placement::BottomStart,
+                Placement::TopEnd,
+                Placement::BottomEnd
+            ]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::LeftStart, true, Some(Alignment::End), None),
+            vec![
+                Placement::BottomStart,
+                Placement::TopStart,
+                Placement::BottomEnd,
+                Placement::TopEnd
+            ]
+        );
     }
+
     #[test]
     fn end_right_end() {
-        assert_eq!(goap(RightEnd, false, Alignment::Start), vec![TopEnd, BottomEnd]);
-        assert_eq!(goap(RightEnd, false, Alignment::End), vec![BottomEnd, TopEnd]);
-        assert_eq!(goap(RightEnd, true, Alignment::Start), vec![TopEnd, BottomEnd, TopStart, BottomStart]);
-        assert_eq!(goap(RightEnd, true, Alignment::End), vec![BottomEnd, TopEnd, BottomStart, TopStart]);
+        assert_eq!(
+            get_opposite_axis_placements(Placement::RightEnd, false, Some(Alignment::Start), None),
+            vec![Placement::TopEnd, Placement::BottomEnd]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::RightEnd, false, Some(Alignment::End), None),
+            vec![Placement::BottomEnd, Placement::TopEnd]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::RightEnd, true, Some(Alignment::Start), None),
+            vec![
+                Placement::TopEnd,
+                Placement::BottomEnd,
+                Placement::TopStart,
+                Placement::BottomStart
+            ]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::RightEnd, true, Some(Alignment::End), None),
+            vec![
+                Placement::BottomEnd,
+                Placement::TopEnd,
+                Placement::BottomStart,
+                Placement::TopStart
+            ]
+        );
     }
 
     #[test]
     fn rtl_top() {
-        assert_eq!(goap_rtl(Top, true, Alignment::Start), vec![Right, Left]);
-        assert_eq!(goap_rtl(Top, true, Alignment::End), vec![Left, Right]);
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Top, true, Some(Alignment::Start), Some(true)),
+            vec![Placement::Right, Placement::Left]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Top, true, Some(Alignment::End), Some(true)),
+            vec![Placement::Left, Placement::Right]
+        );
     }
+
     #[test]
     fn rtl_bottom() {
-        assert_eq!(goap_rtl(Bottom, true, Alignment::Start), vec![Right, Left]);
-        assert_eq!(goap_rtl(Bottom, true, Alignment::End), vec![Left, Right]);
+        assert_eq!(
+            get_opposite_axis_placements(
+                Placement::Bottom,
+                true,
+                Some(Alignment::Start),
+                Some(true)
+            ),
+            vec![Placement::Right, Placement::Left]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Bottom, true, Some(Alignment::End), Some(true)),
+            vec![Placement::Left, Placement::Right]
+        );
     }
+
     #[test]
     fn rtl_left() {
-        assert_eq!(goap_rtl(Left, true, Alignment::Start), vec![Top, Bottom]);
-        assert_eq!(goap_rtl(Left, true, Alignment::End), vec![Bottom, Top]);
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Left, true, Some(Alignment::Start), Some(true)),
+            vec![Placement::Top, Placement::Bottom]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Left, true, Some(Alignment::End), Some(true)),
+            vec![Placement::Bottom, Placement::Top]
+        );
     }
+
     #[test]
     fn rtl_right() {
-        assert_eq!(goap_rtl(Right, true, Alignment::Start), vec![Top, Bottom]);
-        assert_eq!(goap_rtl(Right, true, Alignment::End), vec![Bottom, Top]);
+        assert_eq!(
+            get_opposite_axis_placements(
+                Placement::Right,
+                true,
+                Some(Alignment::Start),
+                Some(true)
+            ),
+            vec![Placement::Top, Placement::Bottom]
+        );
+        assert_eq!(
+            get_opposite_axis_placements(Placement::Right, true, Some(Alignment::End), Some(true)),
+            vec![Placement::Bottom, Placement::Top]
+        );
     }
 }
