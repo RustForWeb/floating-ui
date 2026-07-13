@@ -401,6 +401,7 @@ pub fn auto_update(
     let frame_loop_frame_id = frame_id.clone();
     let frame_loop_closure = Rc::new(RefCell::new(None));
     let frame_loop_closure_clone = frame_loop_closure.clone();
+    let frame_loop_closure_cleanup = frame_loop_closure.clone();
 
     *frame_loop_closure_clone.borrow_mut() = Some(Closure::new({
         let owned_reference = owned_reference.clone();
@@ -495,5 +496,7 @@ pub fn auto_update(
         if let Some(frame_id) = frame_id.take() {
             cancel_animation_frame(frame_id);
         }
+
+        drop(frame_loop_closure_cleanup.borrow_mut().take());
     })
 }
