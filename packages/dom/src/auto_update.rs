@@ -5,7 +5,7 @@ use floating_ui_utils::{
     dom::{OverflowAncestor, get_document_element, get_overflow_ancestors, get_window},
 };
 use web_sys::{
-    AddEventListenerOptions, Element, EventTarget, IntersectionObserver, IntersectionObserverEntry,
+    Element, EventTarget, IntersectionObserver, IntersectionObserverEntry,
     IntersectionObserverInit, ResizeObserver, ResizeObserverEntry,
     wasm_bindgen::{JsCast, JsValue, closure::Closure},
     window,
@@ -30,7 +30,7 @@ fn cancel_animation_frame(handle: i32) {
         .expect("Cancel animation frame should be successful.")
 }
 
-fn observe_move(element: Element, on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
+fn observe_move(element: Element, on_move: Rc<dyn Fn()>, ancestor_resize: bool) -> Box<dyn Fn()> {
     let io: Rc<RefCell<Option<IntersectionObserver>>> = Rc::new(RefCell::new(None));
     let timeout_id: Rc<RefCell<Option<i32>>> = Rc::new(RefCell::new(None));
 
@@ -61,55 +61,65 @@ fn observe_move(element: Element, on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
     let refresh_closure_clone = refresh_closure.clone();
 
     let refresh_cleanup = cleanup_rc.clone();
-    *refresh_closure_clone.borrow_mut() = Some(Box::new(move |skip: bool, threshold: f64| {
-        refresh_cleanup();
+    *refresh_closure_clone.borrow_mut() = Some(Box::new({
+        let element = element.clone();
 
-        let element_rect_for_root_margin = element.get_bounding_client_rect();
+        move |skip: bool, threshold: f64| {
+            refresh_cleanup();
 
-        if !skip {
-            on_move();
-        }
+            let element_rect_for_root_margin = element.get_bounding_client_rect();
 
-        if element_rect_for_root_margin.width() == 0.0
-            || element_rect_for_root_margin.height() == 0.0
-        {
-            return;
-        }
+            if !skip {
+                on_move();
+            }
 
-        let inset_top = element_rect_for_root_margin.top().floor();
-        let inset_right = (root.client_width() as f64
-            - (element_rect_for_root_margin.left() + element_rect_for_root_margin.width()))
-        .floor();
-        let inset_bottom = (root.client_height() as f64
-            - (element_rect_for_root_margin.top() + element_rect_for_root_margin.height()))
-        .floor();
-        let inset_left = element_rect_for_root_margin.left().floor();
-        let root_margin = format!(
-            "{}px {}px {}px {}px",
-            -inset_top, -inset_right, -inset_bottom, -inset_left
-        );
+            if element_rect_for_root_margin.width() == 0.0
+                || element_rect_for_root_margin.height() == 0.0
+            {
+                return;
+            }
 
-        let is_first_update: Rc<RefCell<bool>> = Rc::new(RefCell::new(true));
+            let inset_top = element_rect_for_root_margin.top().floor();
+            let inset_right = (root.client_width() as f64
+                - (element_rect_for_root_margin.left() + element_rect_for_root_margin.width()))
+            .floor();
+            let inset_bottom = (root.client_height() as f64
+                - (element_rect_for_root_margin.top() + element_rect_for_root_margin.height()))
+            .floor();
+            let inset_left = element_rect_for_root_margin.left().floor();
+            let root_margin = format!(
+                "{}px {}px {}px {}px",
+                -inset_top, -inset_right, -inset_bottom, -inset_left
+            );
 
-        let timeout_refresh = refresh_closure.clone();
-        let timeout_closure: Rc<Closure<dyn Fn()>> = Rc::new(Closure::new(move || {
-            timeout_refresh
-                .borrow()
-                .as_ref()
-                .expect("Refresh closure should exist.")(false, 1e-7)
-        }));
+            let is_first_update: Rc<RefCell<bool>> = Rc::new(RefCell::new(true));
 
-        let observe_timeout_id = timeout_id.clone();
-        let observe_window = window.clone();
-        let observe_refresh = refresh_closure.clone();
-        let local_observe_closure = Closure::new({
-            let element = element.clone();
+            let timeout_refresh = refresh_closure.clone();
+            let timeout_closure: Rc<Closure<dyn Fn()>> = Rc::new(Closure::new(move || {
+                timeout_refresh
+                    .borrow()
+                    .as_ref()
+                    .expect("Refresh closure should exist.")(false, 1e-7)
+            }));
 
-            move |entries: Vec<IntersectionObserverEntry>| {
-                let ratio = entries[0].intersection_ratio();
+            let observe_timeout_id = timeout_id.clone();
+            let observe_window = window.clone();
+            let observe_refresh = refresh_closure.clone();
+            let local_observe_closure = Closure::new({
+                let element = element.clone();
 
-                if ratio != threshold {
-                    if !*is_first_update.borrow() {
+                move |entries: Vec<IntersectionObserverEntry>| {
+                    let ratio = entries[0].intersection_ratio();
+
+                    // The entry is a snapshot, so the reference may have moved since the
+                    // intersection was computed (under performance constraints, or between
+                    // consecutive frames of a multi-frame layout shift). The reported ratio
+                    // and the observed area are stale in that case and cannot be trusted to
+                    // detect subsequent movement, so refresh regardless of the ratio.
+                    if !rects_are_equal(
+                        &(&element_rect_for_root_margin).into(),
+                        &element.get_bounding_client_rect().into(),
+                    ) {
                         observe_refresh
                             .borrow()
                             .as_ref()
@@ -119,64 +129,76 @@ fn observe_move(element: Element, on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
                         return;
                     }
 
-                    if ratio == 0.0 {
-                        // If the reference is clipped, the ratio is 0. Throttle the refresh to prevent an infinite loop of updates.
-                        observe_timeout_id.replace(Some(
-                            observe_window
-                                .set_timeout_with_callback_and_timeout_and_arguments_0(
-                                    (*timeout_closure).as_ref().unchecked_ref(),
-                                    1000,
-                                )
-                                .expect("Set timeout should be successful."),
-                        ));
-                    } else {
-                        observe_refresh
-                            .borrow()
-                            .as_ref()
-                            .expect("Refresh closure should exist.")(
-                            false, ratio
-                        );
+                    if ratio != threshold {
+                        if !*is_first_update.borrow() {
+                            observe_refresh
+                                .borrow()
+                                .as_ref()
+                                .expect("Refresh closure should exist.")(
+                                false, 1.0
+                            );
+                            return;
+                        }
+
+                        if ratio == 0.0 {
+                            // If the reference is clipped in place, the ratio is 0. Throttle the refresh to prevent an infinite loop of updates.
+                            observe_timeout_id.replace(Some(
+                                observe_window
+                                    .set_timeout_with_callback_and_timeout_and_arguments_0(
+                                        (*timeout_closure).as_ref().unchecked_ref(),
+                                        1000,
+                                    )
+                                    .expect("Set timeout should be successful."),
+                            ));
+                        } else {
+                            observe_refresh
+                                .borrow()
+                                .as_ref()
+                                .expect("Refresh closure should exist.")(
+                                false, ratio
+                            );
+                        }
                     }
+
+                    is_first_update.replace(false);
                 }
+            });
 
-                if ratio == 1.0
-                    && !rects_are_equal(
-                        &element_rect_for_root_margin.clone().into(),
-                        &element.get_bounding_client_rect().into(),
-                    )
-                {
-                    // It's possible that even though the ratio is reported as 1, the
-                    // element is not actually fully within the IntersectionObserver's root
-                    // area anymore. This can happen under performance constraints. This may
-                    // be a bug in the browser's IntersectionObserver implementation. To
-                    // work around this, we compare the element's bounding rect now with
-                    // what it was at the time we created the IntersectionObserver. If they
-                    // are not equal then the element moved, so we refresh.
-                    observe_refresh
-                        .borrow()
-                        .as_ref()
-                        .expect("Refresh closure should exist.")(false, 1.0);
-                }
+            let options = IntersectionObserverInit::new();
+            options.set_root_margin(&root_margin);
+            options.set_threshold(&JsValue::from_f64(threshold.clamp(0.0, 1.0)));
 
-                is_first_update.replace(false);
-            }
-        });
+            let local_io = IntersectionObserver::new_with_options(
+                local_observe_closure.as_ref().unchecked_ref(),
+                &options,
+            )
+            .expect("Intersection observer should be created.");
 
-        let options = IntersectionObserverInit::new();
-        options.set_root_margin(&root_margin);
-        options.set_threshold(&JsValue::from_f64(threshold.clamp(0.0, 1.0)));
+            observe_closure.replace(Some(local_observe_closure));
 
-        let local_io = IntersectionObserver::new_with_options(
-            local_observe_closure.as_ref().unchecked_ref(),
-            &options,
-        )
-        .expect("Intersection observer should be created.");
-
-        observe_closure.replace(Some(local_observe_closure));
-
-        local_io.observe(&element);
-        io.replace(Some(local_io));
+            local_io.observe(&element);
+            io.replace(Some(local_io));
+        }
     }));
+
+    // The window is a resize ancestor, so when `ancestor_resize` is enabled its
+    // listener already runs the update on resize. Here we only need to rebuild
+    // the `IntersectionObserver` for the new root size, skipping a redundant
+    // update. When `ancestor_resize` is disabled, this becomes the sole update.
+    let win = get_window(Some(&element));
+    let handle_resize: Closure<dyn Fn()> = Closure::new({
+        let refresh_closure_clone = refresh_closure_clone.clone();
+
+        move || {
+            refresh_closure_clone
+                .borrow()
+                .as_ref()
+                .expect("Refresh closure should exist.")(ancestor_resize, 1.0);
+        }
+    });
+
+    win.add_event_listener_with_callback("resize", handle_resize.as_ref().unchecked_ref())
+        .expect("Resize event listener should be added.");
 
     refresh_closure_clone
         .borrow()
@@ -184,6 +206,8 @@ fn observe_move(element: Element, on_move: Rc<dyn Fn()>) -> Box<dyn Fn()> {
         .expect("Refresh closure should exist.")(true, 1.0);
 
     Box::new(move || {
+        win.remove_event_listener_with_callback("resize", handle_resize.as_ref().unchecked_ref())
+            .expect("Resize event listener should be removed.");
         cleanup_rc();
     })
 }
@@ -303,15 +327,8 @@ pub fn auto_update(
         };
 
         if ancestor_scoll {
-            let options = AddEventListenerOptions::new();
-            options.set_passive(true);
-
             event_target
-                .add_event_listener_with_callback_and_add_event_listener_options(
-                    "scroll",
-                    update_closure.as_ref().unchecked_ref(),
-                    &options,
-                )
+                .add_event_listener_with_callback("scroll", update_closure.as_ref().unchecked_ref())
                 .expect("Scroll event listener should be added.");
         }
 
@@ -323,7 +340,8 @@ pub fn auto_update(
     }
 
     let cleanup_observe_move = reference_element.as_ref().and_then(|reference_element| {
-        layout_shift.then(|| observe_move(reference_element.clone(), update.clone()))
+        layout_shift
+            .then(|| observe_move(reference_element.clone(), update.clone(), ancestor_resize))
     });
 
     let reobserve_frame: Rc<RefCell<Option<i32>>> = Rc::new(RefCell::new(None));

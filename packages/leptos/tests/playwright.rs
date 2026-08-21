@@ -7,10 +7,12 @@ const IMPLEMENTED_TESTS: [&str; 19] = [
     "border",
     "containing-block",
     "decimal-size",
+    // "fixed-clipping",
     "flip",
     "hide",
     // "iframe",
     "inline",
+    // "layout-viewport",
     "offset",
     "placement",
     "relative",
@@ -23,6 +25,7 @@ const IMPLEMENTED_TESTS: [&str; 19] = [
     // "top-layer",
     "transform",
     "virtual-element",
+    // "viewport-boundary",
 ];
 
 #[test]

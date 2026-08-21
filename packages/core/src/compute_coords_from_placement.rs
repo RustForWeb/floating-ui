@@ -46,7 +46,7 @@ pub fn compute_coords_from_placement(
     if let Some(alignment) = get_alignment(placement) {
         coords.update_axis(alignment_axis, |value| {
             value
-                - common_align
+                + common_align
                     * (if alignment == Alignment::End {
                         1.0
                     } else {

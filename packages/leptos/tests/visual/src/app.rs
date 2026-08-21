@@ -4,7 +4,7 @@ use leptos_router::path;
 
 use crate::spec::arrow::Arrow;
 use crate::spec::auto_placement::AutoPlacement;
-use crate::spec::auto_update::AutoUpdate;
+use crate::spec::auto_update::{AutoUpdate, AutoUpdateRootResize};
 use crate::spec::border::Border;
 use crate::spec::containing_block::ContainingBlock;
 use crate::spec::decimal_size::DecimalSize;
@@ -23,7 +23,7 @@ use crate::spec::transform::Transform;
 use crate::spec::virtual_element::VirtualElement;
 use crate::utils::new::New;
 
-const ROUTES: [&str; 23] = [
+const ROUTES: [&str; 27] = [
     "placement",
     "relative",
     "transform",
@@ -41,12 +41,16 @@ const ROUTES: [&str; 23] = [
     "autoPlacement",
     "inline",
     "autoUpdate",
+    "autoUpdate-root-resize",
     "shadow-DOM",
     "containing-block",
+    "fixed-clipping",
     "virtual-element",
     "perf",
     "iframe",
     "top-layer",
+    "layout-viewport",
+    "viewport-boundary",
 ];
 
 #[component]
@@ -122,12 +126,16 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("autoPlacement") view=AutoPlacement />
                     <Route path=path!("inline") view=Inline />
                     <Route path=path!("autoUpdate") view=AutoUpdate />
+                    <Route path=path!("autoUpdate-root-resize") view=AutoUpdateRootResize />
                     // <Route path=path!("shadow-DOM") view=ShadowDom />
                     <Route path=path!("containing-block") view=ContainingBlock />
+                    // <Route path=path!("fixed-clipping") view=FixedClipping />
                     <Route path=path!("virtual-element") view=VirtualElement />
                     // <Route path=path!("perf") view=Perf />
                     // <Route path=path!("iframe") view=Iframe />
                     // <Route path=path!("top-layer") view=TopLayer />
+                    // <Route path=path!("layout-viewport") view=LayoutViewport />
+                    // <Route path=path!("viewport-boundary") view=ViewportBoundary />
                 </ParentRoute>
             </Routes>
         </Router>

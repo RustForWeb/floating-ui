@@ -1,4 +1,4 @@
-use std::{rc::Rc, time::Duration};
+use std::{collections::HashMap, rc::Rc, sync::LazyLock, time::Duration};
 
 use convert_case::{Case, Casing};
 use floating_ui_leptos::{
@@ -15,13 +15,36 @@ use send_wrapper::SendWrapper;
 
 use crate::utils::all_placements::ALL_PLACEMENTS;
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 enum ConnectedStatus {
     One,
     TwoDisjoined,
     TwoJoined,
     Three,
 }
+
+// Hebrew (RTL script) copy used to exercise right-to-left line wrapping. In a
+// disjoined wrap the two line fragments are ordered opposite to LTR: the top
+// fragment sits to the *left* of the bottom fragment.
+const RTL_BEFORE: &str = "לורם איפסום דולור סיט אמט קונסקטטור אדיפיסינג עלית סד דו איואיסמוד ";
+const RTL_AFTER: &str = " אוט אאו מגנה אאו אאוגה אפיקיטור ביבנדום איד קומודו טלוס נולם גרבידה מי נק סודלס טינסידונט לורם אורסי אליקום אקס איד קומודו אראט ליברו אוט ריסוס נאם מולסטיה נון לקטוס סיט אמט טמפוס";
+static RTL_TEXT: LazyLock<HashMap<ConnectedStatus, &'static str>> = LazyLock::new(|| {
+    HashMap::from([
+        (ConnectedStatus::One, "בדיקה"),
+        (
+            ConnectedStatus::TwoDisjoined,
+            "נולה רוטרום דפיבוס טורפיס אאו וולוטפאט",
+        ),
+        (
+            ConnectedStatus::TwoJoined,
+            "נולה רוטרום דפיבוס טורפיס אאו וולוטפאט דואיס קורסוס ניסי מאסה נון דיקטום",
+        ),
+        (
+            ConnectedStatus::Three,
+            "נולה רוטרום דפיבוס טורפיס אאו וולוטפאט דואיס קורסוס ניסי מאסה נון דיקטום טורפיס אינטרדום אט נולה רוטרום דפיבוס טורפיס אאו וולוטפאט",
+        ),
+    ])
+});
 
 #[component]
 pub fn Inline() -> impl IntoView {
@@ -30,6 +53,7 @@ pub fn Inline() -> impl IntoView {
 
     let (placement, set_placement) = signal(Placement::Bottom);
     let (status, set_status) = signal(ConnectedStatus::TwoDisjoined);
+    let (rtl, set_rtl) = signal(false);
     let (open, set_open) = signal(false);
     let (mouse_coords, set_mouse_coords) = signal::<Option<Coords>>(None);
 
@@ -164,21 +188,39 @@ pub fn Inline() -> impl IntoView {
         <h1>Inline</h1>
         <p>The floating element should choose the most appropriate rect.</p>
         <div class="container">
-            <p class="prose" style:padding="10px">
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-                <strong
-                    node_ref=reference_ref
-                    style:color="royalblue"
-                    on:mouseenter=handle_mouse_enter
-                    on:mouseleave=handle_mouse_leave
-                >
-                    {text}
-                </strong>". Ut eu magna eu augue efficitur bibendum id commodo tellus. Nullam
-                gravida, mi nec sodales tincidunt, lorem orci aliquam ex, id commodo
-                erat libero ut risus. Nam molestie non lectus sit amet tempus. Vivamus
-                accumsan "
-                <strong style:color={"red"}>"nunc quis faucibus egestas"</strong>". "
-                "Duis cursus nisi massa, non dictum turpis interdum at."
+            <p
+                class="prose"
+                dir=move || if rtl.get() { Some("rtl") } else { None }
+                style:padding="10px"
+            >
+                <Show when=move || rtl.get()>
+                    {RTL_BEFORE}
+                    <strong
+                        node_ref=reference_ref
+                        style:color="royalblue"
+                        on:mouseenter=handle_mouse_enter
+                        on:mouseleave=handle_mouse_leave
+                    >
+                        {RTL_TEXT.get(&status.get()).map(ToOwned::to_owned).unwrap_or_default()}
+                    </strong>
+                    {RTL_AFTER}
+                </Show>
+                <Show when=move || !rtl.get()>
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+                    <strong
+                        node_ref=reference_ref
+                        style:color="royalblue"
+                        on:mouseenter=handle_mouse_enter
+                        on:mouseleave=handle_mouse_leave
+                    >
+                        {text}
+                    </strong>". Ut eu magna eu augue efficitur bibendum id commodo tellus. Nullam
+                    gravida, mi nec sodales tincidunt, lorem orci aliquam ex, id commodo
+                    erat libero ut risus. Nam molestie non lectus sit amet tempus. Vivamus
+                    accumsan "
+                    <strong style:color={"red"}>"nunc quis faucibus egestas"</strong>". "
+                    "Duis cursus nisi massa, non dictum turpis interdum at."
+                </Show>
             </p>
 
             <Show when=move || open.get()>
@@ -263,6 +305,27 @@ pub fn Inline() -> impl IntoView {
                             ConnectedStatus::TwoJoined => "2-joined",
                             ConnectedStatus::Three => "3",
                         }}
+                    </button>
+                }
+            />
+        </div>
+
+        <h2>RTL</h2>
+        <div class="controls">
+            <For
+                each=|| [false, true]
+                key=|value| format!("{value}")
+                children=move |value| view! {
+                    <button
+                        data-testid=format!("rtl-{}", value)
+                        style:background-color=move || if open.get() == value {
+                            "black"
+                        } else {
+                            ""
+                        }
+                        on:click=move |_| set_rtl.set(value)
+                    >
+                        {format!("{value}")}
                     </button>
                 }
             />

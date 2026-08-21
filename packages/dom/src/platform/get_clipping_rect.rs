@@ -14,8 +14,10 @@ use crate::{
     platform::{Platform, get_scale::get_scale},
     types::Boundary,
     utils::{
-        get_bounding_client_rect::get_bounding_client_rect, get_document_rect::get_document_rect,
-        get_viewport_rect::get_viewport_rect, get_visual_offsets::get_visual_offsets,
+        get_bounding_client_rect::get_bounding_client_rect,
+        get_document_rect::get_document_rect,
+        get_viewport_rect::{ViewportRootBoundary, get_viewport_rect},
+        get_visual_offsets::get_visual_offsets,
     },
 };
 
@@ -50,9 +52,11 @@ fn get_client_rect_from_clipping_ancestor(
             get_inner_bounding_client_rect(&element, strategy)
         }
         ElementOrRootBoundary::RootBoundary(RootBoundary::Viewport)
-        | ElementOrRootBoundary::RootBoundary(RootBoundary::LayoutViewport) => {
-            get_viewport_rect(&get_document_element(Some(element.into())), strategy)
-        }
+        | ElementOrRootBoundary::RootBoundary(RootBoundary::LayoutViewport) => get_viewport_rect(
+            &get_document_element(Some(element.into())),
+            strategy,
+            ViewportRootBoundary::Viewport,
+        ),
         ElementOrRootBoundary::RootBoundary(RootBoundary::Document) => {
             get_document_rect(&get_document_element(Some(element.into())))
         }

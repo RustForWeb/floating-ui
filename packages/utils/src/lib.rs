@@ -341,6 +341,21 @@ cfg_if::cfg_if! {
             }
         }
 
+         impl From<&web_sys::DomRect> for ClientRectObject {
+            fn from(value: &web_sys::DomRect) -> Self {
+                Self {
+                    x: value.x(),
+                    y: value.y(),
+                    width: value.width(),
+                    height: value.height(),
+                    top: value.top(),
+                    right: value.right(),
+                    bottom: value.bottom(),
+                    left: value.left(),
+                }
+            }
+        }
+
         impl From<web_sys::DomRect> for ClientRectObject {
             fn from(value: web_sys::DomRect) -> Self {
                 Self {
