@@ -180,6 +180,18 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
             .get_client_rects(elements.reference)
             .unwrap_or(vec![]);
 
+        // No rects (e.g. a hidden or detached reference, or a collapsed range) -
+        // keep the existing reference rect rather than resetting to an invalid
+        // one with non-finite values.
+        if native_client_rects.is_empty() {
+            return MiddlewareReturn {
+                x: None,
+                y: None,
+                data: None,
+                reset: None,
+            };
+        }
+
         let client_rects = get_rects_by_line(native_client_rects.clone());
         let fallback = rect_to_client_rect(get_bounding_rect(native_client_rects));
         let padding_object = get_padding_object(padding);
@@ -187,7 +199,8 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
         let get_bounding_client_rect = move || {
             // There are two rects and they are disjoined.
             if client_rects.len() == 2
-                && client_rects[0].left > client_rects[1].right
+                && (client_rects[0].left > client_rects[1].right
+                    || client_rects[1].left > client_rects[0].right)
                 && let Some(x) = options.x
                 && let Some(y) = options.y
             {
@@ -222,19 +235,13 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
                     } else {
                         last_rect.right
                     };
-                    let width = right - left;
-                    let height = bottom - top;
 
-                    return ClientRectObject {
+                    return rect_to_client_rect(Rect {
                         x: left,
                         y: top,
-                        width,
-                        height,
-                        top,
-                        right,
-                        bottom,
-                        left,
-                    };
+                        width: right - left,
+                        height: bottom - top,
+                    });
                 }
 
                 let is_left_side = placement.side() == Side::Left;
@@ -261,21 +268,13 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
 
                 let top = measure_rects.first().expect("Enough elements exist.").top;
                 let bottom = measure_rects.last().expect("Enough elements exist.").bottom;
-                let left = min_left;
-                let right = max_right;
-                let width = right - left;
-                let height = bottom - top;
 
-                return ClientRectObject {
-                    x: left,
+                return rect_to_client_rect(Rect {
+                    x: min_left,
                     y: top,
-                    width,
-                    height,
-                    top,
-                    right,
-                    bottom,
-                    left,
-                };
+                    width: max_right - min_left,
+                    height: bottom - top,
+                });
             }
 
             fallback.clone()

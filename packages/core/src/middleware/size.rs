@@ -207,27 +207,10 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
         }
 
         if no_shift && alignment.is_none() {
-            let x_min = overflow.left.max(0.0);
-            let x_max = overflow.right.max(0.0);
-            let y_min = overflow.top.max(0.0);
-            let y_max = overflow.bottom.max(0.0);
-
             if is_y_axis {
-                available_width = width
-                    - 2.0
-                        * (if x_min != 0.0 || x_max != 0.0 {
-                            x_min + x_max
-                        } else {
-                            overflow.left.max(overflow.right)
-                        });
+                available_width = width - 2.0 * overflow.left.max(overflow.right);
             } else {
-                available_height = height
-                    - 2.0
-                        * (if y_min != 0.0 || y_max != 0.0 {
-                            y_min + y_max
-                        } else {
-                            overflow.top.max(overflow.bottom)
-                        });
+                available_height = height - 2.0 * overflow.top.max(overflow.bottom);
             }
         }
 

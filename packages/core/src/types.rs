@@ -353,6 +353,7 @@ pub enum Boundary<Element> {
 #[derive(Clone, Debug, PartialEq)]
 pub enum RootBoundary {
     Viewport,
+    LayoutViewport,
     Document,
     Rect(Rect),
 }
