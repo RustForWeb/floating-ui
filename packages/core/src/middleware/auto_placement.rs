@@ -236,22 +236,11 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
             allowed_placements
         };
 
-        let overflow = platform.detect_overflow(
-            MiddlewareState {
-                elements: elements.clone(),
-                ..state
-            },
-            options.detect_overflow.unwrap_or_default(),
-        );
-
         let current_index = data.index;
         let current_placement = placements.get(current_index);
 
         if let Some(current_placement) = current_placement {
             let current_placement = *current_placement;
-
-            let alignment_sides =
-                get_alignment_sides(current_placement, rects, platform.is_rtl(elements.floating));
 
             // Make `compute_coords` start from the right place.
             if placement != current_placement {
@@ -265,6 +254,17 @@ impl<Element: Clone + PartialEq, Window: Clone + PartialEq> Middleware<Element, 
                     })),
                 };
             }
+
+            let overflow = platform.detect_overflow(
+                MiddlewareState {
+                    elements: elements.clone(),
+                    ..state
+                },
+                options.detect_overflow.unwrap_or_default(),
+            );
+
+            let alignment_sides =
+                get_alignment_sides(current_placement, rects, platform.is_rtl(elements.floating));
 
             let current_overflows = vec![
                 overflow.side(get_side(current_placement)),

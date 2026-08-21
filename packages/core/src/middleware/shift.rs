@@ -192,34 +192,30 @@ impl<Element: Clone + PartialEq + 'static, Window: Clone + PartialEq + 'static>
         let mut main_axis_coord = coords.axis(main_axis);
         let mut cross_axis_coord = coords.axis(cross_axis);
 
-        if check_main_axis {
-            let min_side = match main_axis {
-                Axis::X => Side::Left,
-                Axis::Y => Side::Top,
-            };
-            let max_side = match main_axis {
-                Axis::X => Side::Right,
-                Axis::Y => Side::Bottom,
-            };
-            let min = main_axis_coord + overflow.side(min_side);
-            let max = main_axis_coord - overflow.side(max_side);
+        let clamp_coord = |axis: Axis, coord: f64| -> f64 {
+            clamp(
+                coord
+                    + overflow.side(if axis == Axis::Y {
+                        Side::Top
+                    } else {
+                        Side::Left
+                    }),
+                coord,
+                coord
+                    - overflow.side(if axis == Axis::Y {
+                        Side::Bottom
+                    } else {
+                        Side::Right
+                    }),
+            )
+        };
 
-            main_axis_coord = clamp(min, main_axis_coord, max);
+        if check_main_axis {
+            main_axis_coord = clamp_coord(main_axis, main_axis_coord);
         }
 
         if check_cross_axis {
-            let min_side = match cross_axis {
-                Axis::X => Side::Left,
-                Axis::Y => Side::Top,
-            };
-            let max_side = match cross_axis {
-                Axis::X => Side::Right,
-                Axis::Y => Side::Bottom,
-            };
-            let min = cross_axis_coord + overflow.side(min_side);
-            let max = cross_axis_coord - overflow.side(max_side);
-
-            cross_axis_coord = clamp(min, cross_axis_coord, max);
+            cross_axis_coord = clamp_coord(cross_axis, cross_axis_coord);
         }
 
         let limited_coords = limiter.compute(MiddlewareState {

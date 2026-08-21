@@ -4,7 +4,7 @@ use floating_ui_utils::{
     dom::{
         OverflowAncestor, get_computed_style, get_document_element, get_node_name,
         get_overflow_ancestors, get_parent_node, is_containing_block, is_last_traversable_node,
-        is_overflow_element, is_top_layer,
+        is_top_layer,
     },
     rect_to_client_rect,
 };
@@ -49,7 +49,8 @@ fn get_client_rect_from_clipping_ancestor(
         ElementOrRootBoundary::Element(element) => {
             get_inner_bounding_client_rect(&element, strategy)
         }
-        ElementOrRootBoundary::RootBoundary(RootBoundary::Viewport) => {
+        ElementOrRootBoundary::RootBoundary(RootBoundary::Viewport)
+        | ElementOrRootBoundary::RootBoundary(RootBoundary::LayoutViewport) => {
             get_viewport_rect(&get_document_element(Some(element.into())), strategy)
         }
         ElementOrRootBoundary::RootBoundary(RootBoundary::Document) => {
@@ -69,23 +70,6 @@ fn get_client_rect_from_clipping_ancestor(
     rect_to_client_rect(rect)
 }
 
-fn has_fixed_position_ancestor(element: &Element, stop_node: &Node) -> bool {
-    let parent_node = get_parent_node(element);
-    if &parent_node == stop_node
-        || !parent_node.is_instance_of::<Element>()
-        || is_last_traversable_node(&parent_node)
-    {
-        false
-    } else {
-        let element = parent_node.unchecked_into::<Element>();
-        get_computed_style(&element)
-            .get_property_value("position")
-            .expect("Computed style should have position.")
-            == "fixed"
-            || has_fixed_position_ancestor(&element, stop_node)
-    }
-}
-
 fn get_clipping_element_ancestors(element: &Element) -> Vec<Element> {
     // TODO: cache
 
@@ -99,7 +83,7 @@ fn get_clipping_element_ancestors(element: &Element) -> Vec<Element> {
             OverflowAncestor::VisualViewport(_) => None,
         })
         .collect();
-    let mut current_containing_block_computed_style: Option<CssStyleDeclaration> = None;
+    let mut last_kept_computed_style: Option<CssStyleDeclaration> = None;
     let element_is_fixed = get_computed_style(element)
         .get_property_value("position")
         .expect("Computed style should have position.")
@@ -116,37 +100,34 @@ fn get_clipping_element_ancestors(element: &Element) -> Vec<Element> {
         let computed_style = get_computed_style(current_element);
         let current_node_is_containing = is_containing_block(current_element.into());
 
-        let position = computed_style
-            .get_property_value("position")
-            .expect("Computed style should have position");
+        // Position of the containing block chain below the current node. A fixed
+        // element whose containing block hasn't been found yet is a fixed chain.
+        let last_position =
+            if let Some(last_kept_computed_style) = last_kept_computed_style.as_ref() {
+                last_kept_computed_style
+                    .get_property_value("position")
+                    .expect("Computed style should have position")
+            } else {
+                if element_is_fixed { "fixed" } else { "" }.to_owned()
+            };
 
-        if !current_node_is_containing && position == "fixed" {
-            current_containing_block_computed_style = None;
-        }
-
-        let should_drop_current_node = if element_is_fixed {
-            !current_node_is_containing && current_containing_block_computed_style.is_none()
-        } else {
-            (!current_node_is_containing
-                && position == "static"
-                && current_containing_block_computed_style
-                    .as_ref()
-                    .is_some_and(|style| {
-                        let positon = style
-                            .get_property_value("position")
-                            .expect("Computed style should have position");
-
-                        positon == "absolute" || positon == "fixed"
-                    }))
-                || (is_overflow_element(current_element)
-                    && !current_node_is_containing
-                    && has_fixed_position_ancestor(element, current_element))
-        };
+        // A non-containing ancestor does not clip the element when the chain
+        // below it escapes it: a fixed chain escapes all ancestors up to the
+        // next containing block, an absolute chain escapes static ancestors.
+        let should_drop_current_node = !current_node_is_containing
+            && (last_position == "fixed"
+                || (last_position == "absolute"
+                    && computed_style
+                        .get_property_value("position")
+                        .expect("Computed style should have position")
+                        == "static"));
 
         if should_drop_current_node {
+            // Drop non-containing blocks.
             result.retain(|ancestor| ancestor != current_element);
         } else {
-            current_containing_block_computed_style = Some(computed_style);
+            // The kept node carries the chain position for the next iteration.
+            last_kept_computed_style = Some(computed_style);
         }
 
         current_node = get_parent_node(&current_node);

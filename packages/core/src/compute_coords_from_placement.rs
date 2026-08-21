@@ -42,18 +42,18 @@ pub fn compute_coords_from_placement(
     };
 
     let rtl = rtl.unwrap_or(false);
-    match get_alignment(placement) {
-        Some(Alignment::Start) => {
-            coords.update_axis(alignment_axis, |value| {
-                value - common_align * (if rtl && is_vertical { -1.0 } else { 1.0 })
-            });
-        }
-        Some(Alignment::End) => {
-            coords.update_axis(alignment_axis, |value| {
-                value + common_align * (if rtl && is_vertical { -1.0 } else { 1.0 })
-            });
-        }
-        None => {}
+
+    if let Some(alignment) = get_alignment(placement) {
+        coords.update_axis(alignment_axis, |value| {
+            value
+                - common_align
+                    * (if alignment == Alignment::End {
+                        1.0
+                    } else {
+                        -1.0
+                    })
+                    * (if rtl && is_vertical { -1.0 } else { 1.0 })
+        });
     }
 
     coords

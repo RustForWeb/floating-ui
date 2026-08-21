@@ -26,16 +26,15 @@ pub fn get_css_dimensions(element: &Element) -> CssDimensions {
         .parse::<f64>()
         .unwrap_or(0.0);
 
-    let offset_width;
-    let offset_height;
-    if is_html_element(element) {
+    let (offset_width, offset_height) = if is_html_element(element) {
         let element = element.unchecked_ref::<HtmlElement>();
-        offset_width = element.offset_width() as f64;
-        offset_height = element.offset_height() as f64;
+        (
+            element.offset_width() as f64,
+            element.offset_height() as f64,
+        )
     } else {
-        offset_width = width;
-        offset_height = height;
-    }
+        (width, height)
+    };
     let should_fallback = width.round() != offset_width || height.round() != offset_height;
 
     CssDimensions {
