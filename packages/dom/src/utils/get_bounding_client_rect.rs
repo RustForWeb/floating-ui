@@ -51,58 +51,54 @@ pub fn get_bounding_client_rect(
     let mut width = client_rect.width / scale.x;
     let mut height = client_rect.height / scale.y;
 
-    if let Some(dom_element) = dom_element {
+    if let Some(dom_element) = dom_element
+        && let Some(offset_parent) = offset_parent
+    {
         let window = get_window(Some(&dom_element));
         let offset_window = match offset_parent {
-            Some(DomElementOrWindow::Element(element)) => Some(get_window(Some(element))),
-            Some(DomElementOrWindow::Window(window)) => Some(window.clone()),
-            None => None,
+            DomElementOrWindow::Element(element) => get_window(Some(element)),
+            DomElementOrWindow::Window(window) => window.clone(),
         };
 
-        if offset_parent.is_some() {
-            let mut current_window = window;
-            loop {
-                let current_iframe = get_frame_element(&current_window);
+        let mut current_window = window;
+        loop {
+            let current_iframe = get_frame_element(&current_window);
 
-                if let Some(current_iframe) = current_iframe.as_ref() {
-                    if offset_window
-                        .as_ref()
-                        .is_some_and(|offset_window| offset_window != &current_window)
-                    {
-                        let iframe_scale = get_scale(current_iframe.into());
-                        let iframe_rect = current_iframe.get_bounding_client_rect();
-                        let css = get_computed_style(current_iframe);
-                        let padding_left = css
-                            .get_property_value("padding-left")
-                            .expect("Computed style should have padding left.")
-                            .parse::<f64>()
-                            .expect("Padding left should be a number.");
-                        let padding_top = css
-                            .get_property_value("padding-right")
-                            .expect("Computed style should have padding right.")
-                            .parse::<f64>()
-                            .expect("Padding right should be a number.");
+            if let Some(current_iframe) = current_iframe.as_ref() {
+                if offset_window != current_window {
+                    let iframe_scale = get_scale(current_iframe.into());
+                    let iframe_rect = current_iframe.get_bounding_client_rect();
+                    let css = get_computed_style(current_iframe);
+                    let padding_left = css
+                        .get_property_value("padding-left")
+                        .expect("Computed style should have padding left.")
+                        .parse::<f64>()
+                        .expect("Padding left should be a number.");
+                    let padding_top = css
+                        .get_property_value("padding-right")
+                        .expect("Computed style should have padding right.")
+                        .parse::<f64>()
+                        .expect("Padding right should be a number.");
 
-                        let left = iframe_rect.left()
-                            + (current_iframe.client_left() as f64 + padding_left) * iframe_scale.x;
-                        let top = iframe_rect.top()
-                            + (current_iframe.client_top() as f64 + padding_top) * iframe_scale.y;
+                    let left = iframe_rect.left()
+                        + (current_iframe.client_left() as f64 + padding_left) * iframe_scale.x;
+                    let top = iframe_rect.top()
+                        + (current_iframe.client_top() as f64 + padding_top) * iframe_scale.y;
 
-                        x *= iframe_scale.x;
-                        y *= iframe_scale.y;
-                        width *= iframe_scale.x;
-                        height *= iframe_scale.y;
+                    x *= iframe_scale.x;
+                    y *= iframe_scale.y;
+                    width *= iframe_scale.x;
+                    height *= iframe_scale.y;
 
-                        x += left;
-                        y += top;
+                    x += left;
+                    y += top;
 
-                        current_window = get_window(Some(current_iframe));
-                    } else {
-                        break;
-                    }
+                    current_window = get_window(Some(current_iframe));
                 } else {
                     break;
                 }
+            } else {
+                break;
             }
         }
     }

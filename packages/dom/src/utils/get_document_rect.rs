@@ -1,7 +1,4 @@
-use floating_ui_utils::{
-    Rect,
-    dom::{get_document_element, get_node_scroll},
-};
+use floating_ui_utils::{Rect, dom::get_node_scroll};
 use web_sys::Element;
 
 use crate::platform::is_rtl::is_rtl;
@@ -9,10 +6,9 @@ use crate::platform::is_rtl::is_rtl;
 use super::get_window_scroll_bar_x::get_window_scroll_bar_x;
 
 /// Gets the entire size of the scrollable document area, even extending outside of the `<html>` and `<body>` rect bounds if horizontally scrollable.
-pub fn get_document_rect(element: &Element) -> Rect {
-    let html = get_document_element(Some(element.into()));
-    let scroll = get_node_scroll(element.into());
-    let body = element
+pub fn get_document_rect(html: &Element) -> Rect {
+    let scroll = get_node_scroll(html.into());
+    let body = html
         .owner_document()
         .expect("Element should have owner document.")
         .body()
@@ -37,7 +33,7 @@ pub fn get_document_rect(element: &Element) -> Rect {
     .max()
     .expect("Iterator is not empty.") as f64;
 
-    let mut x = -scroll.scroll_left + get_window_scroll_bar_x(element, None);
+    let mut x = -scroll.scroll_left + get_window_scroll_bar_x(html, None);
     let y = -scroll.scroll_top;
 
     if is_rtl(&body) {

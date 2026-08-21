@@ -52,7 +52,7 @@ pub fn convert_offset_parent_relative_rect_to_viewport_relative_rect(
             });
 
     #[allow(clippy::nonminimal_bool)]
-    if is_offset_parent_an_element || (!is_offset_parent_an_element && !is_fixed) {
+    if is_offset_parent_an_element || !is_fixed {
         if let Some(offset_parent) = offset_parent.as_ref()
             && (get_node_name(offset_parent.into()) != "body"
                 || is_overflow_element(&document_element))

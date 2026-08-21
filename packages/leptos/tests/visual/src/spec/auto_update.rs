@@ -5,7 +5,8 @@ use floating_ui_leptos::{
 use leptos::prelude::*;
 use leptos_node_ref::AnyNodeRef;
 use send_wrapper::SendWrapper;
-use wasm_bindgen::JsCast;
+use wasm_bindgen::{JsCast, closure::Closure};
+use web_sys::{HtmlElement, window};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 enum LayoutShift {
@@ -259,6 +260,34 @@ pub fn AutoUpdate() -> impl IntoView {
                     </button>
                 }
             />
+            <button
+                on:click=move |_| {
+                    // Move the reference twice on consecutive frames, with the
+                    // second move landing after the IntersectionObserver measured
+                    // the intermediate position but before its first callback.
+                    let el = reference_ref.get().expect("Reference should exist.").unchecked_into::<HtmlElement>();
+                    el.style().set_property("left", "40px").expect("Property should be set.");
+
+                    let inner_closure: Closure<dyn FnMut()> = Closure::once(move || {
+                        el.style().set_property("left", "280px").expect("Property should be set.");
+                    });
+
+                    let closure: Closure<dyn FnMut()> = Closure::once(move || {
+                         window()
+                        .expect("Window should exist.")
+                        .request_animation_frame(inner_closure.as_ref().unchecked_ref())
+                        .expect("Request animation frame should be successful.");
+                    });
+
+                     window()
+                        .expect("Window should exist.")
+                        .request_animation_frame(closure.as_ref().unchecked_ref())
+                        .expect("Request animation frame should be successful.");
+                }
+                data-testid="layoutShift-moveTwice"
+            >
+                moveTwice
+            </button>
         </div>
 
         <h2>animationFrame</h2>
@@ -305,6 +334,102 @@ pub fn AutoUpdate() -> impl IntoView {
                     }
                 }
             />
+        </div>
+    }
+}
+
+#[component]
+pub fn AutoUpdateRootResize() -> impl IntoView {
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
+
+    let (moved, set_moved) = signal(false);
+
+    let UseFloatingReturn {
+        x,
+        y,
+        strategy,
+        update,
+        ..
+    } = use_floating(
+        reference_ref,
+        floating_ref,
+        UseFloatingOptions::default().strategy(Strategy::Fixed),
+    );
+
+    type CleanupFn = Box<dyn Fn()>;
+    let cleanup: StoredValue<Option<SendWrapper<CleanupFn>>> = StoredValue::new(None);
+
+    Effect::new({
+        let update = update.clone();
+
+        move |_| {
+            if let Some(reference) = reference_ref.get()
+                && let Some(floating) = floating_ref.get()
+            {
+                if let Some(cleanup) = &*cleanup.read_value() {
+                    cleanup();
+                }
+
+                // Match React test behaviour by moving the size change from style attributes to here.
+                // The style attributes update after this effect, so `auto_update` would not use the correct size.
+                let style = reference.unchecked_ref::<web_sys::HtmlElement>().style();
+
+                style
+                    .set_property(
+                        "width",
+                        if moved.get() {
+                            "650px"
+                        } else {
+                            "calc(100vw - 220px"
+                        },
+                    )
+                    .expect("Style should be updated.");
+
+                cleanup.set_value(Some(SendWrapper::new(auto_update(
+                    (&reference).into(),
+                    Some(&floating),
+                    (*update).clone(),
+                    AutoUpdateOptions::default()
+                        .ancestor_resize(false)
+                        .element_resize(false)
+                        .layout_shift(false),
+                ))));
+            }
+        }
+    });
+
+    on_cleanup(move || {
+        if let Some(cleanup) = &*cleanup.read_value() {
+            cleanup();
+        }
+    });
+
+    view! {
+        <h1>AutoUpdate Root Resize</h1>
+        <button
+            node_ref=reference_ref
+            data-testid="rootResize-reference"
+            on:click=move |_| set_moved.set(true)
+            style:position="relative"
+            style:top="32px"
+            style:left=move || if moved.get() { "650px" } else { "calc(100vw - 220px)" }
+            style:width="75px"
+            style:height="22px"
+        >
+            Toggle
+        </button>
+        <div
+            node_ref=floating_ref
+            class="floating"
+            data-testid="rootResize-floating"
+            style:position=move || format!("{:?}", strategy.get()).to_lowercase()
+            style:top=move || format!("{}px", y.get())
+            style:left=move || format!("{}px", x.get())
+            style:width="75px"
+            style:height="22px"
+        >
+            Floating
         </div>
     }
 }

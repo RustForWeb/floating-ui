@@ -10,7 +10,18 @@ use crate::utils::get_window_scroll_bar_x::get_window_scroll_bar_x;
 // Most scrollbars leave 15-18px of space.
 const SCROLLBAR_MAX: f64 = 25.0;
 
-pub fn get_viewport_rect(element: &Element, strategy: Strategy) -> Rect {
+#[derive(Clone, Debug, PartialEq)]
+pub enum ViewportRootBoundary {
+    Viewport,
+    LayoutViewport,
+}
+
+pub fn get_viewport_rect(
+    element: &Element,
+    strategy: Strategy,
+    root_boundary: ViewportRootBoundary,
+) -> Rect {
+    let is_layout_viewport = root_boundary == ViewportRootBoundary::LayoutViewport;
     let window = get_window(Some(element));
     let html = get_document_element(Some(element.into()));
     let visual_viewport = window.visual_viewport();
@@ -21,19 +32,34 @@ pub fn get_viewport_rect(element: &Element, strategy: Strategy) -> Rect {
     let mut height = html.client_height() as f64;
 
     if let Some(visual_viewport) = visual_viewport {
-        width = visual_viewport.width();
-        height = visual_viewport.height();
+        // Client coordinates are relative to the layout viewport, except in WebKit with an `absolute` strategy,
+        // where they are relative to the visual viewport.
+        let layout_relative_client_coords = !is_web_kit() || strategy == Strategy::Fixed;
 
-        let visual_viewport_based = is_web_kit();
-        if !visual_viewport_based || strategy == Strategy::Fixed {
-            x = visual_viewport.offset_left();
-            y = visual_viewport.offset_top();
+        if is_layout_viewport {
+            if !layout_relative_client_coords {
+                x = -visual_viewport.offset_left();
+                y = -visual_viewport.offset_top();
+            }
+        } else {
+            width = visual_viewport.width();
+            height = visual_viewport.height();
+
+            if layout_relative_client_coords {
+                x = visual_viewport.offset_left();
+                y = visual_viewport.offset_top();
+            }
         }
     }
 
     let window_scrollbar_x = get_window_scroll_bar_x(&html, None);
-    // <html> `overflow: hidden` + `scrollbar-gutter: stable` reduces the visual width of the <html>,
-    // but this is not considered in the size of `html.client_width`.
+    // `scrollbar-gutter: stable` on the <html> reserves gutter space that shrinks
+    // the visual width but isn't reflected in `html.clientWidth`, so subtract it.
+    // Only the inline-end (right) gutter can hold the scrollbar; `both-edges` also
+    // reserves an empty inline-start gutter that clips nothing, so exclude just
+    // the one scrollbar-side gutter — halve the measured (two-gutter) total. A
+    // left-side scrollbar (`window_scroll_bar_x > 0`) is already handled by
+    // `get_html_offset`/`visual_viewport.width`; skip it here.
     if window_scrollbar_x <= 0.0 {
         let doc = html
             .owner_document()
@@ -54,17 +80,23 @@ pub fn get_viewport_rect(element: &Element, strategy: Strategy) -> Rect {
         } else {
             0.0
         };
-        let clipping_stable_scrollbar_width =
+        let reserved_width =
             ((html.client_width() as f64) - (body.client_width() as f64) - body_margin_inline)
                 .abs();
+        let gutter = if get_computed_style(&html)
+            .get_property_value("scrollbar-gutter")
+            .ok()
+            .as_deref()
+            == Some("stable both-edges")
+        {
+            reserved_width / 2.0
+        } else {
+            reserved_width
+        };
 
-        if clipping_stable_scrollbar_width <= SCROLLBAR_MAX {
-            width -= clipping_stable_scrollbar_width;
+        if gutter <= SCROLLBAR_MAX {
+            width -= gutter;
         }
-    } else if window_scrollbar_x <= SCROLLBAR_MAX {
-        // If the <body> scrollbar is on the left, the width needs to be extended
-        // by the scrollbar amount so there isn't extra space on the right.
-        width += window_scrollbar_x;
     }
 
     Rect {
