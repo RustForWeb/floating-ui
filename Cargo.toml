@@ -16,7 +16,6 @@ repository = "https://github.com/RustForWeb/floating-ui"
 version = "0.7.0"
 
 [workspace.dependencies]
-cfg-if = "1.0.0"
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
 dioxus = "0.7.0"
