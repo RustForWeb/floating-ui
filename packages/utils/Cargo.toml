@@ -20,7 +20,6 @@ default = []
 dom = ["dep:web-sys"]
 
 [dependencies]
-cfg-if.workspace = true
 dyn_derive.workspace = true
 dyn_std.workspace = true
 serde.workspace = true

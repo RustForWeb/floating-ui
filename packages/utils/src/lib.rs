@@ -331,8 +331,8 @@ impl From<Rect> for ClientRectObject {
     }
 }
 
-cfg_if::cfg_if! {
-    if #[cfg(feature = "dom")] {
+cfg_select! {
+    feature = "dom" => {
         impl ClientRectObject {
             pub fn from_dom_rect_list(value: web_sys::DomRectList) -> Vec<Self> {
                 (0..value.length())
